@@ -1,0 +1,693 @@
+/* Tailwind Base */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ========================================
+   TURISCOVERY - PROFESSIONAL INSTITUTIONAL DESIGN
+   ======================================== */
+
+/* Google Fonts Import - Professional Typography */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Open+Sans:wght@300;400;500;600;700&display=swap');
+
+/* ========================================
+   COLOR PALETTE - PROFESSIONAL & INSTITUTIONAL
+   ======================================== */
+:root {
+    /* Primary - Professional Purple */
+    --color-primary: #5E5CE8;
+    --color-primary-light: #7674EC;
+    --color-primary-dark: #4542B8;
+
+    /* Secondary - Vibrant Green */
+    --color-secondary: #78E181;
+    --color-secondary-dark: #60C866;
+
+    /* Accent - Professional Orange */
+    --color-accent: #FCB032;
+    --color-accent-dark: #E39A1E;
+
+    /* Info - Light Cyan */
+    --color-info: #B2DFEB;
+    --color-info-dark: #8FCFDE;
+
+    /* Neutrals - Corporate Gray Scale */
+    --color-gray: #AEBBC3;
+    --color-gray-dark: #8A9BA6;
+    --color-gray-light: #E8EDEF;
+
+    --color-text: #2C3E50;
+    --color-text-light: #5A6C7D;
+    --color-text-muted: #95A5A6;
+
+    --color-bg: #FFFFFF;
+    --color-bg-light: #F8F9FA;
+    --color-bg-gray: #ECEFF1;
+
+    /* Semantic Colors */
+    --color-success: #78E181;
+    --color-warning: #FCB032;
+    --color-danger: #E74C3C;
+
+    /* Typography */
+    --font-primary: 'Montserrat', sans-serif;
+    --font-secondary: 'Open Sans', sans-serif;
+
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+    --spacing-2xl: 4rem;
+
+    /* Shadows */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+    --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.15);
+
+    /* Border Radius */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+}
+
+/* ========================================
+   BASE STYLES - PROFESSIONAL FOUNDATION
+   ======================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-secondary);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--color-text);
+    background: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ========================================
+   TYPOGRAPHY - PROFESSIONAL & READABLE
+   ======================================== */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-primary);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--color-text);
+    margin-bottom: var(--spacing-md);
+    letter-spacing: -0.01em;
+}
+
+h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+}
+
+h2 {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 700;
+}
+
+h3 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 600;
+}
+
+h4 {
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+}
+
+h5 {
+    font-size: 1.125rem;
+}
+
+h6 {
+    font-size: 1rem;
+}
+
+p {
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-text-light);
+    line-height: 1.7;
+}
+
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--color-primary-dark);
+}
+
+/* ========================================
+   LAYOUT - RESPONSIVE CONTAINER
+   ======================================== */
+.container {
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-lg);
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 var(--spacing-md);
+    }
+}
+
+.section {
+    padding: var(--spacing-2xl) 0;
+}
+
+@media (max-width: 768px) {
+    .section {
+        padding: var(--spacing-xl) 0;
+    }
+}
+
+/* ========================================
+   GRID SYSTEM - FULLY RESPONSIVE
+   ======================================== */
+.grid {
+    display: grid;
+    gap: var(--spacing-lg);
+}
+
+.grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 1024px) {
+    .grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+
+    .grid-2,
+    .grid-3,
+    .grid-4 {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+}
+
+/* ========================================
+   CARDS - PROFESSIONAL & CLEAN
+   ======================================== */
+.card {
+    background: var(--color-bg);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--color-gray-light);
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.card-image {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.card:hover .card-image {
+    transform: scale(1.03);
+}
+
+.card>*:not(.card-image) {
+    padding: 0 var(--spacing-md);
+}
+
+.card>*:last-child {
+    padding-bottom: var(--spacing-md);
+}
+
+.card>*:first-child:not(.card-image) {
+    padding-top: var(--spacing-md);
+}
+
+/* ========================================
+   BUTTONS - PROFESSIONAL & ACCESSIBLE
+   ======================================== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    padding: 0.75rem 1.5rem;
+    font-family: var(--font-primary);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.btn i {
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(94, 92, 232, 0.25);
+}
+
+.btn-primary:hover {
+    box-shadow: 0 6px 16px rgba(94, 92, 232, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-secondary-dark) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(120, 225, 129, 0.25);
+}
+
+.btn-secondary:hover {
+    box-shadow: 0 6px 16px rgba(120, 225, 129, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-outline {
+    background: transparent;
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.btn-outline:hover {
+    background: var(--color-primary);
+    color: white;
+}
+
+@media (max-width: 640px) {
+    .btn {
+        width: 100%;
+        padding: 0.875rem 1.25rem;
+    }
+}
+
+/* ========================================
+   BADGES - PROFESSIONAL LABELS
+   ======================================== */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.875rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    border-radius: 20px;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+}
+
+.badge i {
+    font-size: 0.75rem;
+}
+
+.badge-primary {
+    background: var(--color-primary);
+    color: white;
+}
+
+.badge-success {
+    background: var(--color-success);
+    color: white;
+}
+
+.badge-warning {
+    background: var(--color-warning);
+    color: white;
+}
+
+.badge-info {
+    background: var(--color-info);
+    color: var(--color-text);
+}
+
+/* ========================================
+   HERO SECTION - CLEAN FOR CAROUSEL
+   ======================================== */
+.hero {
+    /* Quitamos el background morado para que se vean las fotos */
+    background-color: #000;
+
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+}
+
+.hero .container {
+    position: relative;
+    z-index: 20;
+    /* Aseguramos que el texto esté ENCIMA de las fotos */
+    text-align: center;
+}
+
+.hero h1 {
+    color: white;
+    margin-bottom: var(--spacing-md);
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    /* Sombra más fuerte para leer sobre fotos */
+}
+
+.hero p {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    margin-bottom: var(--spacing-lg);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    /* Sombra para el texto */
+}
+
+/* Asegura que el carrusel ocupe todo el espacio */
+#hero-carousel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+/* Estilo para cada diapositiva (Compatible con IMG) */
+.carousel-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    /* ESTO ES LO NUEVO: Para que la etiqueta <img> cubra todo sin deformarse */
+    object-fit: cover;
+    object-position: center;
+
+    /* Mantenemos esto por si acaso usas divs antiguos */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* ========================================
+   PILLAR CARDS - INSTITUTIONAL STYLE
+   ======================================== */
+.pillars {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-xl);
+}
+
+@media (max-width: 1024px) {
+    .pillars {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .pillars {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+}
+
+.pillar-card {
+    background: var(--color-bg);
+    padding: var(--spacing-xl) var(--spacing-lg);
+    border-radius: var(--radius-xl);
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid var(--color-gray-light);
+}
+
+.pillar-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--color-primary-light);
+}
+
+.pillar-icon {
+    font-size: 3rem;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-md);
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.pillar-card:hover .pillar-icon {
+    transform: scale(1.1);
+    color: var(--color-primary-light);
+}
+
+.pillar-card h3 {
+    font-size: clamp(1.25rem, 2vw, 1.5rem);
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-text);
+}
+
+.pillar-card p {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-text-light);
+}
+
+/* ========================================
+   NAVIGATION - PROFESSIONAL HEADER
+   ======================================== */
+nav {
+    background: var(--color-bg);
+    box-shadow: var(--shadow-sm);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid var(--color-gray-light);
+}
+
+/* ========================================
+   FIX PARA MOSTRAR EL MENÚ (Responsive)
+   ======================================== */
+
+/* 1. Aseguramos que en móvil estén ocultos (por si quitas las clases de Tailwind) */
+#desktop-nav,
+#auth-buttons {
+    display: none;
+}
+
+/* 2. En pantallas medianas/grandes (Desktop), forzamos que se muestren */
+@media (min-width: 768px) {
+
+    #desktop-nav,
+    #auth-buttons {
+        display: flex !important;
+        /* !important para sobreescribir la clase 'hidden' de Tailwind si sigue ahí */
+        align-items: center;
+        gap: 1.5rem;
+        /* Ajusta este espacio entre enlaces según necesites */
+    }
+}
+
+/* ========================================
+   DASHBOARD - PROFESSIONAL ADMIN INTERFACE
+   ======================================== */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 2px solid var(--color-gray-light);
+}
+
+@media (max-width: 640px) {
+    .dashboard-header {
+        flex-direction: column;
+        gap: var(--spacing-md);
+        align-items: flex-start;
+    }
+}
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.stat-card {
+    background: linear-gradient(135deg, white 0%, var(--color-bg-light) 100%);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border-left: 4px solid var(--color-primary);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.stat-card h3 {
+    font-size: 2.5rem;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-xs);
+    font-family: var(--font-secondary);
+}
+
+.stat-card p {
+    color: var(--color-text-light);
+    font-size: 0.9375rem;
+    margin: 0;
+}
+
+/* ========================================
+   UTILITIES - HELPFUL CLASSES
+   ======================================== */
+.text-center {
+    text-align: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-secondary {
+    color: var(--color-text-light);
+}
+
+.text-muted {
+    color: var(--color-text-muted);
+}
+
+.mb-0 {
+    margin-bottom: 0;
+}
+
+.mb-1 {
+    margin-bottom: var(--spacing-xs);
+}
+
+.mb-2 {
+    margin-bottom: var(--spacing-sm);
+}
+
+.mb-3 {
+    margin-bottom: var(--spacing-md);
+}
+
+.mb-4 {
+    margin-bottom: var(--spacing-lg);
+}
+
+.mt-0 {
+    margin-top: 0;
+}
+
+.mt-1 {
+    margin-top: var(--spacing-xs);
+}
+
+.mt-2 {
+    margin-top: var(--spacing-sm);
+}
+
+.mt-3 {
+    margin-top: var(--spacing-md);
+}
+
+.mt-4 {
+    margin-top: var(--spacing-lg);
+}
+
+/* ========================================
+   ANIMATIONS - SUBTLE & PROFESSIONAL
+   ======================================== */
+.fade-in {
+    animation: fadeInUp 0.6s ease-out forwards;
+    opacity: 0;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
+   RESPONSIVE UTILITIES
+   ======================================== */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    h2 {
+        font-size: 1.75rem;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+    }
+}
+
+/* ========================================
+   PRINT STYLES - PROFESSIONAL DOCUMENTS
+   ======================================== */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    body {
+        color: #000;
+        background: #fff;
+    }
+}
