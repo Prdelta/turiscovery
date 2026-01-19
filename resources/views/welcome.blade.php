@@ -210,10 +210,14 @@
                 const container = document.getElementById('featured-events');
                 if (!container) return;
 
-                const response = await axios.get('/api/eventos?limit=3');
+                // Use per_page instead of limit to match Laravel pagination
+                const response = await axios.get('/api/eventos?per_page=3');
 
-                if (response.data.success && response.data.data.length > 0) {
-                    container.innerHTML = response.data.data.map(evento => `
+                // Handle pagination structure (response.data.data.data) or simple array (response.data.data)
+                const events = response.data.data.data ? response.data.data.data : response.data.data;
+
+                if (response.data.success && Array.isArray(events) && events.length > 0) {
+                    container.innerHTML = events.map(evento => `
                     <article class="card">
                         <img src="${evento.image_url || 'https://via.placeholder.com/400x240'}" alt="${evento.title}" class="card-image">
                         <div style="padding: var(--spacing-md);">

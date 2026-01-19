@@ -197,10 +197,12 @@
     <script>
         lucide.createIcons();
 
-        // Mock Login Logic
+        // Real API Login Logic
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
+            const email = e.target.querySelector('input[name="email"]').value;
+            const password = e.target.querySelector('input[name="password"]').value;
             const originalText = btn.innerHTML;
 
             btn.disabled = true;
@@ -208,19 +210,45 @@
             lucide.createIcons();
 
             try {
-                // Simulate API call
-                await new Promise(r => setTimeout(r, 1500));
+                // Call the API
+                const response = await axios.post('/api/login', {
+                    email: email,
+                    password: password
+                });
 
-                // Simular token y usuario para demo
-                localStorage.setItem('auth_token', 'demo_token_123');
+                if (response.data.success) {
+                    // Store token and user info
+                    const token = response.data.data.access_token;
+                    const user = response.data.data.user;
 
-                // Redirect based on dummy logic (should be handled by backend in real app)
-                window.location.href = '/dashboard';
+                    localStorage.setItem('auth_token', token);
+                    localStorage.setItem('user_role', user.role);
+
+                    // Set default headers for future requests
+                    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+                    // Redirect based on role
+                    if (user.role === 'admin' || user.role === 'socio') {
+                        window.location.href = '/dashboard';
+                    } else {
+                        // Tourist
+                        window.location.href = '/';
+                    }
+                } else {
+                    throw new Error(response.data.message || 'Error al iniciar sesión');
+                }
 
             } catch (error) {
+                console.error(error);
                 btn.innerHTML = originalText;
                 btn.disabled = false;
-                alert('Error al iniciar sesión');
+
+                let msg = 'Error al iniciar sesión. Verifique sus credenciales.';
+                if (error.response && error.response.data && error.response.data.message) {
+                    msg = error.response.data.message;
+                }
+
+                alert(msg);
             }
         });
     </script>

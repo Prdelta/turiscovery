@@ -84,8 +84,11 @@
                 const response = await axios.get('/api/experiencias'); // Adjust endpoint if needed
                 const container = document.getElementById('experiencias-grid');
 
-                if (response.data.success && response.data.data.length > 0) {
-                    container.innerHTML = response.data.data.map(item => `
+                // Handle pagination structure
+                const items = response.data.data.data ? response.data.data.data : response.data.data;
+
+                if (response.data.success && Array.isArray(items) && items.length > 0) {
+                    container.innerHTML = items.map(item => `
                     <article class="card hover:shadow-lg transition-all duration-300">
                         <div style="position: relative; height: 200px; overflow: hidden; background: #eee;">
                             <img src="${item.image_url || 'https://via.placeholder.com/400x200'}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: cover;">

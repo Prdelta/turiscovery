@@ -36,8 +36,11 @@
                 const response = await axios.get('/api/promociones');
                 const container = document.getElementById('promociones-grid');
 
-                if (response.data.success && response.data.data.length > 0) {
-                    container.innerHTML = response.data.data.map(promo => `
+                // Handle pagination
+                const items = response.data.data.data ? response.data.data.data : response.data.data;
+
+                if (response.data.success && Array.isArray(items) && items.length > 0) {
+                    container.innerHTML = items.map(promo => `
                     <article class="card overflow-hidden hover:translate-y-1 transition-transform border-t-4" style="border-top-color: var(--color-accent);">
                         <div class="p-6 text-center border-b border-dashed border-gray-200" style="background: #fffbeb;">
                             <span class="text-3xl font-bold text-accent mb-1 block">${promo.discount || '10%'} OFF</span>

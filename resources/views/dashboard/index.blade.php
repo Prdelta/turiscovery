@@ -237,17 +237,23 @@
             try {
                 // Load counts from API
                 const [locales, eventos, promociones, experiencias] = await Promise.all([
-                    axios.get('/api/locales?limit=1'),
-                    axios.get('/api/eventos?limit=1'),
-                    axios.get('/api/promociones?limit=1'),
-                    axios.get('/api/experiencias?limit=1')
+                    axios.get('/api/locales?per_page=1'),
+                    axios.get('/api/eventos?per_page=1'),
+                    axios.get('/api/promociones?per_page=1'),
+                    axios.get('/api/experiencias?per_page=1')
                 ]);
 
-                animateCounter('stat-locales', locales.data.meta?.total || locales.data.data?.length || 0);
-                animateCounter('stat-eventos', eventos.data.meta?.total || eventos.data.data?.length || 0);
-                animateCounter('stat-promociones', promociones.data.meta?.total || promociones.data.data?.length || 0);
-                animateCounter('stat-experiencias', experiencias.data.meta?.total || experiencias.data.data?.length ||
-                    0);
+                // Helper to get total from paginated response
+                const getTotal = (res) => {
+                    if (res.data.data && res.data.data.total) return res.data.data.total; // Paginator
+                    if (Array.isArray(res.data.data)) return res.data.data.length; // Array
+                    return 0;
+                };
+
+                animateCounter('stat-locales', getTotal(locales));
+                animateCounter('stat-eventos', getTotal(eventos));
+                animateCounter('stat-promociones', getTotal(promociones));
+                animateCounter('stat-experiencias', getTotal(experiencias));
             } catch (error) {
                 console.error('Error loading stats:', error);
             }
@@ -263,15 +269,15 @@
                 let endpoints = [];
                 if (filter === 'all' || filter === 'locales') endpoints.push({
                     type: 'locales',
-                    url: '/api/locales?limit=2'
+                    url: '/api/locales?per_page=2'
                 });
                 if (filter === 'all' || filter === 'eventos') endpoints.push({
                     type: 'eventos',
-                    url: '/api/eventos?limit=2'
+                    url: '/api/eventos?per_page=2'
                 });
                 if (filter === 'all' || filter === 'experiencias') endpoints.push({
                     type: 'experiencias',
-                    url: '/api/experiencias?limit=2'
+                    url: '/api/experiencias?per_page=2'
                 });
 
                 const responses = await Promise.all(
@@ -283,11 +289,16 @@
 
                 let items = [];
                 responses.forEach(res => {
-                    if (res.data.success && res.data.data) {
-                        res.data.data.forEach(item => items.push({
-                            ...item,
-                            contentType: res.contentType
-                        }));
+                    if (res.data.success) {
+                        // Handle pagination structure
+                        const dataList = res.data.data.data ? res.data.data.data : res.data.data;
+
+                        if (Array.isArray(dataList)) {
+                            dataList.forEach(item => items.push({
+                                ...item,
+                                contentType: res.contentType
+                            }));
+                        }
                     }
                 });
 

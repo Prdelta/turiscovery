@@ -35,8 +35,11 @@
                 const response = await axios.get('/api/locales');
                 const container = document.getElementById('locales-grid');
 
-                if (response.data.success && response.data.data.length > 0) {
-                    container.innerHTML = response.data.data.map(local => `
+                // Handle pagination
+                const items = response.data.data.data ? response.data.data.data : response.data.data;
+
+                if (response.data.success && Array.isArray(items) && items.length > 0) {
+                    container.innerHTML = items.map(local => `
                     <article class="card hover:shadow-lg transition-shadow">
                         <div style="height: 180px; overflow: hidden; position: relative;">
                             <img src="${local.image_url || 'https://via.placeholder.com/400x200?text=Comercio'}" style="width: 100%; height: 100%; object-fit: cover;">

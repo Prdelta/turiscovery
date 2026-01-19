@@ -58,8 +58,11 @@
                 const response = await axios.get('/api/eventos');
                 const container = document.getElementById('eventos-grid');
 
-                if (response.data.success && response.data.data.length > 0) {
-                    container.innerHTML = response.data.data.map(ev => `
+                // Handle pagination structure
+                const events = response.data.data.data ? response.data.data.data : response.data.data;
+
+                if (response.data.success && Array.isArray(events) && events.length > 0) {
+                    container.innerHTML = events.map(ev => `
                     <article class="card flex-row overflow-hidden hover:shadow-md transition-shadow" style="display: flex; flex-direction: row;">
                         <div style="width: 140px; background: #f0f0f0; position: relative;">
                             ${ev.image_url ? 
