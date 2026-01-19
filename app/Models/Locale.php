@@ -30,6 +30,8 @@ class Locale extends Model
         'is_active' => 'boolean',
     ];
 
+    protected $appends = ['image_url'];
+
     // ========== Relationships ==========
 
     public function user()
@@ -134,5 +136,10 @@ class Locale extends Model
             return $result ? $result->lng : null;
         }
         return null;
+    }
+
+    public function getImageUrlAttribute()
+    {
+        return $this->images[0] ?? null;
     }
 }

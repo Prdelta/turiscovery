@@ -40,6 +40,8 @@ class Promocion extends Model
         'is_active' => 'boolean',
     ];
 
+    protected $appends = ['image_url'];
+
     // ========== Relationships ==========
 
     public function user()
@@ -119,5 +121,10 @@ class Promocion extends Model
     public function getReviewsCountAttribute()
     {
         return $this->reviews()->count();
+    }
+
+    public function getImageUrlAttribute()
+    {
+        return $this->images[0] ?? null;
     }
 }

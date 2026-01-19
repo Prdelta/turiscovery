@@ -35,6 +35,8 @@ class Evento extends Model
         'is_active' => 'boolean',
     ];
 
+    protected $appends = ['image_url'];
+
     // ========== Relationships ==========
 
     public function user()
@@ -144,5 +146,10 @@ class Evento extends Model
     public function getReviewsCountAttribute()
     {
         return $this->reviews()->count();
+    }
+
+    public function getImageUrlAttribute()
+    {
+        return $this->images[0] ?? null;
     }
 }

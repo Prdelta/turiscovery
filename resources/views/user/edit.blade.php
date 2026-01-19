@@ -41,12 +41,36 @@
                                 class="form-input w-full rounded-lg border-gray-300 bg-gray-50 text-gray-500 cursor-not-allowed"
                                 readonly>
                         </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Teléfono</label>
+                            <input type="tel" name="phone" value="{{ Auth::user()->phone ?? '' }}"
+                                class="form-input w-full rounded-lg border-gray-300 focus:ring-blue-500"
+                                placeholder="+51 900 000 000">
+                        </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Biografía (Opcional)</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Biografía</label>
                         <textarea name="bio" rows="3" class="form-input w-full rounded-lg border-gray-300 focus:ring-blue-500"
-                            placeholder="Cuéntanos un poco sobre ti..."></textarea>
+                            placeholder="Cuéntanos un poco sobre ti...">{{ Auth::user()->bio ?? '' }}</textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-3">Intereses de Viaje</label>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            @php
+                                $preferences = Auth::user()->preferences ?? [];
+                                $options = ['Aventura', 'Cultura', 'Gastronomía', 'Naturaleza', 'Fotografía', 'Relax'];
+                            @endphp
+                            @foreach ($options as $option)
+                                <label class="flex items-center space-x-2 cursor-pointer">
+                                    <input type="checkbox" name="preferences[]" value="{{ $option }}"
+                                        class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                        {{ in_array($option, $preferences) ? 'checked' : '' }}>
+                                    <span class="text-sm text-slate-700">{{ $option }}</span>
+                                </label>
+                            @endforeach
+                        </div>
                     </div>
 
                     <hr class="border-gray-100">

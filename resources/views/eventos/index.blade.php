@@ -63,24 +63,29 @@
 
                 if (response.data.success && Array.isArray(events) && events.length > 0) {
                     container.innerHTML = events.map(ev => `
-                    <article class="card flex-row overflow-hidden hover:shadow-md transition-shadow" style="display: flex; flex-direction: row;">
-                        <div style="width: 140px; background: #f0f0f0; position: relative;">
+                    <article class="card flex-row overflow-hidden hover:shadow-md transition-shadow h-full" style="display: flex; flex-direction: row; min-height: 180px;">
+                        <div style="width: 140px; min-width: 140px; background: #f0f0f0; position: relative;">
                             ${ev.image_url ? 
                                 `<img src="${ev.image_url}" style="width: 100%; height: 100%; object-fit: cover;">` : 
                                 `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--color-gray-light); color: var(--color-gray);"><i data-lucide="calendar"></i></div>`
                             }
                             <div style="position: absolute; top: 10px; left: 10px; background: white; padding: 4px 8px; border-radius: 4px; text-align: center; line-height: 1.2; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                <span style="display: block; font-weight: 700; font-size: 1.1rem; color: var(--color-primary);">${new Date(ev.start_date).getDate()}</span>
-                                <span style="display: block; font-size: 0.7rem; text-transform: uppercase;">${new Date(ev.start_date).toLocaleDateString('es-ES', { month: 'short' })}</span>
+                                <span style="display: block; font-weight: 700; font-size: 1.1rem; color: var(--color-primary);">${new Date(ev.start_time).getDate()}</span>
+                                <span style="display: block; font-size: 0.7rem; text-transform: uppercase;">${new Date(ev.start_time).toLocaleDateString('es-ES', { month: 'short' })}</span>
                             </div>
                         </div>
-                        <div class="p-4 flex-1">
-                            <span class="badge badge-sm badge-info mb-1" style="font-size: 0.7rem;">${ev.category || 'Evento'}</span>
-                            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">${ev.title}</h3>
-                            <p class="text-secondary text-sm mb-3 line-clamp-2">${ev.description || ''}</p>
-                            <div style="display: flex; items-center; gap: 0.5rem; color: var(--color-text-light); font-size: 0.8rem;">
-                                <i data-lucide="map-pin" class="w-3 h-3"></i>
-                                <span>${ev.location || 'Puno'}</span>
+                        <div class="p-4 flex-1 flex flex-col">
+                            <div>
+                                <span class="badge badge-sm badge-info mb-1" style="font-size: 0.7rem;">${ev.category || 'Evento'}</span>
+                                <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem; line-height: 1.3;">${ev.title}</h3>
+                                <p class="text-secondary text-sm mb-3 line-clamp-2">${ev.description || ''}</p>
+                                <div style="display: flex; items-center; gap: 0.5rem; color: var(--color-text-light); font-size: 0.8rem;">
+                                    <i data-lucide="map-pin" class="w-3 h-3 flex-shrink-0"></i>
+                                    <span class="truncate">${ev.address || 'Puno'}</span>
+                                </div>
+                            </div>
+                            <div class="mt-auto pt-3 flex justify-end gap-2">
+                                <button onclick="handleAction('${ev.id}')" class="btn btn-primary btn-sm px-4">Asistir</button>
                             </div>
                         </div>
                     </article>
@@ -99,6 +104,15 @@
                 console.error(e);
                 document.getElementById('eventos-grid').innerHTML =
                     '<p class="text-center text-danger">Error al cargar eventos.</p>';
+            }
+        }
+
+        function handleAction(id) {
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+                window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+            } else {
+                alert('¡Evento agendado! Te enviaremos un recordatorio.');
             }
         }
     </script>

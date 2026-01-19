@@ -114,8 +114,8 @@
         <div class="auth-form-side animate-fade-in-up">
             <div style="max-width: 400px; width: 100%; margin: 0 auto; padding-top: 2rem; padding-bottom: 2rem;">
                 <a href="/" class="flex items-center gap-3 mb-8 group w-fit no-underline">
-                    <img src="/img/logo.png" alt="Turiscovery"
-                        class="h-10 w-auto group-hover:scale-105 transition-transform">
+                    <img src="/img/logo.png" alt="Turiscovery" style="height: 32px; width: auto;"
+                        class="group-hover:scale-105 transition-transform">
                     <span class="font-bold text-2xl text-slate-800 tracking-tight">Turiscovery</span>
                 </a>
 
@@ -191,8 +191,7 @@
         </div>
 
         <!-- Image Side -->
-        <div class="auth-image-side"
-            style="background-image: url('https://images.unsplash.com/photo-1587595431973-160d0d94add1?q=80&w=1776&auto=format&fit=crop');">
+        <div class="auth-image-side" style="background-image: url('/img/login_bg.png');">
             <div class="auth-overlay">
                 <blockquote class="text-2xl font-medium mb-4">
                     "Conectar mi negocio con turistas de todo el mundo nunca había sido tan fácil. Una plataforma

@@ -26,9 +26,29 @@ class UserController extends Controller
         return view('user.edit');
     }
 
-    public function update()
+    public function update(Request $request)
     {
-        // Placeholder for update logic
+        $user = auth()->user();
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:20',
+            'bio' => 'nullable|string|max:1000',
+            'password' => 'nullable|string|min:8|confirmed',
+            'preferences' => 'nullable|array',
+        ]);
+
+        $user->name = $validated['name'];
+        $user->phone = $validated['phone'];
+        $user->bio = $validated['bio'];
+        $user->preferences = $request->input('preferences', []); // Handle array directly
+
+        if ($request->filled('password')) {
+            $user->password = bcrypt($validated['password']);
+        }
+
+        $user->save();
+
         return redirect()->back()->with('success', 'Perfil actualizado correctamente');
     }
 }

@@ -114,8 +114,8 @@
         <div class="auth-form-side animate-fade-in-up">
             <div style="max-width: 400px; width: 100%; margin: 0 auto;">
                 <a href="/" class="flex items-center gap-3 mb-8 group w-fit no-underline">
-                    <img src="/img/logo.png" alt="Turiscovery"
-                        class="h-10 w-auto group-hover:scale-105 transition-transform">
+                    <img src="/img/logo.png" alt="Turiscovery" style="height: 32px; width: auto;"
+                        class="group-hover:scale-105 transition-transform">
                     <span class="font-bold text-2xl text-slate-800 tracking-tight">Turiscovery</span>
                 </a>
 
@@ -175,8 +175,7 @@
         </div>
 
         <!-- Image Side -->
-        <div class="auth-image-side"
-            style="background-image: url('https://images.unsplash.com/photo-1528543045988-8cd0e101c7ca?q=80&w=1974&auto=format&fit=crop');">
+        <div class="auth-image-side" style="background-image: url('/img/login_bg.png');">
             <div class="auth-overlay">
                 <blockquote class="text-2xl font-medium mb-4">
                     "Descubrir Puno fue una experiencia mágica. La calidez de su gente y la riqueza de su cultura
@@ -228,11 +227,20 @@
                     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
                     // Redirect based on role
-                    if (user.role === 'admin' || user.role === 'socio') {
-                        window.location.href = '/dashboard';
+                    // Check for redirect param
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const redirectUrl = urlParams.get('redirect');
+
+                    if (redirectUrl) {
+                        window.location.href = decodeURIComponent(redirectUrl);
                     } else {
-                        // Tourist
-                        window.location.href = '/';
+                        // Redirect based on role
+                        if (user.role === 'admin' || user.role === 'socio') {
+                            window.location.href = '/dashboard';
+                        } else {
+                            // Tourist
+                            window.location.href = '/';
+                        }
                     }
                 } else {
                     throw new Error(response.data.message || 'Error al iniciar sesión');

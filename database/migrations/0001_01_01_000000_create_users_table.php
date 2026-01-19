@@ -26,6 +26,9 @@ return new class extends Migration
 
             // Profile
             $table->string('avatar')->nullable();
+            $table->string('phone')->nullable();
+            $table->text('bio')->nullable();
+            $table->json('preferences')->nullable();
 
             $table->rememberToken();
             $table->timestamps();

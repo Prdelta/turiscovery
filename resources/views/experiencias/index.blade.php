@@ -92,7 +92,7 @@
                     <article class="card hover:shadow-lg transition-all duration-300">
                         <div style="position: relative; height: 200px; overflow: hidden; background: #eee;">
                             <img src="${item.image_url || 'https://via.placeholder.com/400x200'}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: cover;">
-                            <span class="badge badge-primary" style="position: absolute; top: 10px; right: 10px;">${item.price ? 'S/ ' + item.price : 'Consultar'}</span>
+                            <span class="badge badge-primary" style="position: absolute; top: 10px; right: 10px;">${item.price_pen ? 'S/ ' + item.price_pen : 'Consultar'}</span>
                         </div>
                         <div class="p-6">
                             <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">${item.title}</h3>
@@ -100,9 +100,12 @@
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--color-text-light); font-size: 0.875rem;">
                                     <i data-lucide="clock" class="w-4 h-4"></i>
-                                    <span>${item.duration || 'Flexible'}</span>
+                                    <span>${item.duration_hours ? item.duration_hours + ' h' : 'Flexible'}</span>
                                 </div>
-                                <a href="/experiencias/${item.id}" class="btn btn-outline btn-sm">Ver Más</a>
+                                <div class="flex gap-2">
+                                    <button onclick="handleBooking('${item.id}')" class="btn btn-primary btn-sm">Reservar</button>
+                                    <a href="/experiencias/${item.id}" class="btn btn-outline btn-sm">Ver Más</a>
+                                </div>
                             </div>
                         </div>
                     </article>
@@ -121,6 +124,17 @@
                 console.error(e);
                 document.getElementById('experiencias-grid').innerHTML =
                     '<p class="text-center text-danger">Error al cargar experiencias.</p>';
+            }
+        }
+
+        function handleBooking(id) {
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+                // Redirect to login with current page as return
+                window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+            } else {
+                // Mock booking flow
+                alert('¡Reserva iniciada! (Funcionalidad de pago en construcción)');
             }
         }
     </script>

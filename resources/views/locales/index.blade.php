@@ -44,12 +44,15 @@
                         <div style="height: 180px; overflow: hidden; position: relative;">
                             <img src="${local.image_url || 'https://via.placeholder.com/400x200?text=Comercio'}" style="width: 100%; height: 100%; object-fit: cover;">
                             <span class="badge badge-success" style="position: absolute; top: 10px; right: 10px;">Abierto</span>
+                            <button onclick="handleFavorite('${local.id}', this)" class="btn btn-sm btn-light" style="position: absolute; top: 10px; left: 10px; border-radius: 50%; width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="heart" class="w-4 h-4 text-gray-400"></i>
+                            </button>
                         </div>
                         <div class="p-6">
                             <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">${local.name}</h3>
                             <div class="flex items-center gap-1 mb-3 text-warning">
                                 <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                                <span class="text-sm font-semibold text-gray-700">${local.rating || '4.5'}</span>
+                                <span class="text-sm font-semibold text-gray-700">${local.average_rating ? Number(local.average_rating).toFixed(1) : 'Nuevo'}</span>
                                 <span class="text-xs text-gray-400">(${local.reviews_count || 12} reseñas)</span>
                             </div>
                             <p class="text-secondary text-sm mb-4 line-clamp-2">${local.description || 'Descripción del negocio...'}</p>
@@ -83,6 +86,25 @@
                 console.error(e);
                 document.getElementById('locales-grid').innerHTML =
                     '<p class="text-center text-danger">Error al cargar locales.</p>';
+            }
+        }
+
+        function handleFavorite(id, btn) {
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+                window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+            } else {
+                // Mock favorite toggle
+                const icon = btn.querySelector('i');
+                if (icon.classList.contains('fill-current')) {
+                    icon.classList.remove('fill-current', 'text-red-500');
+                    icon.classList.add('text-gray-400');
+                } else {
+                    icon.classList.add('fill-current', 'text-red-500');
+                    icon.classList.remove('text-gray-400');
+                    alert('¡Agregado a favoritos!');
+                }
+                lucide.createIcons();
             }
         }
     </script>

@@ -69,14 +69,7 @@ Route::middleware(['auth'])->prefix('dashboard')->group(function () {
     Route::resource('locales', \App\Http\Controllers\LocalController::class);
     Route::resource('eventos', \App\Http\Controllers\EventoController::class);
     Route::resource('promociones', \App\Http\Controllers\PromocionController::class);
-
-    // Experiencias (Placeholder until controller is ready)
-    Route::get('/experiencias', function () {
-        return view('dashboard.experiencias.index');
-    });
-    Route::get('/experiencias/create', function () {
-        return view('dashboard.experiencias.create');
-    });
+    Route::resource('experiencias', \App\Http\Controllers\ExperienciaController::class);
 });
 
 // User Panel (Tourist)

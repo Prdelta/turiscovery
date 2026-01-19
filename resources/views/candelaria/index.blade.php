@@ -52,10 +52,10 @@
                     </div>
                 </div>
                 <div class="grid grid-2" style="gap: 1rem;">
-                    <img src="https://images.unsplash.com/photo-1582234551101-729904721a97?auto=format&fit=crop&w=400&q=80"
+                    <img src="/img/candelaria_hist.png"
                         class="rounded-xl shadow-lg hover:scale-105 transition-transform duration-300"
                         style="height: 240px; width: 100%; object-fit: cover;">
-                    <img src="https://images.unsplash.com/photo-1533552033066-e8d7bb6c2453?auto=format&fit=crop&w=400&q=80"
+                    <img src="/img/evt_candelaria.png"
                         class="rounded-xl shadow-lg hover:scale-105 transition-transform duration-300"
                         style="height: 240px; width: 100%; object-fit: cover; margin-top: 2rem;">
                 </div>

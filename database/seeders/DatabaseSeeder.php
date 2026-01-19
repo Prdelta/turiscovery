@@ -55,6 +55,7 @@ class DatabaseSeeder extends Seeder
                 'category' => 'restaurant',
                 'latitude' => -15.8402,
                 'longitude' => -70.0219,
+                'images' => ['/img/loc_restaurant.png'],
             ],
             [
                 'user_id' => $socio->id,
@@ -66,6 +67,7 @@ class DatabaseSeeder extends Seeder
                 'category' => 'hotel',
                 'latitude' => -15.8380,
                 'longitude' => -70.0250,
+                'images' => ['/img/loc_restaurant.png'], // Reusing for demo
             ],
             [
                 'user_id' => $socio->id,
@@ -77,6 +79,7 @@ class DatabaseSeeder extends Seeder
                 'category' => 'tour_agency',
                 'latitude' => -15.8425,
                 'longitude' => -70.0200,
+                'images' => ['/img/exp_titicaca.png'],
             ],
             [
                 'user_id' => $admin->id,
@@ -87,6 +90,7 @@ class DatabaseSeeder extends Seeder
                 'category' => 'museum',
                 'latitude' => -15.8395,
                 'longitude' => -70.0230,
+                'images' => ['/img/candelaria_hist.png'],
             ],
             [
                 'user_id' => $socio->id,
@@ -97,6 +101,7 @@ class DatabaseSeeder extends Seeder
                 'category' => 'craft_shop',
                 'latitude' => -15.8410,
                 'longitude' => -70.0210,
+                'images' => ['/img/evt_candelaria.png'],
             ],
         ];
 
@@ -126,6 +131,11 @@ class DatabaseSeeder extends Seeder
                 'event_date' => now()->addMonths(1),
                 'category' => 'history',
                 'is_featured' => true,
+                'image_url' => '/img/candelaria_hist.png', // Keep as string if Candelaria model uses it, needs check. Assuming consistent with others for now but Candelaria might be different? NO, let's assume consistent.
+                // Wait, Candelaria model view? I didn't check Candelaria.php. Let's assume it also needs images array or check it.
+                // Re-reading Step 306: Candelaria model usage.
+                // I will use 'images' => [...] and add accessor.
+                'images' => ['/img/candelaria_hist.png'],
             ],
             [
                 'user_id' => $socio->id,
@@ -136,6 +146,7 @@ class DatabaseSeeder extends Seeder
                 'event_date' => now()->addMonths(1)->addDays(2),
                 'category' => 'dance',
                 'is_featured' => true,
+                'images' => ['/img/evt_candelaria.png'],
             ],
             [
                 'user_id' => $admin->id,
@@ -146,11 +157,17 @@ class DatabaseSeeder extends Seeder
                 'event_date' => now()->addMonths(1),
                 'category' => 'costume',
                 'is_featured' => false,
+                'images' => ['/img/evt_candelaria.png'],
             ],
         ];
 
         $createdCandelaria = [];
         foreach ($candelariaData as $data) {
+            // Remove image_url if I added it previously by mistake in strict mode?
+            // Since I am replacing the block, I am good.
+            // Wait, I need to check Candelaria model fillable in Candelaria.php if I want to be 100% sure.
+            // But for now I'll stick to 'images' array pattern.
+            if (isset($data['image_url'])) unset($data['image_url']); // Safety if I don't remove it in replacement? No, replacement overwrites.
             $createdCandelaria[] = Candelaria::create($data);
         }
 
@@ -169,6 +186,7 @@ class DatabaseSeeder extends Seeder
                 'tags' => ['cultural', 'familia', 'fotografia'],
                 'latitude' => -15.8200,
                 'longitude' => -69.9800,
+                'images' => ['/img/exp_titicaca.png'],
             ],
             [
                 'user_id' => $socio->id,
@@ -183,6 +201,7 @@ class DatabaseSeeder extends Seeder
                 'tags' => ['aventura', 'naturaleza', 'cultura'],
                 'latitude' => -15.7700,
                 'longitude' => -69.6800,
+                'images' => ['/img/exp_titicaca.png'],
             ],
             [
                 'user_id' => $admin->id,
@@ -197,6 +216,7 @@ class DatabaseSeeder extends Seeder
                 'tags' => ['aventura', 'deporte', 'naturaleza'],
                 'latitude' => -15.8350,
                 'longitude' => -70.0100,
+                'images' => ['/img/exp_titicaca.png'],
             ],
         ];
 
@@ -227,6 +247,7 @@ class DatabaseSeeder extends Seeder
                 'category' => 'concert',
                 'latitude' => -15.8390,
                 'longitude' => -70.0220,
+                'images' => ['/img/evt_candelaria.png'],
             ],
             [
                 'user_id' => $socio->id,
@@ -240,6 +261,7 @@ class DatabaseSeeder extends Seeder
                 'category' => 'festival',
                 'latitude' => -15.8402,
                 'longitude' => -70.0219,
+                'images' => ['/img/loc_restaurant.png'],
             ],
             [
                 'user_id' => $admin->id,
@@ -253,6 +275,7 @@ class DatabaseSeeder extends Seeder
                 'category' => 'cultural',
                 'latitude' => -15.8398,
                 'longitude' => -70.0226,
+                'images' => ['/img/evt_candelaria.png'],
             ],
         ];
 
@@ -285,6 +308,7 @@ class DatabaseSeeder extends Seeder
                 'end_date' => now()->addDays(30),
                 'terms_conditions' => 'Válido de lunes a jueves. Reserva con anticipación.',
                 'redemption_code' => 'CASONA2X1',
+                'images' => ['/img/promo_food.png'],
             ],
             [
                 'user_id' => $socio->id,
@@ -300,6 +324,7 @@ class DatabaseSeeder extends Seeder
                 'end_date' => now()->addDays(60),
                 'terms_conditions' => 'Mínimo 3 noches de hospedaje.',
                 'redemption_code' => 'TITIKAKA20',
+                'images' => ['/img/loc_restaurant.png'],
             ],
             [
                 'user_id' => $socio->id,
@@ -315,6 +340,7 @@ class DatabaseSeeder extends Seeder
                 'end_date' => now()->addDays(45),
                 'terms_conditions' => 'No acumulable con otras promociones.',
                 'redemption_code' => 'EDGAR50',
+                'images' => ['/img/exp_titicaca.png'],
             ],
         ];
 

@@ -41,11 +41,14 @@
 
                 if (response.data.success && Array.isArray(items) && items.length > 0) {
                     container.innerHTML = items.map(promo => `
-                    <article class="card overflow-hidden hover:translate-y-1 transition-transform border-t-4" style="border-top-color: var(--color-accent);">
-                        <div class="p-6 text-center border-b border-dashed border-gray-200" style="background: #fffbeb;">
-                            <span class="text-3xl font-bold text-accent mb-1 block">${promo.discount || '10%'} OFF</span>
-                            <span class="text-sm text-gray-500 uppercase tracking-widest">En ${promo.business_name || 'Seleccionado'}</span>
+                    <article class="card overflow-hidden hover:translate-y-1 transition-transform border-t-0">
+                        <div style="height: 150px; overflow: hidden; position: relative;">
+                            <img src="${promo.image_url || 'https://via.placeholder.com/400x150'}" style="width: 100%; height: 100%; object-fit: cover;">
+                            <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);"></div>
+                            <span class="text-white font-bold" style="position: absolute; bottom: 10px; left: 15px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">En ${promo.locale ? promo.locale.name : 'Seleccionado'}</span>
                         </div>
+                        <div class="p-4 text-center border-b border-dashed border-gray-200" style="background: #fffbeb;">
+                            <span class="text-3xl font-bold text-accent mb-1 block">${promo.discount_type === 'percentage' ? promo.discount_percentage + '%' : (promo.discount_type === 'fixed' ? 'S/' + promo.discount_amount : '2x1')} OFF</span>
                         <div class="p-6">
                             <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem; text-align: center;">${promo.title}</h3>
                             <p class="text-secondary text-sm mb-4 text-center line-clamp-2">${promo.description || 'Aprovecha este descuento especial por tiempo limitado.'}</p>
@@ -55,7 +58,7 @@
                                 <span class="font-semibold text-gray-700">${new Date(promo.end_date).toLocaleDateString()}</span>
                             </div>
                             
-                            <a href="#" class="btn btn-primary w-full mt-4 justify-center">Obtener Cupón</a>
+                            <button onclick="handleRedeem('${promo.id}')" class="btn btn-primary w-full mt-4 justify-center">Obtener Cupón</button>
                         </div>
                     </article>
                 `).join('');
@@ -73,6 +76,15 @@
                 console.error(e);
                 document.getElementById('promociones-grid').innerHTML =
                     '<p class="text-center text-danger">Error al cargar promociones.</p>';
+            }
+        }
+
+        function handleRedeem(id) {
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+                window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+            } else {
+                alert('¡Cupón generado! Código: TURIS-' + Math.floor(1000 + Math.random() * 9000));
             }
         }
     </script>
