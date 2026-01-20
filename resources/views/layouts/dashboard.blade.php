@@ -293,7 +293,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
-            checkAuthAndLoadUser();
+            updateUserInfo();
         });
 
         // Sidebar UI Logic
@@ -320,57 +320,35 @@
         closeBtn?.addEventListener('click', () => toggleSidebar(false));
         overlay?.addEventListener('click', () => toggleSidebar(false));
 
-        // Auth Logic (Preserved)
-        async function checkAuthAndLoadUser() {
-            const token = localStorage.getItem('auth_token');
-            if (!token) {
-                window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
-                return;
-            }
+        // Auth Logic - Server-Side Session (No API Tokens)
+        // Si llegaste aquí, ya estás autenticado (protegido por middleware 'auth')
+        function updateUserInfo() {
+            @if (auth()->check())
+                const user = {
+                    name: "{{ auth()->user()->name }}",
+                    role: "{{ auth()->user()->role }}",
+                    avatar: "{{ auth()->user()->avatar ?? '' }}"
+                };
 
-            try {
-                // Simulación de respuesta rápida para UX (Puedes quitar esto en producción)
-                updateUserInfo({
-                    name: 'Cargando...',
-                    role: '...',
-                    avatar_letter: '...'
-                });
+                const userName = document.getElementById('user-name');
+                const userRole = document.getElementById('user-role');
+                const userAvatar = document.getElementById('user-avatar');
 
-                const response = await axios.get('/api/me', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
+                if (userName) userName.textContent = user.name;
+                if (userRole) userRole.textContent = getRoleLabel(user.role);
+                if (userAvatar) userAvatar.textContent = user.name.charAt(0).toUpperCase();
 
-                if (response.data.success) {
-                    const user = response.data.data;
-                    updateUserInfo(user);
-                    updateMenuVisibility(user.role);
-                }
-            } catch (error) {
-                console.error('Error fetching user:', error);
-                localStorage.removeItem('auth_token');
-                window.location.href = '/login';
-            }
+                updateMenuVisibility(user.role);
+            @endif
         }
 
-        function updateUserInfo(user) {
-            const userName = document.getElementById('user-name');
-            const userRole = document.getElementById('user-role');
-            const userAvatar = document.getElementById('user-avatar');
-
-            if (userName) userName.textContent = user.name || 'Usuario';
-            if (userRole) {
-                const roleLabels = {
-                    'admin': 'Admin',
-                    'socio': 'Socio',
-                    'tourist': 'Turista'
-                };
-                userRole.textContent = roleLabels[user.role] || user.role;
-            }
-            if (userAvatar && user.name) {
-                userAvatar.textContent = user.name.charAt(0).toUpperCase();
-            }
+        function getRoleLabel(role) {
+            const roleLabels = {
+                'admin': 'Admin',
+                'socio': 'Socio',
+                'tourist': 'Turista'
+            };
+            return roleLabels[role] || role;
         }
 
         function updateMenuVisibility(role) {
@@ -383,21 +361,20 @@
             }
         }
 
-        async function handleLogout() {
-            try {
-                const token = localStorage.getItem('auth_token');
-                if (token) {
-                    await axios.post('/api/logout', {}, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-                }
-            } catch (e) {
-                console.error('Logout error:', e);
-            }
-            localStorage.removeItem('auth_token');
-            window.location.href = '/';
+        // Logout usando formulario web (POST con CSRF)
+        function handleLogout() {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ route('logout') }}';
+
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = '_token';
+            csrf.value = '{{ csrf_token() }}';
+            form.appendChild(csrf);
+
+            document.body.appendChild(form);
+            form.submit();
         }
     </script>
 

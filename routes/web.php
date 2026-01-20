@@ -67,9 +67,6 @@ Route::get('/register', function () {
 Route::get('/api/auth/google', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/api/auth/google/callback', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'handleGoogleCallback']);
 
-Route::get('/auth/google/callback-view', function () {
-    return view('auth.social-callback');
-})->name('auth.google.callback.view');
 
 
 // Dashboard (Protected)
@@ -96,8 +93,7 @@ Route::middleware(['auth'])->prefix('user')->group(function () {
 
 // Admin Panel (Admin Only)
 Route::middleware(['auth'])->prefix('admin')->group(function () {
-    Route::get('/users/create', [\App\Http\Controllers\Admin\AdminUserController::class, 'create'])->name('admin.users.create');
-    Route::post('/users', [\App\Http\Controllers\Admin\AdminUserController::class, 'store'])->name('admin.users.store');
+    Route::resource('users', \App\Http\Controllers\Admin\AdminUserController::class);
 });
 
 // TEST ROUTES - REMOVE IN PRODUCTION

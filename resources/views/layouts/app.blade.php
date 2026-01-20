@@ -307,16 +307,15 @@
 
         mobileMenuBtn?.addEventListener('click', openMobileMenu);
 
-        // Auth Logic
+        // Auth Logic - Server-Side Session (No API Tokens)
         function checkAuthState() {
-            const token = localStorage.getItem('auth_token');
             const authButtons = document.getElementById('auth-buttons');
             const userMenu = document.getElementById('user-menu');
             const mobileAuthButtons = document.getElementById('mobile-auth-buttons');
             const mobileUserMenu = document.getElementById('mobile-user-menu');
 
-            if (token) {
-                // Desktop
+            @if (auth()->check())
+                // Usuario autenticado - Mostrar menú de usuario
                 if (authButtons) {
                     authButtons.classList.remove('flex');
                     authButtons.classList.add('hidden');
@@ -332,9 +331,8 @@
                     mobileUserMenu.classList.remove('hidden');
                     mobileUserMenu.classList.add('flex');
                 }
-
-            } else {
-                // Desktop
+            @else
+                // Usuario no autenticado - Mostrar botones de login
                 if (authButtons) {
                     authButtons.classList.remove('hidden');
                     authButtons.classList.add('flex');
@@ -353,29 +351,23 @@
                     mobileUserMenu.classList.add('hidden');
                     mobileUserMenu.classList.remove('flex');
                 }
-            }
+            @endif
         }
 
-        async function handleLogout() {
-            try {
-                const token = localStorage.getItem('auth_token');
-                if (token) {
-                    // Si usas axios
-                    // await axios.post('/api/logout', {}, { headers: { Authorization: `Bearer ${token}` } });
-                    // Si usas fetch nativo:
-                    await fetch('/api/logout', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-                }
-            } catch (e) {
-                console.error('Logout error:', e);
-            }
-            localStorage.removeItem('auth_token');
-            window.location.href = '/';
+        // Logout usando formulario web (POST con CSRF)
+        function handleLogout() {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ route('logout') }}';
+
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = '_token';
+            csrf.value = '{{ csrf_token() }}';
+            form.appendChild(csrf);
+
+            document.body.appendChild(form);
+            form.submit();
         }
     </script>
 

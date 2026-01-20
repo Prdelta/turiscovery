@@ -68,7 +68,7 @@
                 <div class="relative flex items-center justify-between">
                     <div>
                         <p class="text-xs font-bold text-red-600 uppercase tracking-wider mb-2">Favoritos</p>
-                        <h3 class="text-5xl font-black text-red-600 mb-1">12</h3>
+                        <h3 class="text-5xl font-black text-red-600 mb-1">{{ $favoritesCount }}</h3>
                         <p class="text-sm text-red-500 font-medium">Lugares guardados</p>
                     </div>
                     <div
@@ -90,7 +90,7 @@
                 <div class="relative flex items-center justify-between">
                     <div>
                         <p class="text-xs font-bold text-yellow-600 uppercase tracking-wider mb-2">Reseñas</p>
-                        <h3 class="text-5xl font-black text-yellow-600 mb-1">5</h3>
+                        <h3 class="text-5xl font-black text-yellow-600 mb-1">{{ $reviewsCount }}</h3>
                         <p class="text-sm text-yellow-500 font-medium">Opiniones compartidas</p>
                     </div>
                     <div
@@ -140,39 +140,36 @@
                     </h3>
                 </div>
                 <div class="p-6 space-y-4">
-                    <!-- Item 1 -->
-                    <div
-                        class="group flex gap-4 items-center p-3 hover:bg-slate-50 rounded-xl transition-all border border-transparent hover:border-red-100 cursor-pointer">
-                        <div class="w-16 h-16 rounded-xl bg-slate-200 bg-cover bg-center flex-shrink-0 shadow-sm"
-                            style="background-image: url('https://via.placeholder.com/150')"></div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-bold text-slate-800 group-hover:text-red-600 transition-colors">Restaurante Los
-                                Balcones</h4>
-                            <p class="text-sm text-slate-500 flex items-center gap-1">
-                                <i data-lucide="utensils" class="w-3 h-3"></i>
-                                Gastronomía • Puno
-                            </p>
+                    @forelse($recentFavorites as $favorite)
+                        <div
+                            class="group flex gap-4 items-center p-3 hover:bg-slate-50 rounded-xl transition-all border border-transparent hover:border-red-100 cursor-pointer">
+                            <div class="w-16 h-16 rounded-xl bg-slate-200 bg-cover bg-center flex-shrink-0 shadow-sm"
+                                style="background-image: url('{{ $favorite->favoritable->image_url ?? 'https://via.placeholder.com/150' }}')">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-bold text-slate-800 group-hover:text-red-600 transition-colors">
+                                    {{ $favorite->favoritable->name ?? ($favorite->favoritable->title ?? 'Sin título') }}
+                                </h4>
+                                <p class="text-sm text-slate-500 flex items-center gap-1">
+                                    <i data-lucide="{{ $favorite->favoritable_type === 'App\\Models\\Locale' ? 'store' : 'compass' }}"
+                                        class="w-3 h-3"></i>
+                                    {{ class_basename($favorite->favoritable_type) }}
+                                </p>
+                            </div>
+                            <button class="text-red-500 hover:text-red-600 hover:scale-110 transition-all">
+                                <i data-lucide="heart" class="w-5 h-5 fill-current"></i>
+                            </button>
                         </div>
-                        <button class="text-red-500 hover:text-red-600 hover:scale-110 transition-all">
-                            <i data-lucide="heart" class="w-5 h-5 fill-current"></i>
-                        </button>
-                    </div>
-                    <!-- Item 2 -->
-                    <div
-                        class="group flex gap-4 items-center p-3 hover:bg-slate-50 rounded-xl transition-all border border-transparent hover:border-red-100 cursor-pointer">
-                        <div class="w-16 h-16 rounded-xl bg-slate-200 bg-cover bg-center flex-shrink-0 shadow-sm"
-                            style="background-image: url('https://via.placeholder.com/150')"></div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-bold text-slate-800 group-hover:text-red-600 transition-colors">Islas Uros</h4>
-                            <p class="text-sm text-slate-500 flex items-center gap-1">
-                                <i data-lucide="compass" class="w-3 h-3"></i>
-                                Experiencia • Lago Titicaca
-                            </p>
+                    @empty
+                        <div class="text-center py-8">
+                            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <i data-lucide="heart" class="w-8 h-8 text-slate-400"></i>
+                            </div>
+                            <p class="text-slate-500 text-sm">Aún no tienes favoritos</p>
+                            <a href="/" class="text-blue-600 hover:underline text-sm mt-2 inline-block">Explorar
+                                ahora</a>
                         </div>
-                        <button class="text-red-500 hover:text-red-600 hover:scale-110 transition-all">
-                            <i data-lucide="heart" class="w-5 h-5 fill-current"></i>
-                        </button>
-                    </div>
+                    @endforelse
                 </div>
                 <div class="px-6 pb-6">
                     <a href="{{ url('/user/favorites') }}"
@@ -195,23 +192,34 @@
                     </h3>
                 </div>
                 <div class="p-6 space-y-4">
-                    <div class="p-4 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl border border-yellow-100">
-                        <div class="flex justify-between items-start mb-3">
-                            <h4 class="font-bold text-slate-800 text-sm">Festividad Candelaria</h4>
-                            <div class="flex text-yellow-500 gap-0.5">
-                                <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                                <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                                <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                                <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                                <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                    @forelse($recentReviews as $review)
+                        <div class="p-4 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl border border-yellow-100">
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="font-bold text-slate-800 text-sm">
+                                    {{ $review->reviewable->name ?? ($review->reviewable->title ?? 'Sin título') }}
+                                </h4>
+                                <div class="flex text-yellow-500 gap-0.5">
+                                    @for ($i = 1; $i <= 5; $i++)
+                                        <i data-lucide="star"
+                                            class="w-4 h-4 {{ $i <= $review->rating ? 'fill-current' : '' }}"></i>
+                                    @endfor
+                                </div>
                             </div>
+                            <p class="text-sm text-slate-600 italic leading-relaxed">
+                                "{{ Str::limit($review->comment, 100) }}"
+                            </p>
+                            <p class="text-xs text-slate-400 mt-2">{{ $review->created_at->diffForHumans() }}</p>
                         </div>
-                        <p class="text-sm text-slate-600 italic leading-relaxed">
-                            "Una experiencia inolvidable, los trajes son impresionantes y la energía de la celebración es
-                            contagiosa..."
-                        </p>
-                        <p class="text-xs text-slate-400 mt-2">Hace 2 días</p>
-                    </div>
+                    @empty
+                        <div class="text-center py-8">
+                            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <i data-lucide="message-square" class="w-8 h-8 text-slate-400"></i>
+                            </div>
+                            <p class="text-slate-500 text-sm">Aún no has escrito reseñas</p>
+                            <a href="/" class="text-blue-600 hover:underline text-sm mt-2 inline-block">Explorar y
+                                compartir tu opinión</a>
+                        </div>
+                    @endforelse
                 </div>
                 <div class="px-6 pb-6">
                     <a href="{{ url('/user/reviews') }}"

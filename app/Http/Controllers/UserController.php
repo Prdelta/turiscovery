@@ -8,17 +8,58 @@ class UserController extends Controller
 {
     public function index()
     {
-        return view('user.index');
+        $user = auth()->user();
+
+        // Cargar conteos
+        $favoritesCount = $user->favorites()->count();
+        $reviewsCount = $user->reviews()->count();
+
+        // Cargar favoritos recientes (últimos 2) con relaciones
+        $recentFavorites = $user->favorites()
+            ->with('favoritable') // Carga polimórfica
+            ->latest()
+            ->take(2)
+            ->get();
+
+        // Cargar reseñas recientes (última reseña)
+        $recentReviews = $user->reviews()
+            ->with('reviewable') // Carga polimórfica
+            ->latest()
+            ->take(1)
+            ->get();
+
+        return view('user.index', compact(
+            'favoritesCount',
+            'reviewsCount',
+            'recentFavorites',
+            'recentReviews'
+        ));
     }
 
     public function favorites()
     {
-        return view('user.favorites');
+        $user = auth()->user();
+
+        // Cargar favoritos con paginación y relaciones polimórficas
+        $favorites = $user->favorites()
+            ->with('favoritable')
+            ->latest()
+            ->paginate(12); // 12 items por página
+
+        return view('user.favorites', compact('favorites'));
     }
 
     public function reviews()
     {
-        return view('user.reviews');
+        $user = auth()->user();
+
+        // Cargar reseñas con paginación y relaciones polimórficas
+        $reviews = $user->reviews()
+            ->with('reviewable')
+            ->latest()
+            ->paginate(10); // 10 items por página
+
+        return view('user.reviews', compact('reviews'));
     }
 
     public function edit()

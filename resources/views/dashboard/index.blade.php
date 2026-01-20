@@ -200,48 +200,45 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            // Load stats based on user role - use session instead of token
-            try {
-                // Use session-based endpoint
-                const userResponse = await axios.get('/api/auth/user');
+            // Load stats based on user role - use server-side session data
+            @if (auth()->check())
+                const user = {
+                    name: "{{ auth()->user()->name }}",
+                    role: "{{ auth()->user()->role }}"
+                };
 
-                if (userResponse.data.success && userResponse.data.authenticated) {
-                    const user = userResponse.data.user;
-                    document.getElementById('welcome-user-name').textContent = user.name;
+                document.getElementById('welcome-user-name').textContent = user.name;
 
-                    // Show role badge
-                    const roleBadge = document.getElementById('user-role-badge');
-                    if (roleBadge) {
-                        roleBadge.textContent = user.role.toUpperCase();
-                        roleBadge.style.display = 'inline-block';
+                // Show role badge
+                const roleBadge = document.getElementById('user-role-badge');
+                if (roleBadge) {
+                    roleBadge.textContent = user.role.toUpperCase();
+                    roleBadge.style.display = 'inline-block';
 
-                        // Color coding
-                        if (user.role === 'admin') roleBadge.style.backgroundColor = '#ef4444'; // Red for admin
-                        else if (user.role === 'socio') roleBadge.style.backgroundColor =
-                            '#4f46e5'; // Blue for socio
-                        else roleBadge.style.backgroundColor = '#10b981'; // Green for tourist
-                    }
-
-                    // Show different actions based on role
-                    if (user.role === 'tourist') {
-                        document.getElementById('quick-actions-content').style.display = 'none';
-                        document.getElementById('tourist-actions').style.display = 'grid';
-                    }
-
-                    // Load stats & content
-                    loadStats();
-                    loadRecentContent();
-
-                    // Filter listener
-                    document.getElementById('content-filter')?.addEventListener('change', (e) => {
-                        loadRecentContent(e.target.value);
-                    });
+                    // Color coding
+                    if (user.role === 'admin') roleBadge.style.backgroundColor = '#ef4444';
+                    else if (user.role === 'socio') roleBadge.style.backgroundColor = '#4f46e5';
+                    else roleBadge.style.backgroundColor = '#10b981';
                 }
-            } catch (error) {
-                console.error('Error loading user:', error);
-                // Redirect to login if not authenticated
+
+                // Show different actions based on role
+                if (user.role === 'tourist') {
+                    document.getElementById('quick-actions-content').style.display = 'none';
+                    document.getElementById('tourist-actions').style.display = 'grid';
+                }
+
+                // Load stats & content
+                loadStats();
+                loadRecentContent();
+
+                // Filter listener
+                document.getElementById('content-filter')?.addEventListener('change', (e) => {
+                    loadRecentContent(e.target.value);
+                });
+            @else
+                // No authenticated - redirect to login
                 window.location.href = '/login';
-            }
+            @endif
         });
 
         async function loadStats() {
