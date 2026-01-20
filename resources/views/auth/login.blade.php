@@ -122,7 +122,7 @@
                 <h1 class="text-3xl font-bold text-slate-900 mb-2">Bienvenido de nuevo</h1>
                 <p class="text-slate-500 mb-8">Ingresa tus credenciales para acceder a tu cuenta.</p>
 
-                <form action="{{ url('/login') }}" method="POST" id="loginForm">
+                <form action="{{ route('login.post') }}" method="POST" id="loginForm">
                     @csrf
 
                     <div class="form-group">
@@ -140,7 +140,8 @@
 
                     <div class="flex items-center justify-between mb-6">
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <input type="checkbox" name="remember"
+                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                             <span class="text-sm text-slate-600">Recordarme</span>
                         </label>
                         <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-700">¿Olvidaste tu
@@ -159,12 +160,13 @@
                                 continúa con</span></div>
                     </div>
 
-                    <button type="button"
-                        class="btn btn-outline w-full justify-center gap-3 py-2.5 border-gray-300 hover:bg-gray-50 text-slate-700">
+                    <a href="/api/auth/google"
+                        class="btn btn-outline w-full justify-center gap-3 py-2.5 border-gray-300 hover:bg-gray-50 text-slate-700 decoration-0 no-underline"
+                        style="text-decoration: none;">
                         <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google"
                             style="width: 20px; height: 20px;">
                         <span>Google</span>
-                    </button>
+                    </a>
                 </form>
 
                 <p class="mt-8 text-center text-sm text-slate-600">
@@ -196,69 +198,8 @@
     <script>
         lucide.createIcons();
 
-        // Real API Login Logic
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            const email = e.target.querySelector('input[name="email"]').value;
-            const password = e.target.querySelector('input[name="password"]').value;
-            const originalText = btn.innerHTML;
-
-            btn.disabled = true;
-            btn.innerHTML = '<i data-lucide="loader" class="animate-spin w-5 h-5"></i> Procesando...';
-            lucide.createIcons();
-
-            try {
-                // Call the API
-                const response = await axios.post('/api/login', {
-                    email: email,
-                    password: password
-                });
-
-                if (response.data.success) {
-                    // Store token and user info
-                    const token = response.data.data.access_token;
-                    const user = response.data.data.user;
-
-                    localStorage.setItem('auth_token', token);
-                    localStorage.setItem('user_role', user.role);
-
-                    // Set default headers for future requests
-                    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-                    // Redirect based on role
-                    // Check for redirect param
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const redirectUrl = urlParams.get('redirect');
-
-                    if (redirectUrl) {
-                        window.location.href = decodeURIComponent(redirectUrl);
-                    } else {
-                        // Redirect based on role
-                        if (user.role === 'admin' || user.role === 'socio') {
-                            window.location.href = '/dashboard';
-                        } else {
-                            // Tourist
-                            window.location.href = '/';
-                        }
-                    }
-                } else {
-                    throw new Error(response.data.message || 'Error al iniciar sesión');
-                }
-
-            } catch (error) {
-                console.error(error);
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-
-                let msg = 'Error al iniciar sesión. Verifique sus credenciales.';
-                if (error.response && error.response.data && error.response.data.message) {
-                    msg = error.response.data.message;
-                }
-
-                alert(msg);
-            }
-        });
+        // Standard Form Submission is now handled by Blade
+        lucide.createIcons();
     </script>
 </body>
 

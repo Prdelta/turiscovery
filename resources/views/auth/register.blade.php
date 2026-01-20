@@ -175,12 +175,13 @@
                                 regístrate con</span></div>
                     </div>
 
-                    <button type="button"
-                        class="btn btn-outline w-full justify-center gap-3 py-2.5 border-gray-300 hover:bg-gray-50 text-slate-700">
+                    <a href="/api/auth/google"
+                        class="btn btn-outline w-full justify-center gap-3 py-2.5 border-gray-300 hover:bg-gray-50 text-slate-700 decoration-0 no-underline"
+                        style="text-decoration: none;">
                         <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google"
                             style="width: 20px; height: 20px;">
                         <span>Google</span>
-                    </button>
+                    </a>
                 </form>
 
                 <p class="mt-8 text-center text-sm text-slate-600">
@@ -214,19 +215,77 @@
 
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
+            const form = e.target;
+            const btn = form.querySelector('button[type="submit"]');
             const originalText = btn.innerHTML;
+
+            // Clear previous errors
+            document.querySelectorAll('.error-message').forEach(el => el.remove());
+            document.querySelectorAll('.form-input').forEach(el => el.classList.remove('border-red-500'));
 
             btn.disabled = true;
             btn.innerHTML = '<i data-lucide="loader" class="animate-spin w-5 h-5"></i> Creando cuenta...';
             lucide.createIcons();
 
             try {
-                await new Promise(r => setTimeout(r, 1500));
-                window.location.href = '/login';
+                const formData = new FormData(form);
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        name: formData.get('name'),
+                        email: formData.get('email'),
+                        password: formData.get('password'),
+                        password_confirmation: formData.get('password_confirmation')
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Show success message
+                    btn.innerHTML = '<i data-lucide="check-circle" class="w-5 h-5"></i> ¡Cuenta creada!';
+                    lucide.createIcons();
+
+                    // Redirect to dashboard after short delay
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1000);
+                } else {
+                    // Handle validation errors
+                    if (data.errors) {
+                        Object.keys(data.errors).forEach(field => {
+                            const input = form.querySelector(`[name="${field}"]`);
+                            if (input) {
+                                input.classList.add('border-red-500');
+                                const errorDiv = document.createElement('div');
+                                errorDiv.className = 'error-message text-red-500 text-sm mt-1';
+                                errorDiv.textContent = data.errors[field][0];
+                                input.parentElement.appendChild(errorDiv);
+                            }
+                        });
+                    }
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    lucide.createIcons();
+                }
             } catch (error) {
+                console.error('Registration error:', error);
+
+                // Show generic error message
+                const errorDiv = document.createElement('div');
+                errorDiv.className =
+                    'error-message bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4';
+                errorDiv.textContent = 'Hubo un error al crear la cuenta. Por favor, intenta de nuevo.';
+                form.insertBefore(errorDiv, form.firstChild);
+
                 btn.innerHTML = originalText;
                 btn.disabled = false;
+                lucide.createIcons();
             }
         });
     </script>

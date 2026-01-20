@@ -1,7 +1,10 @@
-/* Tailwind Base */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Tailwind v4 Import */
+@import "tailwindcss";
+
+/* Content Source Paths for Tailwind v4 */
+@source "../**/*.blade.php";
+@source "../**/*.js";
+@source "../**/*.vue";
 
 /* ========================================
    TURISCOVERY - PROFESSIONAL INSTITUTIONAL DESIGN
@@ -506,22 +509,20 @@ nav {
    FIX PARA MOSTRAR EL MENÚ (Responsive)
    ======================================== */
 
-/* 1. Aseguramos que en móvil estén ocultos (por si quitas las clases de Tailwind) */
+/* 1. Aseguramos que en móvil/tablet estén ocultos */
 #desktop-nav,
 #auth-buttons {
     display: none;
 }
 
-/* 2. En pantallas medianas/grandes (Desktop), forzamos que se muestren */
-@media (min-width: 768px) {
+/* 2. En pantallas grandes (Desktop lg: en Tailwind = 1024px), forzamos que se muestren */
+@media (min-width: 1024px) {
 
     #desktop-nav,
     #auth-buttons {
         display: flex !important;
-        /* !important para sobreescribir la clase 'hidden' de Tailwind si sigue ahí */
         align-items: center;
-        gap: 1.5rem;
-        /* Ajusta este espacio entre enlaces según necesites */
+        gap: 2rem;
     }
 }
 
@@ -690,4 +691,204 @@ nav {
         color: #000;
         background: #fff;
     }
+}
+
+/* ========================================
+   CUSTOM UTILITIES FOR EXPERIENCE DETAILS
+   (Ensuring styles exist even if Tailwind purges them)
+   ======================================== */
+
+/* Text Colors */
+.text-primary {
+    color: var(--color-primary) !important;
+}
+
+.text-secondary {
+    color: var(--color-secondary) !important;
+}
+
+.text-accent {
+    color: var(--color-accent) !important;
+}
+
+.text-info {
+    color: var(--color-info) !important;
+}
+
+.text-white {
+    color: #ffffff !important;
+}
+
+.text-slate-800 {
+    color: #1e293b !important;
+}
+
+/* Fallback for Slate 800 */
+.text-slate-600 {
+    color: #475569 !important;
+}
+
+/* Fallback for Slate 600 */
+.text-slate-500 {
+    color: #64748b !important;
+}
+
+/* Fallback for Slate 500 */
+.text-slate-400 {
+    color: #94a3b8 !important;
+}
+
+/* Fallback for Slate 400 */
+
+/* Backgrounds */
+.bg-primary {
+    background-color: var(--color-primary) !important;
+}
+
+.bg-secondary {
+    background-color: var(--color-secondary) !important;
+}
+
+.bg-white {
+    background-color: #ffffff !important;
+}
+
+.bg-slate-50 {
+    background-color: #f8fafc !important;
+}
+
+.bg-slate-100 {
+    background-color: #f1f5f9 !important;
+}
+
+.bg-slate-200 {
+    background-color: #e2e8f0 !important;
+}
+
+.bg-blue-50 {
+    background-color: #eff6ff !important;
+}
+
+.bg-emerald-50 {
+    background-color: #ecfdf5 !important;
+}
+
+.bg-violet-50 {
+    background-color: #f5f3ff !important;
+}
+
+.bg-orange-50 {
+    background-color: #fff7ed !important;
+}
+
+/* Text Colors for Icons */
+.text-blue-600 {
+    color: #2563eb !important;
+}
+
+.text-emerald-600 {
+    color: #059669 !important;
+}
+
+.text-violet-600 {
+    color: #7c3aed !important;
+}
+
+.text-orange-600 {
+    color: #ea580c !important;
+}
+
+.text-yellow-400 {
+    color: #facc15 !important;
+}
+
+.fill-yellow-400 {
+    fill: #facc15 !important;
+}
+
+/* Spacing */
+.gap-4 {
+    gap: 1rem !important;
+}
+
+.gap-8 {
+    gap: 2rem !important;
+}
+
+.p-4 {
+    padding: 1rem !important;
+}
+
+.p-6 {
+    padding: 1.5rem !important;
+}
+
+.p-8 {
+    padding: 2rem !important;
+}
+
+.py-8 {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+}
+
+.py-12 {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+}
+
+.mb-4 {
+    margin-bottom: 1rem !important;
+}
+
+.mb-6 {
+    margin-bottom: 1.5rem !important;
+}
+
+/* Layout - NOTE: Native CSS Nesting for Media Queries */
+.grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+}
+
+@media (min-width: 1024px) {
+    .lg\:grid-cols-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    .lg\:col-span-2 {
+        grid-column: span 2 / span 2 !important;
+    }
+
+    .lg\:col-span-1 {
+        grid-column: span 1 / span 1 !important;
+    }
+}
+
+/* Specific Fixes */
+.object-cover {
+    object-fit: cover !important;
+}
+
+.sticky {
+    position: sticky !important;
+}
+
+.top-24 {
+    top: 6rem !important;
+}
+
+.rounded-xl {
+    border-radius: 0.75rem !important;
+}
+
+.rounded-2xl {
+    border-radius: 1rem !important;
+}
+
+.rounded-3xl {
+    border-radius: 1.5rem !important;
+}
+
+.shadow-xl {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
 }

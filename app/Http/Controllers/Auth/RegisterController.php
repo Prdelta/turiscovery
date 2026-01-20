@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
@@ -23,7 +24,8 @@ class RegisterController extends Controller
                 ->mixedCase()
                 ->numbers()
                 ->symbols()],
-            'role' => ['sometimes', 'in:tourist,socio'],
+            // Role removed - self-registration only creates tourists
+            // Socios must be created by admins through admin panel
         ]);
 
         if ($validator->fails()) {
@@ -37,8 +39,12 @@ class RegisterController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => $request->password, // Auto-hashed by Laravel
-            'role' => $request->role ?? 'tourist',
+            'role' => 'tourist', // Force all self-registrations to be tourists
         ]);
+
+
+        // Authenticate user in web session (for browser-based registration)
+        Auth::login($user);
 
         // Create Sanctum token for API authentication
         $token = $user->createToken('auth_token')->plainTextToken;

@@ -52,11 +52,24 @@ Route::get('/search', function () {
 // Authentication
 Route::get('/login', function () {
     return view('auth.login');
-});
+})->name('login');
+
+Route::post('/login', [\App\Http\Controllers\Auth\LoginController::class, 'webLogin'])->name('login.post');
+Route::post('/logout', [\App\Http\Controllers\Auth\LoginController::class, 'webLogout'])->name('logout');
 
 Route::get('/register', function () {
     return view('auth.register');
 });
+
+// Google OAuth Routes (Web Middleware for Session)
+// We use /api prefix here to match the Google Console settings and Default config,
+// but we define them in web.php to get Session support.
+Route::get('/api/auth/google', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/api/auth/google/callback', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'handleGoogleCallback']);
+
+Route::get('/auth/google/callback-view', function () {
+    return view('auth.social-callback');
+})->name('auth.google.callback.view');
 
 
 // Dashboard (Protected)
@@ -79,6 +92,12 @@ Route::middleware(['auth'])->prefix('user')->group(function () {
     Route::get('/reviews', [\App\Http\Controllers\UserController::class, 'reviews'])->name('user.reviews');
     Route::get('/edit', [\App\Http\Controllers\UserController::class, 'edit'])->name('user.edit');
     Route::put('/profile', [\App\Http\Controllers\UserController::class, 'update'])->name('user.update');
+});
+
+// Admin Panel (Admin Only)
+Route::middleware(['auth'])->prefix('admin')->group(function () {
+    Route::get('/users/create', [\App\Http\Controllers\Admin\AdminUserController::class, 'create'])->name('admin.users.create');
+    Route::post('/users', [\App\Http\Controllers\Admin\AdminUserController::class, 'store'])->name('admin.users.store');
 });
 
 // TEST ROUTES - REMOVE IN PRODUCTION

@@ -11,7 +11,9 @@
         <div class="card" style="border-left: 5px solid var(--color-primary); padding: var(--spacing-lg);">
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
                 <div>
-                    <h2 class="mb-1" style="font-size: 1.5rem;">¡Hola, <span id="welcome-user-name">Usuario</span>! 👋</h2>
+                    <h2 class="mb-1" style="font-size: 1.5rem;">¡Hola, <span id="welcome-user-name">Usuario</span>! <span
+                            id="user-role-badge" class="badge badge-primary"
+                            style="font-size: 0.8rem; vertical-align: middle; display: none;"></span> 👋</h2>
                     <p class="mb-0 text-secondary">Aquí tienes un resumen de tu actividad en Turiscovery.</p>
                 </div>
                 <div style="display: flex; gap: 10px;">
@@ -198,20 +200,27 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            // Load stats based on user role
-            const token = localStorage.getItem('auth_token');
-            if (!token) return;
-
+            // Load stats based on user role - use session instead of token
             try {
-                const userResponse = await axios.get('/api/me', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
+                // Use session-based endpoint
+                const userResponse = await axios.get('/api/auth/user');
 
-                if (userResponse.data.success) {
-                    const user = userResponse.data.data;
+                if (userResponse.data.success && userResponse.data.authenticated) {
+                    const user = userResponse.data.user;
                     document.getElementById('welcome-user-name').textContent = user.name;
+
+                    // Show role badge
+                    const roleBadge = document.getElementById('user-role-badge');
+                    if (roleBadge) {
+                        roleBadge.textContent = user.role.toUpperCase();
+                        roleBadge.style.display = 'inline-block';
+
+                        // Color coding
+                        if (user.role === 'admin') roleBadge.style.backgroundColor = '#ef4444'; // Red for admin
+                        else if (user.role === 'socio') roleBadge.style.backgroundColor =
+                            '#4f46e5'; // Blue for socio
+                        else roleBadge.style.backgroundColor = '#10b981'; // Green for tourist
+                    }
 
                     // Show different actions based on role
                     if (user.role === 'tourist') {
@@ -230,6 +239,8 @@
                 }
             } catch (error) {
                 console.error('Error loading user:', error);
+                // Redirect to login if not authenticated
+                window.location.href = '/login';
             }
         });
 

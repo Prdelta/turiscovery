@@ -93,4 +93,48 @@ class LoginController extends Controller
             'data' => $request->user(),
         ], 200);
     }
+    /**
+     * Handle user login for Web (Session based)
+     */
+    public function webLogin(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        $remember = $request->has('remember');
+
+        if (Auth::attempt($credentials, $remember)) {
+            $request->session()->regenerate();
+
+            $user = Auth::user();
+
+            // Redirect based on role
+            if ($user->role === 'admin' || $user->role === 'socio') {
+                return redirect()->intended('dashboard');
+            }
+
+            return redirect()->intended('user');
+        }
+
+        return back()->withErrors([
+            'email' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
+        ])->onlyInput('email');
+    }
+
+
+    /**
+     * Handle user logout for Web
+     */
+    public function webLogout(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        return redirect('/');
+    }
 }
