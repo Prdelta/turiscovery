@@ -1,234 +1,245 @@
-@extends('layouts.dashboard')
+@extends('layouts.app')
 
 @section('title', 'Mi Perfil')
-@section('page-title', 'Mi Perfil')
-@section('page-subtitle', 'Bienvenido a tu espacio personal')
 
 @section('content')
-    <div class="fade-in space-y-8">
+    <!-- Hero Section con Gradient Primary -->
+    <section class="relative overflow-hidden" style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl transform translate-x-32 -translate-y-32"></div>
+            <div class="absolute bottom-0 left-0 w-80 h-80 bg-white rounded-full blur-3xl transform -translate-x-24 translate-y-24"></div>
+        </div>
 
-        <!-- Premium Welcome Card with Gradient -->
-        <div
-            class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 text-white shadow-2xl shadow-blue-500/30">
-            <!-- Decorative Background Pattern -->
-            <div class="absolute inset-0 opacity-10">
-                <div
-                    class="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl transform translate-x-32 -translate-y-32">
-                </div>
-                <div
-                    class="absolute bottom-0 left-0 w-80 h-80 bg-blue-300 rounded-full blur-3xl transform -translate-x-24 translate-y-24">
-                </div>
-            </div>
-
-            <div class="relative p-8 md:p-10">
-                <div class="flex flex-col md:flex-row items-center gap-6">
-                    <!-- Avatar with Glow Effect -->
-                    <div class="relative group">
-                        <div
-                            class="absolute inset-0 bg-white/30 rounded-full blur-xl group-hover:bg-white/40 transition-all">
-                        </div>
-                        <div
-                            class="relative w-24 h-24 bg-white/20 backdrop-blur-lg rounded-full flex items-center justify-center text-4xl font-bold border-4 border-white/40 shadow-xl group-hover:scale-110 transition-transform">
-                            {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
-                        </div>
+        <div class="container relative py-16 text-white">
+            <div class="flex flex-col md:flex-row items-center gap-8">
+                <!-- Avatar Grande -->
+                <div class="relative group">
+                    <div class="absolute inset-0 bg-white/30 rounded-full blur-xl group-hover:bg-white/40 transition-all"></div>
+                    <div class="relative w-32 h-32 bg-white/20 backdrop-blur-lg rounded-full flex items-center justify-center text-6xl font-bold border-4 border-white/40 shadow-2xl">
+                        {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
                     </div>
+                </div>
 
-                    <div class="text-center md:text-left flex-1">
-                        <h2 class="text-3xl md:text-4xl font-bold mb-2 drop-shadow-lg">
-                            ¡Hola, {{ Auth::user()->name ?? 'Viajero' }}! 👋
-                        </h2>
-                        <p class="text-blue-100 text-lg mb-6 font-medium">
-                            Descubre las maravillas de Puno y crea recuerdos inolvidables
-                        </p>
-                        <div class="flex flex-wrap justify-center md:justify-start gap-3">
-                            <a href="/"
-                                class="group flex items-center gap-2 px-6 py-3 bg-white text-blue-600 font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all">
-                                <i data-lucide="compass" class="w-5 h-5 group-hover:rotate-12 transition-transform"></i>
-                                <span>Explorar Destinos</span>
-                            </a>
-                            <a href="{{ url('/user/edit') }}"
-                                class="group flex items-center gap-2 px-6 py-3 bg-blue-700/60 hover:bg-blue-700 backdrop-blur-md text-white font-bold rounded-xl border-2 border-white/30 hover:-translate-y-1 transition-all">
-                                <i data-lucide="settings" class="w-5 h-5 group-hover:rotate-90 transition-transform"></i>
-                                <span>Editar Perfil</span>
-                            </a>
-                        </div>
+                <!-- Info del Usuario -->
+                <div class="text-center md:text-left flex-1">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-3 drop-shadow-lg">
+                        {{ Auth::user()->name ?? 'Viajero' }}
+                    </h1>
+                    <p class="text-white/80 text-lg mb-4 font-medium">
+                        {{ Auth::user()->email }}
+                    </p>
+                    <div class="flex flex-wrap gap-3 justify-center md:justify-start">
+                        <span class="px-4 py-2 bg-white/20 backdrop-blur-md rounded-full text-sm font-medium border border-white/30">
+                            <i data-lucide="calendar" class="w-4 h-4 inline mr-1"></i>
+                            Miembro desde {{ Auth::user()->created_at->format('M Y') }}
+                        </span>
+                        <span class="px-4 py-2 bg-white/20 backdrop-blur-md rounded-full text-sm font-medium border border-white/30">
+                            <i data-lucide="award" class="w-4 h-4 inline mr-1"></i>
+                            Explorador Nivel 1
+                        </span>
                     </div>
+                </div>
+
+                <!-- Botón de Editar -->
+                <div class="flex gap-3">
+                    <a href="{{ url('/user/edit') }}"
+                        class="flex items-center gap-2 px-6 py-3 bg-white font-bold rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all"
+                        style="color: var(--color-primary);">
+                        <i data-lucide="settings" class="w-5 h-5"></i>
+                        <span>Editar Perfil</span>
+                    </a>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Premium Stats Grid -->
+    <!-- Estadísticas Grid -->
+    <section class="container -mt-8 mb-12 relative z-10">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Favorites Stat -->
+            <!-- Favoritos Stat -->
             <a href="{{ url('/user/favorites') }}"
-                class="group relative overflow-hidden bg-gradient-to-br from-red-50 to-pink-50 border-2 border-red-100 rounded-2xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                <div
-                    class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-500/10 to-pink-500/10 rounded-full blur-2xl group-hover:scale-150 transition-transform">
-                </div>
-                <div class="relative flex items-center justify-between">
+                class="card group p-6 border-l-4 hover:-translate-y-2 transition-all duration-300"
+                style="border-left-color: var(--color-danger);">
+                <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-xs font-bold text-red-600 uppercase tracking-wider mb-2">Favoritos</p>
-                        <h3 class="text-5xl font-black text-red-600 mb-1">{{ $favoritesCount }}</h3>
-                        <p class="text-sm text-red-500 font-medium">Lugares guardados</p>
+                        <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--color-text-muted);">Favoritos</p>
+                        <h3 class="text-5xl font-black mb-1" style="color: var(--color-danger);">{{ $favoritesCount }}</h3>
+                        <p class="text-sm font-medium" style="color: var(--color-text-light);">Lugares guardados</p>
                     </div>
-                    <div
-                        class="w-16 h-16 bg-gradient-to-br from-red-500 to-pink-500 text-white rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all">
-                        <i data-lucide="heart" class="w-8 h-8"></i>
+                    <div class="w-16 h-16 rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-all"
+                        style="background: linear-gradient(135deg, var(--color-danger) 0%, #c0392b 100%);">
+                        <i data-lucide="heart" class="w-8 h-8 text-white"></i>
                     </div>
-                </div>
-                <div
-                    class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform">
                 </div>
             </a>
 
             <!-- Reviews Stat -->
             <a href="{{ url('/user/reviews') }}"
-                class="group relative overflow-hidden bg-gradient-to-br from-yellow-50 to-amber-50 border-2 border-yellow-100 rounded-2xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                <div
-                    class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-yellow-500/10 to-amber-500/10 rounded-full blur-2xl group-hover:scale-150 transition-transform">
-                </div>
-                <div class="relative flex items-center justify-between">
+                class="card group p-6 border-l-4 hover:-translate-y-2 transition-all duration-300"
+                style="border-left-color: var(--color-accent);">
+                <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-xs font-bold text-yellow-600 uppercase tracking-wider mb-2">Reseñas</p>
-                        <h3 class="text-5xl font-black text-yellow-600 mb-1">{{ $reviewsCount }}</h3>
-                        <p class="text-sm text-yellow-500 font-medium">Opiniones compartidas</p>
+                        <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--color-text-muted);">Reseñas</p>
+                        <h3 class="text-5xl font-black mb-1" style="color: var(--color-accent);">{{ $reviewsCount }}</h3>
+                        <p class="text-sm font-medium" style="color: var(--color-text-light);">Opiniones compartidas</p>
                     </div>
-                    <div
-                        class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-amber-500 text-white rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all">
-                        <i data-lucide="star" class="w-8 h-8"></i>
+                    <div class="w-16 h-16 rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-all"
+                        style="background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-dark) 100%);">
+                        <i data-lucide="star" class="w-8 h-8 text-white"></i>
                     </div>
-                </div>
-                <div
-                    class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-500 to-amber-500 transform scale-x-0 group-hover:scale-x-100 transition-transform">
                 </div>
             </a>
 
-            <!-- Level Stat -->
-            <div
-                class="group relative overflow-hidden bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-100 rounded-2xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                <div
-                    class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-full blur-2xl group-hover:scale-150 transition-transform">
-                </div>
-                <div class="relative flex items-center justify-between">
+            <!-- Explorador Badge -->
+            <div class="card group p-6 border-l-4 hover:-translate-y-2 transition-all duration-300"
+                style="border-left-color: var(--color-secondary);">
+                <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-2">Tu Nivel</p>
-                        <h3 class="text-3xl font-black text-emerald-600 mb-1">Explorador</h3>
-                        <p class="text-sm text-emerald-500 font-medium">¡Sigue descubriendo!</p>
+                        <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color: var(--color-text-muted);">Tu Nivel</p>
+                        <h3 class="text-3xl font-black mb-1" style="color: var(--color-secondary);">Explorador</h3>
+                        <p class="text-sm font-medium" style="color: var(--color-text-light);">¡Sigue descubriendo!</p>
                     </div>
-                    <div
-                        class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 text-white rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all">
-                        <i data-lucide="award" class="w-8 h-8"></i>
+                    <div class="w-16 h-16 rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-all"
+                        style="background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-secondary-dark) 100%);">
+                        <i data-lucide="award" class="w-8 h-8 text-white"></i>
                     </div>
-                </div>
-                <div
-                    class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 transform scale-x-0 group-hover:scale-x-100 transition-transform">
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Recent Activity Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Recent Favorites -->
-            <div
-                class="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden hover:shadow-xl transition-shadow">
-                <div class="bg-gradient-to-r from-red-500 to-pink-500 p-6">
-                    <h3 class="font-bold text-xl text-white flex items-center gap-3">
-                        <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-                            <i data-lucide="heart" class="w-5 h-5"></i>
+    <!-- Actividad Reciente -->
+    <section class="container mb-16">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            <!-- Favoritos Recientes -->
+            <div class="card overflow-hidden">
+                <div class="p-6" style="background: linear-gradient(135deg, var(--color-danger) 0%, #c0392b 100%);">
+                    <h3 class="font-bold text-2xl text-white flex items-center gap-3">
+                        <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                            <i data-lucide="heart" class="w-6 h-6"></i>
                         </div>
                         Favoritos Recientes
                     </h3>
                 </div>
                 <div class="p-6 space-y-4">
                     @forelse($recentFavorites as $favorite)
-                        <div
-                            class="group flex gap-4 items-center p-3 hover:bg-slate-50 rounded-xl transition-all border border-transparent hover:border-red-100 cursor-pointer">
-                            <div class="w-16 h-16 rounded-xl bg-slate-200 bg-cover bg-center flex-shrink-0 shadow-sm"
+                        <div class="group flex gap-4 items-center p-4 hover:bg-gray-50 rounded-xl transition-all border-2 border-transparent hover:border-gray-100 cursor-pointer">
+                            <div class="w-20 h-20 rounded-xl bg-gray-200 bg-cover bg-center flex-shrink-0 shadow-md"
                                 style="background-image: url('{{ $favorite->favoritable->image_url ?? 'https://via.placeholder.com/150' }}')">
                             </div>
                             <div class="flex-1 min-w-0">
-                                <h4 class="font-bold text-slate-800 group-hover:text-red-600 transition-colors">
+                                <h4 class="font-bold group-hover:text-primary transition-colors mb-1" style="color: var(--color-text);">
                                     {{ $favorite->favoritable->name ?? ($favorite->favoritable->title ?? 'Sin título') }}
                                 </h4>
-                                <p class="text-sm text-slate-500 flex items-center gap-1">
-                                    <i data-lucide="{{ $favorite->favoritable_type === 'App\\Models\\Locale' ? 'store' : 'compass' }}"
-                                        class="w-3 h-3"></i>
+                                <p class="text-sm flex items-center gap-1" style="color: var(--color-text-muted);">
+                                    <i data-lucide="{{ $favorite->favoritable_type === 'App\\Models\\Locale' ? 'store' : 'compass' }}" class="w-3 h-3"></i>
                                     {{ class_basename($favorite->favoritable_type) }}
                                 </p>
                             </div>
-                            <button class="text-red-500 hover:text-red-600 hover:scale-110 transition-all">
-                                <i data-lucide="heart" class="w-5 h-5 fill-current"></i>
+                            <button class="hover:scale-125 transition-all" style="color: var(--color-danger);">
+                                <i data-lucide="heart" class="w-6 h-6 fill-current"></i>
                             </button>
                         </div>
                     @empty
-                        <div class="text-center py-8">
-                            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                <i data-lucide="heart" class="w-8 h-8 text-slate-400"></i>
+                        <div class="text-center py-12">
+                            <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4" style="background-color: var(--color-bg-gray);">
+                                <i data-lucide="heart" class="w-10 h-10" style="color: var(--color-gray);"></i>
                             </div>
-                            <p class="text-slate-500 text-sm">Aún no tienes favoritos</p>
-                            <a href="/" class="text-blue-600 hover:underline text-sm mt-2 inline-block">Explorar
-                                ahora</a>
+                            <p class="mb-3" style="color: var(--color-text-muted);">Aún no tienes favoritos</p>
+                            <a href="/" class="font-medium" style="color: var(--color-primary);">Explorar ahora</a>
                         </div>
                     @endforelse
                 </div>
-                <div class="px-6 pb-6">
-                    <a href="{{ url('/user/favorites') }}"
-                        class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
-                        <span>Ver Todos los Favoritos</span>
-                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                    </a>
-                </div>
+                @if($favoritesCount > 0)
+                    <div class="px-6 pb-6">
+                        <a href="{{ url('/user/favorites') }}"
+                            class="btn btn-primary w-full justify-center">
+                            <span>Ver Todos los Favoritos</span>
+                            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+                @endif
             </div>
 
-            <!-- Recent Reviews -->
-            <div
-                class="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden hover:shadow-xl transition-shadow">
-                <div class="bg-gradient-to-r from-yellow-500 to-amber-500 p-6">
-                    <h3 class="font-bold text-xl text-white flex items-center gap-3">
-                        <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-                            <i data-lucide="message-square" class="w-5 h-5"></i>
+            <!-- Reseñas Recientes -->
+            <div class="card overflow-hidden">
+                <div class="p-6" style="background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-dark) 100%);">
+                    <h3 class="font-bold text-2xl text-white flex items-center gap-3">
+                        <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                            <i data-lucide="message-square" class="w-6 h-6"></i>
                         </div>
                         Tus Reseñas Recientes
                     </h3>
                 </div>
                 <div class="p-6 space-y-4">
                     @forelse($recentReviews as $review)
-                        <div class="p-4 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl border border-yellow-100">
+                        <div class="p-5 rounded-xl border-2" style="background-color: #FEF5E7; border-color: var(--color-accent);">
                             <div class="flex justify-between items-start mb-3">
-                                <h4 class="font-bold text-slate-800 text-sm">
+                                <h4 class="font-bold text-base" style="color: var(--color-text);">
                                     {{ $review->reviewable->name ?? ($review->reviewable->title ?? 'Sin título') }}
                                 </h4>
-                                <div class="flex text-yellow-500 gap-0.5">
+                                <div class="flex gap-0.5" style="color: var(--color-accent);">
                                     @for ($i = 1; $i <= 5; $i++)
-                                        <i data-lucide="star"
-                                            class="w-4 h-4 {{ $i <= $review->rating ? 'fill-current' : '' }}"></i>
+                                        <i data-lucide="star" class="w-4 h-4 {{ $i <= $review->rating ? 'fill-current' : '' }}"></i>
                                     @endfor
                                 </div>
                             </div>
-                            <p class="text-sm text-slate-600 italic leading-relaxed">
-                                "{{ Str::limit($review->comment, 100) }}"
+                            <p class="text-sm italic leading-relaxed mb-2" style="color: var(--color-text-light);">
+                                "{{ Str::limit($review->comment, 150) }}"
                             </p>
-                            <p class="text-xs text-slate-400 mt-2">{{ $review->created_at->diffForHumans() }}</p>
+                            <p class="text-xs" style="color: var(--color-text-muted);">{{ $review->created_at->diffForHumans() }}</p>
                         </div>
                     @empty
-                        <div class="text-center py-8">
-                            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                <i data-lucide="message-square" class="w-8 h-8 text-slate-400"></i>
+                        <div class="text-center py-12">
+                            <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4" style="background-color: var(--color-bg-gray);">
+                                <i data-lucide="message-square" class="w-10 h-10" style="color: var(--color-gray);"></i>
                             </div>
-                            <p class="text-slate-500 text-sm">Aún no has escrito reseñas</p>
-                            <a href="/" class="text-blue-600 hover:underline text-sm mt-2 inline-block">Explorar y
-                                compartir tu opinión</a>
+                            <p class="mb-3" style="color: var(--color-text-muted);">Aún no has escrito reseñas</p>
+                            <a href="/" class="font-medium" style="color: var(--color-primary);">Explorar y compartir tu opinión</a>
                         </div>
                     @endforelse
                 </div>
-                <div class="px-6 pb-6">
-                    <a href="{{ url('/user/reviews') }}"
-                        class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-gradient-to-r from-yellow-500 to-amber-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
-                        <span>Ver Todas tus Reseñas</span>
-                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                    </a>
-                </div>
+                @if($reviewsCount > 0)
+                    <div class="px-6 pb-6">
+                        <a href="{{ url('/user/reviews') }}"
+                            class="btn w-full justify-center"
+                            style="background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-dark) 100%); color: white;">
+                            <span>Ver Todas tus Reseñas</span>
+                            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+                @endif
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="container mb-16">
+        <div class="rounded-3xl p-8 md:p-12 text-white text-center shadow-2xl"
+            style="background: linear-gradient(135deg, var(--color-text) 0%, #1a252f 100%);">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">¿Listo para tu próxima aventura?</h2>
+            <p class="text-white/70 text-lg mb-8 max-w-2xl mx-auto">
+                Descubre experiencias únicas, eventos emocionantes y las mejores promociones en Puno
+            </p>
+            <div class="flex flex-wrap gap-4 justify-center">
+                <a href="/experiencias" class="btn btn-secondary">
+                    <i data-lucide="compass" class="w-5 h-5"></i>
+                    Explorar Experiencias
+                </a>
+                <a href="/eventos" class="btn btn-primary">
+                    <i data-lucide="calendar" class="w-5 h-5"></i>
+                    Ver Eventos
+                </a>
+            </div>
+        </div>
+    </section>
+
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                lucide.createIcons();
+            });
+        </script>
+    @endpush
 @endsection

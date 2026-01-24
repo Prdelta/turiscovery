@@ -39,10 +39,11 @@ class GoogleAuthController extends Controller
 
                 // Redirect based on role
                 if ($user->role === 'admin' || $user->role === 'socio') {
-                    return redirect()->intended('dashboard');
+                    return redirect()->intended('/dashboard');
                 }
 
-                return redirect()->intended('user');
+                // Turistas van a home (el header se actualiza automáticamente)
+                return redirect('/')->with('success', '¡Bienvenido de nuevo, ' . $user->name . '!');
             }
 
             // Check if user exists with this email (link Google account)
@@ -60,10 +61,11 @@ class GoogleAuthController extends Controller
 
                 // Redirect based on role
                 if ($existingUser->role === 'admin' || $existingUser->role === 'socio') {
-                    return redirect()->intended('dashboard');
+                    return redirect()->intended('/dashboard');
                 }
 
-                return redirect()->intended('user');
+                // Turistas van a home
+                return redirect('/')->with('success', '¡Bienvenido de nuevo, ' . $existingUser->name . '!');
             }
 
             // Create new user with Google account
@@ -80,11 +82,11 @@ class GoogleAuthController extends Controller
             Auth::login($newUser);
             $request->session()->regenerate();
 
-            // Redirect new tourist to user panel
-            return redirect()->intended('user');
+            // Redirect new tourist to home
+            return redirect('/')->with('success', '¡Bienvenido a Turiscovery, ' . $newUser->name . '!');
         } catch (\Exception $e) {
             // Log the error for debugging
-            \Log::error('Google OAuth Error: ' . $e->getMessage());
+            Log::error('Google OAuth Error: ' . $e->getMessage());
 
             return redirect('/login')->withErrors([
                 'error' => 'No se pudo completar la autenticación con Google. Por favor, intenta de nuevo.'

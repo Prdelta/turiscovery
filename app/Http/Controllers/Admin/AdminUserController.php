@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
@@ -18,7 +19,7 @@ class AdminUserController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            if (!auth()->check() || !auth()->user()->isAdmin()) {
+            if (!Auth::check() || !Auth::user()->isAdmin()) {
                 abort(403, 'Unauthorized. Only administrators can access this page.');
             }
             return $next($request);
@@ -150,7 +151,7 @@ class AdminUserController extends Controller
     public function destroy(User $user)
     {
         // Prevent deleting own account
-        if ($user->id === auth()->id()) {
+        if ($user->id === Auth::id()) {
             return redirect()->route('admin.users.index')->with('error', 'No puedes eliminar tu propia cuenta');
         }
 

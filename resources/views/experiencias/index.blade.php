@@ -1,72 +1,131 @@
 @extends('layouts.app')
 
 @section('content')
-    <section class="hero text-center"
-        style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;">
-        <div class="container">
-            <span class="badge badge-info mb-2 md:inline-flex hidden"
-                style="background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); color: white; border: 1px solid rgba(255,255,255,0.4);">
-                Turismo Vivencial y Aventura
-            </span>
-            <h1 class="fade-in text-white mb-4">Experiencias Inolvidables</h1>
-            <p class="fade-in text-gray-200 mb-8"
-                style="font-size: 1.25rem; max-width: 700px; margin: 0 auto; animation-delay: 0.2s;">
+    <section class="hero text-center hero-overlay bg-cover bg-center relative overflow-hidden"
+        style="background-image: url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1920&q=80');">
+        <!-- Overlay con gradiente animado -->
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-900/80 via-purple-900/70 to-pink-900/60"></div>
+
+        <div class="container mx-auto px-4 relative z-10">
+            <!-- Badge animado -->
+            <div class="inline-flex mb-4">
+                <span class="badge bg-gradient-to-r from-blue-400 to-purple-500 text-white px-6 py-2 text-sm font-bold shadow-2xl backdrop-blur border-2 border-white/30 animate-pulse-soft">
+                    <i data-lucide="compass" class="w-4 h-4 inline mr-2"></i>
+                    Turismo Vivencial y Aventura
+                </span>
+            </div>
+
+            <h1 class="fade-in text-white mb-6 text-4xl md:text-6xl font-black text-shadow-strong leading-tight">
+                Experiencias que<br/>
+                <span class="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">Transforman Vidas</span>
+            </h1>
+            <p class="fade-in text-white/90 mb-10 text-lg md:text-2xl max-w-3xl mx-auto font-medium text-shadow">
                 Navega por el Titicaca, convive con comunidades locales y explora ruinas ancestrales.
             </p>
 
-            <div class="card p-2 fade-in"
-                style="max-width: 600px; margin: 0 auto; background: white; animation-delay: 0.4s; display: flex; gap: 0.5rem; align-items: center;">
-                <i data-lucide="search" class="text-gray-400 ml-2"></i>
-                <input type="text" placeholder="¿Qué te gustaría vivir hoy?"
-                    style="border: none; outline: none; flex: 1; padding: 0.5rem;">
-                <button class="btn btn-primary">Buscar</button>
+            <!-- Buscador mejorado -->
+            <div class="card p-2 fade-in max-w-3xl mx-auto flex gap-2 items-center shadow-2xl border-4 border-white/20 bg-white/95 backdrop-blur-lg">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center ml-2">
+                    <i data-lucide="search" class="text-white w-5 h-5"></i>
+                </div>
+                <input type="text" placeholder="¿Qué aventura te gustaría vivir hoy?"
+                    class="border-0 outline-none flex-1 p-4 text-lg font-medium text-slate-700 placeholder:text-slate-400">
+                <button class="btn bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold px-8 py-4 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all">
+                    <i data-lucide="sparkles" class="w-5 h-5 mr-2"></i>
+                    Explorar
+                </button>
+            </div>
+
+            <!-- Stats rápidos -->
+            <div class="grid grid-cols-3 gap-6 max-w-2xl mx-auto mt-12 fade-in">
+                <div class="text-white">
+                    <div class="text-3xl md:text-4xl font-black mb-1">50+</div>
+                    <div class="text-sm text-white/80 font-semibold">Experiencias</div>
+                </div>
+                <div class="text-white">
+                    <div class="text-3xl md:text-4xl font-black mb-1">1000+</div>
+                    <div class="text-sm text-white/80 font-semibold">Turistas Felices</div>
+                </div>
+                <div class="text-white">
+                    <div class="text-3xl md:text-4xl font-black mb-1">4.9★</div>
+                    <div class="text-sm text-white/80 font-semibold">Calificación</div>
+                </div>
             </div>
         </div>
+
+        <!-- Elementos decorativos -->
+        <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-50 to-transparent"></div>
     </section>
 
-    <section class="section">
-        <div class="container">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h2 class="mb-0">Explorar por Categoría</h2>
+    <section class="section bg-gradient-to-b from-slate-50 to-white">
+        <div class="container mx-auto px-4">
+            <!-- Header de categorías -->
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-black mb-3 gradient-text">Explora Por Categoría</h2>
+                <p class="text-slate-600 max-w-2xl mx-auto">Elige tu tipo de aventura favorita</p>
             </div>
 
-            <div class="grid grid-4 mb-12">
-                <a href="#" class="card hover:shadow-md transition-shadow text-center p-6 bg-slate-50 border-0">
-                    <div
-                        style="width: 60px; height: 60px; background: #e0f2fe; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
-                        <i data-lucide="ship" style="color: #0284c7; width: 32px; height: 32px;"></i>
+            <!-- Categorías mejoradas -->
+            <div class="grid grid-4 mb-16 gap-6">
+                <a href="#" class="card group relative overflow-hidden border-0 bg-gradient-to-br from-sky-400 to-blue-600 text-white transform hover:scale-105 hover:rotate-1 transition-all duration-300">
+                    <div class="p-8 text-center relative z-10">
+                        <div class="w-20 h-20 bg-white/20 backdrop-blur rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                            <i data-lucide="ship" class="text-white w-10 h-10"></i>
+                        </div>
+                        <h3 class="text-xl font-black mb-2">Lago Titicaca</h3>
+                        <p class="text-sm text-white/80 font-medium">Navegación y paisajes</p>
                     </div>
-                    <h3 style="font-size: 1.1rem; margin-bottom: 0;">Lago Titicaca</h3>
+                    <div class="absolute inset-0 shimmer opacity-0 group-hover:opacity-100"></div>
                 </a>
-                <a href="#" class="card hover:shadow-md transition-shadow text-center p-6 bg-slate-50 border-0">
-                    <div
-                        style="width: 60px; height: 60px; background: #fce7f3; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
-                        <i data-lucide="users" style="color: #db2777; width: 32px; height: 32px;"></i>
+
+                <a href="#" class="card group relative overflow-hidden border-0 bg-gradient-to-br from-pink-400 to-rose-600 text-white transform hover:scale-105 hover:rotate-1 transition-all duration-300">
+                    <div class="p-8 text-center relative z-10">
+                        <div class="w-20 h-20 bg-white/20 backdrop-blur rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                            <i data-lucide="users" class="text-white w-10 h-10"></i>
+                        </div>
+                        <h3 class="text-xl font-black mb-2">Vivencial</h3>
+                        <p class="text-sm text-white/80 font-medium">Cultura local auténtica</p>
                     </div>
-                    <h3 style="font-size: 1.1rem; margin-bottom: 0;">Vivencial</h3>
+                    <div class="absolute inset-0 shimmer opacity-0 group-hover:opacity-100"></div>
                 </a>
-                <a href="#" class="card hover:shadow-md transition-shadow text-center p-6 bg-slate-50 border-0">
-                    <div
-                        style="width: 60px; height: 60px; background: #dcfce7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
-                        <i data-lucide="mountain" style="color: #16a34a; width: 32px; height: 32px;"></i>
+
+                <a href="#" class="card group relative overflow-hidden border-0 bg-gradient-to-br from-green-400 to-emerald-600 text-white transform hover:scale-105 hover:rotate-1 transition-all duration-300">
+                    <div class="p-8 text-center relative z-10">
+                        <div class="w-20 h-20 bg-white/20 backdrop-blur rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                            <i data-lucide="mountain" class="text-white w-10 h-10"></i>
+                        </div>
+                        <h3 class="text-xl font-black mb-2">Aventura</h3>
+                        <p class="text-sm text-white/80 font-medium">Adrenalina pura</p>
                     </div>
-                    <h3 style="font-size: 1.1rem; margin-bottom: 0;">Aventura</h3>
+                    <div class="absolute inset-0 shimmer opacity-0 group-hover:opacity-100"></div>
                 </a>
-                <a href="#" class="card hover:shadow-md transition-shadow text-center p-6 bg-slate-50 border-0">
-                    <div
-                        style="width: 60px; height: 60px; background: #fef3c7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
-                        <i data-lucide="camera" style="color: #d97706; width: 32px; height: 32px;"></i>
+
+                <a href="#" class="card group relative overflow-hidden border-0 bg-gradient-to-br from-amber-400 to-orange-600 text-white transform hover:scale-105 hover:rotate-1 transition-all duration-300">
+                    <div class="p-8 text-center relative z-10">
+                        <div class="w-20 h-20 bg-white/20 backdrop-blur rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                            <i data-lucide="camera" class="text-white w-10 h-10"></i>
+                        </div>
+                        <h3 class="text-xl font-black mb-2">Cultural</h3>
+                        <p class="text-sm text-white/80 font-medium">Historia y tradición</p>
                     </div>
-                    <h3 style="font-size: 1.1rem; margin-bottom: 0;">Cultural</h3>
+                    <div class="absolute inset-0 shimmer opacity-0 group-hover:opacity-100"></div>
                 </a>
             </div>
 
-            <h2 class="mb-6">Experiencias Destacadas</h2>
-            <div id="experiencias-grid" class="grid grid-3">
-                <div class="col-span-3 text-center py-12">
-                    <i data-lucide="loader" class="animate-spin mb-2 w-8 h-8 text-primary mx-auto"></i>
-                    <p>Cargando experiencias...</p>
+            <!-- Header de experiencias destacadas -->
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-black text-slate-800 mb-2">⭐ Experiencias Destacadas</h2>
+                    <p class="text-slate-600">Las más solicitadas por nuestros viajeros</p>
                 </div>
+                <a href="#" class="hidden md:flex btn btn-outline gap-2 items-center">
+                    Ver Todas
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </a>
+            </div>
+
+            <div id="experiencias-grid" class="grid grid-3">
+                <x-loading-state message="Cargando experiencias..." />
             </div>
         </div>
         <!-- Reservation Modal -->

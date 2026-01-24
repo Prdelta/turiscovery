@@ -1,11 +1,26 @@
-@extends('layouts.dashboard')
+@extends('layouts.app')
 
 @section('title', 'Mis Reseñas')
-@section('page-title', 'Mis Reseñas')
-@section('page-subtitle', 'Historial de tus opiniones y valoraciones')
 
 @section('content')
-    <div class="fade-in max-w-4xl">
+    <!-- Header Section -->
+    <section class="text-white py-12" style="background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-dark) 100%);">
+        <div class="container">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                    <h1 class="text-4xl font-bold mb-2">Mis Reseñas</h1>
+                    <p class="text-white/80">Historial de tus opiniones y valoraciones</p>
+                </div>
+                <a href="/user" class="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-lg transition-colors border border-white/30 font-medium">
+                    <i data-lucide="arrow-left" class="w-4 h-4 inline mr-2"></i>
+                    Volver al Perfil
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <div class="container py-12">
+        <div class="max-w-4xl mx-auto">
         @if ($reviews->count() > 0)
             <div class="space-y-6">
                 @foreach ($reviews as $review)
@@ -70,5 +85,14 @@
                 <a href="/" class="btn btn-primary">Explorar Destinos</a>
             </div>
         @endif
+        </div>
     </div>
+
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                lucide.createIcons();
+            });
+        </script>
+    @endpush
 @endsection

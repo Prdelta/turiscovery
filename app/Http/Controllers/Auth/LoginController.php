@@ -112,10 +112,12 @@ class LoginController extends Controller
 
             // Redirect based on role
             if ($user->role === 'admin' || $user->role === 'socio') {
-                return redirect()->intended('dashboard');
+                return redirect()->intended('/dashboard');
             }
 
-            return redirect()->intended('user');
+            // Turistas van a home o a la página que intentaban acceder
+            // El header se actualiza automáticamente
+            return redirect()->intended('/')->with('success', '¡Bienvenido de nuevo, ' . $user->name . '!');
         }
 
         return back()->withErrors([

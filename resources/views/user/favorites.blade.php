@@ -1,11 +1,25 @@
-@extends('layouts.dashboard')
+@extends('layouts.app')
 
 @section('title', 'Mis Favoritos')
-@section('page-title', 'Mis Favoritos')
-@section('page-subtitle', 'Lugares y eventos que has guardado')
 
 @section('content')
-    <div class="fade-in">
+    <!-- Header Section -->
+    <section class="text-white py-12" style="background: linear-gradient(135deg, var(--color-danger) 0%, #c0392b 100%);">
+        <div class="container">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                    <h1 class="text-4xl font-bold mb-2">Mis Favoritos</h1>
+                    <p class="text-white/80">Lugares y eventos que has guardado</p>
+                </div>
+                <a href="/user" class="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-lg transition-colors border border-white/30 font-medium">
+                    <i data-lucide="arrow-left" class="w-4 h-4 inline mr-2"></i>
+                    Volver al Perfil
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <div class="container py-12">
         <!-- Filter Tabs (Visual Only for now) -->
         <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
             <button class="px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-medium shadow-sm">Todos</button>
@@ -72,4 +86,12 @@
             </div>
         @endif
     </div>
+
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                lucide.createIcons();
+            });
+        </script>
+    @endpush
 @endsection

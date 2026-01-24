@@ -2,13 +2,18 @@
 
 use App\Http\Controllers\Auth\{GoogleAuthController, LoginController, RegisterController};
 use App\Http\Controllers\Api\{
+    BookingController,
     CandelariaController,
+    CandelariaDanzaController,
+    CandelariaGalleryController,
+    EventAttendeeController,
     EventoController,
     ExperienciaController,
     FavoriteController,
     LocaleController,
     PromocionController,
-    ReviewController
+    ReviewController,
+    UserCouponController
 };
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +49,14 @@ Route::get('/promociones/{id}', [PromocionController::class, 'show']);
 
 Route::get('/locales', [LocaleController::class, 'index']);
 Route::get('/locales/{id}', [LocaleController::class, 'show']);
+
+// Candelaria Gallery (Public)
+Route::get('/candelaria-gallery', [CandelariaGalleryController::class, 'index']);
+
+// Candelaria Danzas (Public)
+Route::get('/candelaria-danzas', [CandelariaDanzaController::class, 'index']);
+Route::get('/candelaria-danzas/featured', [CandelariaDanzaController::class, 'featured']);
+Route::get('/candelaria-danzas/{id}', [CandelariaDanzaController::class, 'show']);
 
 // ========== Protected Routes (Sanctum Authentication Required) ==========
 
@@ -100,15 +113,39 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/favorites/check', [FavoriteController::class, 'check']);
     Route::delete('/favorites/{id}', [FavoriteController::class, 'destroy']);
 
+    // Bookings (Reservas de Experiencias)
+    Route::get('/bookings', [BookingController::class, 'index']);
+    Route::post('/bookings', [BookingController::class, 'store']);
+    Route::get('/bookings/{id}', [BookingController::class, 'show']);
+    Route::post('/bookings/{id}/cancel', [BookingController::class, 'cancel']);
+    Route::post('/bookings/check-availability', [BookingController::class, 'checkAvailability']);
+
+    // Event Attendances (Confirmación de asistencia a eventos)
+    Route::get('/event-attendances', [EventAttendeeController::class, 'index']);
+    Route::post('/event-attendances', [EventAttendeeController::class, 'store']);
+    Route::put('/event-attendances/{id}', [EventAttendeeController::class, 'update']);
+    Route::delete('/event-attendances/{eventoId}', [EventAttendeeController::class, 'destroy']);
+    Route::get('/event-attendances/check/{eventoId}', [EventAttendeeController::class, 'check']);
+    Route::get('/event-attendances/count/{eventoId}', [EventAttendeeController::class, 'count']);
+
+    // User Coupons (Cupones de promociones)
+    Route::get('/user-coupons', [UserCouponController::class, 'index']);
+    Route::post('/user-coupons', [UserCouponController::class, 'store']);
+    Route::get('/user-coupons/{id}', [UserCouponController::class, 'show']);
+    Route::post('/user-coupons/{id}/redeem', [UserCouponController::class, 'redeem']);
+
     // ========== Admin Routes (Full Control) ==========
 
     Route::middleware('role:admin')->group(function () {
-        // Admins have access to all routes above
-        // Plus additional admin-only routes if needed
+        // Candelaria Gallery Management
+        Route::post('/candelaria-gallery', [CandelariaGalleryController::class, 'store']);
+        Route::put('/candelaria-gallery/{id}', [CandelariaGalleryController::class, 'update']);
+        Route::delete('/candelaria-gallery/{id}', [CandelariaGalleryController::class, 'destroy']);
 
-        // Example: Admin analytics, user management, etc.
-        // Route::get('/admin/analytics', [AdminController::class, 'analytics']);
-        // Route::get('/admin/users', [AdminController::class, 'users']);
+        // Candelaria Danzas Management
+        Route::post('/candelaria-danzas', [CandelariaDanzaController::class, 'store']);
+        Route::put('/candelaria-danzas/{id}', [CandelariaDanzaController::class, 'update']);
+        Route::delete('/candelaria-danzas/{id}', [CandelariaDanzaController::class, 'destroy']);
     });
 });
 

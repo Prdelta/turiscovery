@@ -100,30 +100,105 @@
                         <i data-lucide="search" class="w-5 h-5"></i>
                     </a>
 
-                    <!-- Auth Buttons (Desktop) -->
-                    <div id="auth-buttons" class="hidden lg:flex items-center gap-3">
-                        <a href="/login"
-                            class="px-4 py-2 font-semibold text-slate-600 hover:text-blue-600 transition-colors duration-200">
-                            Iniciar Sesión
-                        </a>
-                        <a href="/register"
-                            class="px-5 py-2 font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
-                            Registrarse
-                        </a>
-                    </div>
+                    <!-- Auth Buttons (Desktop) - Solo si NO está autenticado -->
+                    @guest
+                        <div id="auth-buttons" class="hidden lg:flex items-center gap-3">
+                            <a href="/login"
+                                class="px-4 py-2 font-semibold text-slate-600 hover:text-blue-600 transition-colors duration-200">
+                                Iniciar Sesión
+                            </a>
+                            <a href="/register"
+                                class="px-5 py-2 font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+                                Registrarse
+                            </a>
+                        </div>
+                    @endguest
 
-                    <!-- User Menu (Desktop) -->
-                    <div id="user-menu" class="hidden lg:flex items-center gap-3">
-                        <a href="/dashboard"
-                            class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors duration-200">
-                            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
-                            Dashboard
-                        </a>
-                        <button onclick="handleLogout()"
-                            class="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200">
-                            <i data-lucide="log-out" class="w-5 h-5"></i>
-                        </button>
-                    </div>
+                    <!-- User Menu (Desktop) - Solo si está autenticado -->
+                    @auth
+                        <div id="user-menu" class="hidden lg:flex items-center gap-3">
+                        <div class="relative group">
+                            <button
+                                class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 transition-all duration-200">
+                                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                    @auth
+                                        {{ substr(auth()->user()->name, 0, 1) }}
+                                    @else
+                                        U
+                                    @endauth
+                                </div>
+                                <div class="text-left">
+                                    <p class="text-sm font-semibold text-slate-800">
+                                        @auth
+                                            {{ auth()->user()->name }}
+                                        @else
+                                            Usuario
+                                        @endauth
+                                    </p>
+                                    <p class="text-xs text-slate-500">
+                                        @auth
+                                            {{ ucfirst(auth()->user()->role) }}
+                                        @else
+                                            Invitado
+                                        @endauth
+                                    </p>
+                                </div>
+                                <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-transform group-hover:rotate-180"></i>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div
+                                class="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                <div class="p-3 border-b border-slate-100">
+                                    <p class="text-sm font-semibold text-slate-800">
+                                        @auth
+                                            {{ auth()->user()->name }}
+                                        @endauth
+                                    </p>
+                                    <p class="text-xs text-slate-500">
+                                        @auth
+                                            {{ auth()->user()->email }}
+                                        @endauth
+                                    </p>
+                                </div>
+                                <div class="py-2">
+                                    <a href="/user"
+                                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                                        <i data-lucide="user" class="w-4 h-4"></i>
+                                        <span>Mi Perfil</span>
+                                    </a>
+                                    <a href="/user/favorites"
+                                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                                        <i data-lucide="heart" class="w-4 h-4"></i>
+                                        <span>Mis Favoritos</span>
+                                    </a>
+                                    <a href="/user/reviews"
+                                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                                        <i data-lucide="star" class="w-4 h-4"></i>
+                                        <span>Mis Reseñas</span>
+                                    </a>
+                                    @auth
+                                        @if(auth()->user()->role === 'admin' || auth()->user()->role === 'socio')
+                                            <div class="border-t border-slate-100 my-2"></div>
+                                            <a href="/dashboard"
+                                                class="flex items-center gap-3 px-4 py-2.5 text-sm text-blue-700 hover:bg-blue-50 transition-colors">
+                                                <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                                                <span>Dashboard</span>
+                                            </a>
+                                        @endif
+                                    @endauth
+                                </div>
+                                <div class="border-t border-slate-100 p-2">
+                                    <button onclick="handleLogout()"
+                                        class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                                        <span>Cerrar Sesión</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    @endauth
 
                     <!-- Mobile Menu Button -->
                     <button id="mobile-menu-btn"
@@ -189,29 +264,90 @@
 
             <!-- Auth Section -->
             <div class="p-6 pt-0 mt-4 border-t border-slate-100">
-                <!-- Auth Buttons -->
-                <div id="mobile-auth-buttons" class="flex flex-col gap-3">
-                    <a href="/login"
-                        class="w-full px-5 py-3 font-semibold text-center text-slate-600 border border-slate-300 hover:border-blue-600 hover:text-blue-600 rounded-lg transition-all duration-200">
-                        Iniciar Sesión
-                    </a>
-                    <a href="/register"
-                        class="w-full px-5 py-3 font-semibold text-center text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
-                        Registrarse
-                    </a>
-                </div>
+                <!-- Auth Buttons - Solo si NO está autenticado -->
+                @guest
+                    <div id="mobile-auth-buttons" class="flex flex-col gap-3">
+                        <a href="/login"
+                            class="w-full px-5 py-3 font-semibold text-center text-slate-600 border border-slate-300 hover:border-blue-600 hover:text-blue-600 rounded-lg transition-all duration-200">
+                            Iniciar Sesión
+                        </a>
+                        <a href="/register"
+                            class="w-full px-5 py-3 font-semibold text-center text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+                            Registrarse
+                        </a>
+                    </div>
+                @endguest
 
-                <!-- User Menu -->
-                <div id="mobile-user-menu" class="hidden flex-col gap-3">
-                    <a href="/dashboard"
-                        class="w-full px-5 py-3 font-semibold text-center text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors duration-200">
-                        Dashboard
+                <!-- User Menu - Solo si está autenticado -->
+                @auth
+                    <div id="mobile-user-menu" class="flex flex-col gap-3">
+                    <!-- User Info Card -->
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white font-bold text-lg border-2 border-white/30">
+                                @auth
+                                    {{ substr(auth()->user()->name, 0, 1) }}
+                                @else
+                                    U
+                                @endauth
+                            </div>
+                            <div>
+                                <p class="font-semibold">
+                                    @auth
+                                        {{ auth()->user()->name }}
+                                    @else
+                                        Usuario
+                                    @endauth
+                                </p>
+                                <p class="text-xs text-blue-100">
+                                    @auth
+                                        {{ auth()->user()->email }}
+                                    @endauth
+                                </p>
+                            </div>
+                        </div>
+                        <div class="text-xs bg-white/10 rounded-lg px-2 py-1 inline-block">
+                            @auth
+                                {{ ucfirst(auth()->user()->role) }}
+                            @endauth
+                        </div>
+                    </div>
+
+                    <a href="/user"
+                        class="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+                        <i data-lucide="user" class="w-5 h-5"></i>
+                        <span class="font-medium">Mi Perfil</span>
                     </a>
+                    <a href="/user/favorites"
+                        class="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+                        <i data-lucide="heart" class="w-5 h-5"></i>
+                        <span class="font-medium">Mis Favoritos</span>
+                    </a>
+                    <a href="/user/reviews"
+                        class="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+                        <i data-lucide="star" class="w-5 h-5"></i>
+                        <span class="font-medium">Mis Reseñas</span>
+                    </a>
+
+                    @auth
+                        @if(auth()->user()->role === 'admin' || auth()->user()->role === 'socio')
+                            <div class="border-t border-slate-200 my-2"></div>
+                            <a href="/dashboard"
+                                class="flex items-center gap-3 px-4 py-3 text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors font-medium">
+                                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        @endif
+                    @endauth
+
+                    <div class="border-t border-slate-200 my-2"></div>
                     <button onclick="handleLogout()"
-                        class="w-full px-5 py-3 font-semibold text-red-600 border border-red-300 hover:bg-red-50 rounded-lg transition-all duration-200">
-                        Cerrar Sesión
+                        class="flex items-center justify-center gap-2 w-full px-5 py-3 font-semibold text-red-600 border border-red-300 hover:bg-red-50 rounded-lg transition-all duration-200">
+                        <i data-lucide="log-out" class="w-5 h-5"></i>
+                        <span>Cerrar Sesión</span>
                     </button>
-                </div>
+                    </div>
+                @endauth
             </div>
         </div>
     </div>
@@ -280,7 +416,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
-            checkAuthState();
         });
 
         // Mobile Menu Logic
@@ -306,53 +441,6 @@
         }
 
         mobileMenuBtn?.addEventListener('click', openMobileMenu);
-
-        // Auth Logic - Server-Side Session (No API Tokens)
-        function checkAuthState() {
-            const authButtons = document.getElementById('auth-buttons');
-            const userMenu = document.getElementById('user-menu');
-            const mobileAuthButtons = document.getElementById('mobile-auth-buttons');
-            const mobileUserMenu = document.getElementById('mobile-user-menu');
-
-            @if (auth()->check())
-                // Usuario autenticado - Mostrar menú de usuario
-                if (authButtons) {
-                    authButtons.classList.remove('flex');
-                    authButtons.classList.add('hidden');
-                }
-                if (userMenu) {
-                    userMenu.classList.remove('hidden');
-                    userMenu.classList.add('flex');
-                }
-
-                // Mobile
-                if (mobileAuthButtons) mobileAuthButtons.classList.add('hidden');
-                if (mobileUserMenu) {
-                    mobileUserMenu.classList.remove('hidden');
-                    mobileUserMenu.classList.add('flex');
-                }
-            @else
-                // Usuario no autenticado - Mostrar botones de login
-                if (authButtons) {
-                    authButtons.classList.remove('hidden');
-                    authButtons.classList.add('flex');
-                }
-                if (userMenu) {
-                    userMenu.classList.remove('flex');
-                    userMenu.classList.add('hidden');
-                }
-
-                // Mobile
-                if (mobileAuthButtons) {
-                    mobileAuthButtons.classList.remove('hidden');
-                    mobileAuthButtons.classList.add('flex');
-                }
-                if (mobileUserMenu) {
-                    mobileUserMenu.classList.add('hidden');
-                    mobileUserMenu.classList.remove('flex');
-                }
-            @endif
-        }
 
         // Logout usando formulario web (POST con CSRF)
         function handleLogout() {

@@ -69,8 +69,8 @@ Route::get('/api/auth/google/callback', [\App\Http\Controllers\Auth\GoogleAuthCo
 
 
 
-// Dashboard (Protected)
-Route::middleware(['auth'])->prefix('dashboard')->group(function () {
+// Dashboard (Protected - Solo Socios y Admins)
+Route::middleware(['auth', 'socio.admin'])->prefix('dashboard')->group(function () {
     Route::get('/', function () {
         return view('dashboard.index');
     })->name('dashboard');

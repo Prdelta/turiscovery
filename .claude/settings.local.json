@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan:*)",
+      "Bash(test:*)",
+      "Bash(npm run build:*)",
+      "WebSearch",
+      "WebFetch(domain:ich.unesco.org)"
+    ]
+  }
+}

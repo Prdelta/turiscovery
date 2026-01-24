@@ -1,11 +1,26 @@
-@extends('layouts.dashboard')
+@extends('layouts.app')
 
 @section('title', 'Editar Perfil')
-@section('page-title', 'Configuración de Perfil')
-@section('page-subtitle', 'Actualiza tu información personal')
 
 @section('content')
-    <div class="max-w-3xl fade-in">
+    <!-- Header Section -->
+    <section class="text-white py-12" style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);">
+        <div class="container">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                    <h1 class="text-4xl font-bold mb-2">Configuración de Perfil</h1>
+                    <p class="text-white/80">Actualiza tu información personal</p>
+                </div>
+                <a href="/user" class="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-lg transition-colors border border-white/30 font-medium">
+                    <i data-lucide="arrow-left" class="w-4 h-4 inline mr-2"></i>
+                    Volver al Perfil
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <div class="container py-12">
+        <div class="max-w-3xl mx-auto">
 
         <div class="card p-8 bg-white border border-gray-200">
             <form action="{{ url('/user/profile') }}" method="POST" enctype="multipart/form-data">
@@ -102,5 +117,14 @@
                 </div>
             </form>
         </div>
+        </div>
     </div>
+
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                lucide.createIcons();
+            });
+        </script>
+    @endpush
 @endsection

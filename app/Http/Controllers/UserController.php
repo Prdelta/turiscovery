@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Cargar conteos
         $favoritesCount = $user->favorites()->count();
@@ -38,7 +39,7 @@ class UserController extends Controller
 
     public function favorites()
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Cargar favoritos con paginación y relaciones polimórficas
         $favorites = $user->favorites()
@@ -51,7 +52,7 @@ class UserController extends Controller
 
     public function reviews()
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Cargar reseñas con paginación y relaciones polimórficas
         $reviews = $user->reviews()
@@ -69,7 +70,7 @@ class UserController extends Controller
 
     public function update(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
