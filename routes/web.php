@@ -94,6 +94,33 @@ Route::middleware(['auth'])->prefix('user')->group(function () {
 // Admin Panel (Admin Only)
 Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::resource('users', \App\Http\Controllers\Admin\AdminUserController::class);
+
+    // Socios Management
+    Route::get('socios/supervision', [\App\Http\Controllers\Admin\SocioController::class, 'supervision'])->name('admin.socios.supervision');
+    Route::post('socios/{socio}/toggle-status', [\App\Http\Controllers\Admin\SocioController::class, 'toggleStatus'])->name('admin.socios.toggle-status');
+    Route::resource('socios', \App\Http\Controllers\Admin\SocioController::class)->names([
+        'index' => 'admin.socios.index',
+        'create' => 'admin.socios.create',
+        'store' => 'admin.socios.store',
+        'show' => 'admin.socios.show',
+        'edit' => 'admin.socios.edit',
+        'update' => 'admin.socios.update',
+        'destroy' => 'admin.socios.destroy',
+    ]);
+
+    // Candelaria Management
+    Route::prefix('candelaria')->name('admin.candelaria.')->group(function () {
+        // Gallery Management
+        Route::resource('gallery', \App\Http\Controllers\Admin\CandelariaGalleryController::class)->except(['show']);
+
+        // Danzas Management
+        Route::resource('danzas', \App\Http\Controllers\Admin\CandelariaDanzaController::class)->except(['show']);
+
+        // Resource Search
+        Route::get('resources/search', [\App\Http\Controllers\Admin\ResourceSearchController::class, 'index'])->name('resources.search');
+        Route::get('resources/search-images', [\App\Http\Controllers\Admin\ResourceSearchController::class, 'searchImages'])->name('resources.search-images');
+        Route::get('resources/search-wikipedia', [\App\Http\Controllers\Admin\ResourceSearchController::class, 'searchWikipedia'])->name('resources.search-wikipedia');
+    });
 });
 
 // TEST ROUTES - REMOVE IN PRODUCTION

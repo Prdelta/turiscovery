@@ -78,6 +78,7 @@
 
 @push('scripts')
     <script>
+        // Las utilidades ya están disponibles globalmente vía app.js compilado por Vite
         const isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -86,70 +87,169 @@
         });
 
         async function loadEventos() {
+            const container = document.getElementById('eventos-grid');
+
             try {
                 const response = await axios.get('/api/eventos');
-                const container = document.getElementById('eventos-grid');
-                const events = response.data.data.data || response.data.data;
+                const { data: events, meta } = extractPaginatedData(response);
 
-                if (response.data.success && Array.isArray(events) && events.length > 0) {
-                    container.innerHTML = events.map(ev => `
-                    <article class="card card-hover group relative overflow-hidden">
-                        <div class="relative h-56 overflow-hidden">
-                            ${ev.image_url ?
-                                `<img src="${ev.image_url}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="${ev.title}">` :
-                                `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100">
-                                    <i data-lucide="calendar" class="w-16 h-16 text-blue-400"></i>
-                                </div>`
-                            }
-                            <div class="card-image-overlay"></div>
+                // Limpiar contenedor de forma segura
+                clearContainer(container);
 
-                            <!-- Fecha Badge con gradiente -->
-                            <div class="absolute top-4 left-4 bg-gradient-to-br from-white to-blue-50 px-4 py-3 rounded-xl shadow-2xl border-2 border-white/50 backdrop-blur-sm text-center transform group-hover:scale-110 transition-transform duration-300">
-                                <span class="block font-black text-2xl bg-gradient-to-br from-blue-600 to-purple-600 bg-clip-text text-transparent">${new Date(ev.start_time).getDate()}</span>
-                                <span class="block text-xs font-bold uppercase text-slate-600">${new Date(ev.start_time).toLocaleDateString('es-ES', { month: 'short' })}</span>
-                            </div>
+                if (events.length > 0) {
+                    // Renderizar eventos usando DOM API (sin innerHTML)
+                    events.forEach(evento => {
+                        const card = createEventCard(evento);
+                        container.appendChild(card);
+                    });
 
-                            <!-- Badge de categoría -->
-                            <div class="absolute top-4 right-4">
-                                <span class="badge badge-primary shadow-lg backdrop-blur-sm bg-blue-600/90 px-4 py-2 text-xs font-bold">
-                                    <i data-lucide="music" class="w-3 h-3 inline mr-1"></i>
-                                    ${ev.category || 'Evento'}
-                                </span>
-                            </div>
+                    // Event delegation para manejar clicks en botones
+                    container.addEventListener('click', handleEventClick);
 
-                            <!-- Info overlay on hover -->
-                            <div class="absolute inset-x-0 bottom-0 p-4 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                                <p class="text-sm font-medium line-clamp-2 text-shadow-strong">${ev.description || 'Evento cultural en Puno'}</p>
-                            </div>
-                        </div>
-
-                        <div class="p-5 bg-gradient-to-br from-white to-slate-50">
-                            <h3 class="text-xl font-bold mb-3 leading-tight text-slate-800 group-hover:text-primary transition-colors line-clamp-2">${ev.title}</h3>
-
-                            <div class="flex items-center gap-2 text-slate-500 text-sm mb-4 p-3 bg-white rounded-lg border border-slate-100">
-                                <i data-lucide="map-pin" class="w-4 h-4 text-red-500 flex-shrink-0"></i>
-                                <span class="truncate font-medium">${ev.address || 'Puno, Perú'}</span>
-                            </div>
-
-                            <button onclick="handleAttend('${ev.id}')" class="btn btn-primary w-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all">
-                                <i data-lucide="calendar-check" class="w-4 h-4"></i>
-                                Confirmar Asistencia
-                            </button>
-                        </div>
-
-                        <!-- Efecto de brillo en hover -->
-                        <div class="absolute inset-0 shimmer opacity-0 group-hover:opacity-100 pointer-events-none"></div>
-                    </article>
-                `).join('');
+                    // Reinicializar iconos de Lucide
                     lucide.createIcons();
                 } else {
-                    container.innerHTML = `<x-empty-state icon="calendar-off" message="No hay eventos próximos registrados." />`;
+                    // Mostrar estado vacío
+                    const emptyState = createEmptyState('No hay eventos próximos registrados.', 'calendar-off');
+                    container.appendChild(emptyState);
                     lucide.createIcons();
                 }
-            } catch (e) {
-                console.error(e);
-                document.getElementById('eventos-grid').innerHTML =
-                    '<p class="text-center text-danger">Error al cargar eventos.</p>';
+            } catch (error) {
+                const errorMessage = handleApiError(error);
+                const errorDiv = createElementWithText('p', errorMessage, 'text-center text-red-600 py-8');
+                clearContainer(container);
+                container.appendChild(errorDiv);
+            }
+        }
+
+        /**
+         * Crea tarjeta de evento de forma segura (sin XSS)
+         */
+        function createEventCard(evento) {
+            const article = document.createElement('article');
+            article.className = 'card card-hover group relative overflow-hidden';
+
+            // Imagen del evento
+            const imageDiv = document.createElement('div');
+            imageDiv.className = 'relative h-56 overflow-hidden';
+
+            if (evento.image_url) {
+                const img = document.createElement('img');
+                safeSetAttribute(img, 'src', evento.image_url);
+                safeSetAttribute(img, 'alt', evento.title || 'Evento');
+                img.className = 'w-full h-full object-cover group-hover:scale-110 transition-transform duration-500';
+                imageDiv.appendChild(img);
+            } else {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100';
+                const icon = document.createElement('i');
+                icon.setAttribute('data-lucide', 'calendar');
+                icon.className = 'w-16 h-16 text-blue-400';
+                placeholder.appendChild(icon);
+                imageDiv.appendChild(placeholder);
+            }
+
+            // Overlay de imagen
+            const overlay = document.createElement('div');
+            overlay.className = 'card-image-overlay';
+            imageDiv.appendChild(overlay);
+
+            // Badge de fecha
+            const dateBadge = document.createElement('div');
+            dateBadge.className = 'absolute top-4 left-4 bg-gradient-to-br from-white to-blue-50 px-4 py-3 rounded-xl shadow-2xl border-2 border-white/50 backdrop-blur-sm text-center transform group-hover:scale-110 transition-transform duration-300';
+
+            const eventDate = new Date(evento.start_time);
+            const daySpan = createElementWithText('span', eventDate.getDate().toString(), 'block font-black text-2xl bg-gradient-to-br from-blue-600 to-purple-600 bg-clip-text text-transparent');
+            const monthSpan = createElementWithText('span', eventDate.toLocaleDateString('es-ES', { month: 'short' }), 'block text-xs font-bold uppercase text-slate-600');
+
+            dateBadge.appendChild(daySpan);
+            dateBadge.appendChild(monthSpan);
+            imageDiv.appendChild(dateBadge);
+
+            // Badge de categoría
+            const categoryBadgeWrapper = document.createElement('div');
+            categoryBadgeWrapper.className = 'absolute top-4 right-4';
+
+            const categoryBadge = document.createElement('span');
+            categoryBadge.className = 'badge badge-primary shadow-lg backdrop-blur-sm bg-blue-600/90 px-4 py-2 text-xs font-bold';
+
+            const musicIcon = document.createElement('i');
+            musicIcon.setAttribute('data-lucide', 'music');
+            musicIcon.className = 'w-3 h-3 inline mr-1';
+
+            const categoryText = document.createTextNode(evento.category || 'Evento');
+
+            categoryBadge.appendChild(musicIcon);
+            categoryBadge.appendChild(categoryText);
+            categoryBadgeWrapper.appendChild(categoryBadge);
+            imageDiv.appendChild(categoryBadgeWrapper);
+
+            // Info overlay on hover
+            const infoOverlay = document.createElement('div');
+            infoOverlay.className = 'absolute inset-x-0 bottom-0 p-4 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300';
+
+            const descriptionP = createElementWithText('p', evento.description || 'Evento cultural en Puno', 'text-sm font-medium line-clamp-2 text-shadow-strong');
+            infoOverlay.appendChild(descriptionP);
+            imageDiv.appendChild(infoOverlay);
+
+            // Contenido de la tarjeta
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'p-5 bg-gradient-to-br from-white to-slate-50';
+
+            // Título
+            const title = createElementWithText('h3', evento.title || 'Sin título', 'text-xl font-bold mb-3 leading-tight text-slate-800 group-hover:text-primary transition-colors line-clamp-2');
+            contentDiv.appendChild(title);
+
+            // Ubicación
+            const locationDiv = document.createElement('div');
+            locationDiv.className = 'flex items-center gap-2 text-slate-500 text-sm mb-4 p-3 bg-white rounded-lg border border-slate-100';
+
+            const mapIcon = document.createElement('i');
+            mapIcon.setAttribute('data-lucide', 'map-pin');
+            mapIcon.className = 'w-4 h-4 text-red-500 flex-shrink-0';
+
+            const locationSpan = createElementWithText('span', evento.address || 'Puno, Perú', 'truncate font-medium');
+
+            locationDiv.appendChild(mapIcon);
+            locationDiv.appendChild(locationSpan);
+            contentDiv.appendChild(locationDiv);
+
+            // Botón (sin onclick inline - usamos event delegation)
+            const button = document.createElement('button');
+            button.className = 'btn btn-primary w-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all';
+            button.dataset.eventoId = evento.id;
+            button.dataset.action = 'attend';
+
+            const buttonIcon = document.createElement('i');
+            buttonIcon.setAttribute('data-lucide', 'calendar-check');
+            buttonIcon.className = 'w-4 h-4';
+
+            const buttonText = document.createTextNode(' Confirmar Asistencia');
+
+            button.appendChild(buttonIcon);
+            button.appendChild(buttonText);
+            contentDiv.appendChild(button);
+
+            // Efecto shimmer
+            const shimmer = document.createElement('div');
+            shimmer.className = 'absolute inset-0 shimmer opacity-0 group-hover:opacity-100 pointer-events-none';
+
+            // Ensamblar tarjeta
+            article.appendChild(imageDiv);
+            article.appendChild(contentDiv);
+            article.appendChild(shimmer);
+
+            return article;
+        }
+
+        /**
+         * Event delegation para manejar clicks (evita onclick inline)
+         */
+        function handleEventClick(e) {
+            const button = e.target.closest('[data-action="attend"]');
+            if (button) {
+                const eventoId = button.dataset.eventoId;
+                handleAttend(eventoId);
             }
         }
 
@@ -161,7 +261,7 @@
 
             try {
                 const response = await axios.post('/api/event-attendances', {
-                    evento_id: eventoId,
+                    evento_id: parseInt(eventoId, 10),
                     status: 'confirmed',
                     guests: 1
                 });
@@ -174,7 +274,8 @@
                 if (error.response?.status === 401) {
                     window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
                 } else {
-                    alert('Error al confirmar asistencia. Por favor, intenta nuevamente.');
+                    const errorMessage = handleApiError(error);
+                    alert(errorMessage);
                 }
             }
         }

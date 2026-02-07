@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ValidatesPaginationTrait;
 use App\Models\Candelaria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class CandelariaController extends Controller
 {
+    use ValidatesPaginationTrait;
     /**
      * Display a listing of active Candelaria content
      */
@@ -36,8 +38,8 @@ class CandelariaController extends Controller
             });
         }
 
-        // Pagination
-        $perPage = $request->get('per_page', 15);
+        // Validar y limitar per_page para prevenir ataques DOS
+        $perPage = $this->getValidatedPerPage($request, 'candelaria');
         $candelaria = $query->latest()->paginate($perPage);
 
         return response()->json([

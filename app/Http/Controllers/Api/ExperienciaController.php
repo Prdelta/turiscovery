@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ValidatesPaginationTrait;
 use App\Models\Experiencia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class ExperienciaController extends Controller
 {
+    use ValidatesPaginationTrait;
     /**
      * Display a listing of active Experiencias
      */
@@ -48,7 +50,8 @@ class ExperienciaController extends Controller
             });
         }
 
-        $perPage = $request->get('per_page', 15);
+        // Validar y limitar per_page para prevenir ataques DOS
+        $perPage = $this->getValidatedPerPage($request, 'experiencias');
         $experiencias = $query->latest()->paginate($perPage);
 
         return response()->json([

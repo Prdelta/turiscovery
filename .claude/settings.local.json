@@ -5,7 +5,17 @@
       "Bash(test:*)",
       "Bash(npm run build:*)",
       "WebSearch",
-      "WebFetch(domain:ich.unesco.org)"
+      "WebFetch(domain:ich.unesco.org)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(curl:*)",
+      "Bash(tasklist:*)",
+      "Bash(findstr:*)",
+      "Bash(php:*)",
+      "Bash(del:*)",
+      "Bash(python -m json.tool:*)",
+      "Bash(mysql:*)",
+      "WebFetch(domain:commons.wikimedia.org)"
     ]
   }
 }

@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Auth\{GoogleAuthController, LoginController, RegisterController};
+use App\Http\Controllers\Auth\{GoogleAuthController, LoginController, RegisterController, SessionController};
 use App\Http\Controllers\Api\{
     BookingController,
     CandelariaController,
@@ -26,45 +26,55 @@ use Illuminate\Support\Facades\Route;
 
 // ========== Public Routes (No Authentication Required) ==========
 
-// Authentication Routes
+// Authentication Routes (Legacy - Token Based)
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [LoginController::class, 'login']);
+
+// Session-Based Authentication (Secure - httpOnly Cookies)
+Route::post('/session/login', [SessionController::class, 'login']);
+Route::get('/session/check', [SessionController::class, 'check']);
 
 // Google OAuth Routes
 Route::get('/auth/google', [GoogleAuthController::class, 'redirectToGoogle']);
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
 
-// Public Read-Only Routes for 4 Pillars
-Route::get('/candelaria', [CandelariaController::class, 'index']);
-Route::get('/candelaria/{id}', [CandelariaController::class, 'show']);
+// Public Read-Only Routes for 4 Pillars (with parameter validation + API cache)
+Route::middleware(['validate.params', 'api.cache'])->group(function () {
+    Route::get('/candelaria', [CandelariaController::class, 'index']);
+    Route::get('/candelaria/{id}', [CandelariaController::class, 'show']);
 
-Route::get('/experiencias', [ExperienciaController::class, 'index']);
-Route::get('/experiencias/{id}', [ExperienciaController::class, 'show']);
+    Route::get('/experiencias', [ExperienciaController::class, 'index']);
+    Route::get('/experiencias/{id}', [ExperienciaController::class, 'show']);
 
-Route::get('/eventos', [EventoController::class, 'index']);
-Route::get('/eventos/{id}', [EventoController::class, 'show']);
+    Route::get('/eventos', [EventoController::class, 'index']);
+    Route::get('/eventos/{id}', [EventoController::class, 'show']);
 
-Route::get('/promociones', [PromocionController::class, 'index']);
-Route::get('/promociones/{id}', [PromocionController::class, 'show']);
+    Route::get('/promociones', [PromocionController::class, 'index']);
+    Route::get('/promociones/{id}', [PromocionController::class, 'show']);
 
-Route::get('/locales', [LocaleController::class, 'index']);
-Route::get('/locales/{id}', [LocaleController::class, 'show']);
+    Route::get('/locales', [LocaleController::class, 'index']);
+    Route::get('/locales/{id}', [LocaleController::class, 'show']);
 
-// Candelaria Gallery (Public)
-Route::get('/candelaria-gallery', [CandelariaGalleryController::class, 'index']);
+    // Candelaria Gallery (Public)
+    Route::get('/candelaria-gallery', [CandelariaGalleryController::class, 'index']);
 
-// Candelaria Danzas (Public)
-Route::get('/candelaria-danzas', [CandelariaDanzaController::class, 'index']);
-Route::get('/candelaria-danzas/featured', [CandelariaDanzaController::class, 'featured']);
-Route::get('/candelaria-danzas/{id}', [CandelariaDanzaController::class, 'show']);
+    // Candelaria Danzas (Public)
+    Route::get('/candelaria-danzas', [CandelariaDanzaController::class, 'index']);
+    Route::get('/candelaria-danzas/featured', [CandelariaDanzaController::class, 'featured']);
+    Route::get('/candelaria-danzas/{id}', [CandelariaDanzaController::class, 'show']);
+});
 
 // ========== Protected Routes (Sanctum Authentication Required) ==========
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'validate.params'])->group(function () {
 
-    // User Info & Logout
+    // User Info & Logout (Legacy - Token Based)
     Route::post('/logout', [LoginController::class, 'logout']);
     Route::get('/me', [LoginController::class, 'me']);
+
+    // Session-Based Auth Routes
+    Route::post('/session/logout', [SessionController::class, 'logout']);
+    Route::get('/session/me', [SessionController::class, 'me']);
 
     // ========== Socio Routes (Partners can manage their own content) ==========
 

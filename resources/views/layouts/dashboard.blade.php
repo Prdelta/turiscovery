@@ -175,39 +175,40 @@
                         </ul>
                     </div>
 
-                    <div id="user-section">
-                        <p class="px-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Personal</p>
+                    <div id="admin-section" class="hidden">
+                        <p class="px-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Administración</p>
                         <ul class="space-y-1">
                             <li>
-                                <a href="/user"
-                                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-blue-600 {{ request()->is('user') ? 'active' : '' }}">
-                                    <i data-lucide="user" class="w-5 h-5 stroke-[1.5]"></i>
-                                    <span class="text-sm font-medium">Mi Perfil</span>
+                                <a href="/admin/socios"
+                                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-blue-600 {{ request()->is('admin/socios*') ? 'active' : '' }}">
+                                    <i data-lucide="users" class="w-5 h-5 stroke-[1.5]"></i>
+                                    <span class="text-sm font-medium">Socios</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="/user/favorites"
-                                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-blue-600 {{ request()->is('user/favorites') ? 'active' : '' }}">
-                                    <i data-lucide="heart" class="w-5 h-5 stroke-[1.5]"></i>
-                                    <span class="text-sm font-medium">Favoritos</span>
+                                <a href="/admin/candelaria/gallery"
+                                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-blue-600 {{ request()->is('admin/candelaria/gallery*') ? 'active' : '' }}">
+                                    <i data-lucide="image" class="w-5 h-5 stroke-[1.5]"></i>
+                                    <span class="text-sm font-medium">Galería Candelaria</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="/user/reviews"
-                                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-blue-600 {{ request()->is('user/reviews') ? 'active' : '' }}">
-                                    <i data-lucide="star" class="w-5 h-5 stroke-[1.5]"></i>
-                                    <span class="text-sm font-medium">Reseñas</span>
+                                <a href="/admin/candelaria/danzas"
+                                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-blue-600 {{ request()->is('admin/candelaria/danzas*') ? 'active' : '' }}">
+                                    <i data-lucide="music" class="w-5 h-5 stroke-[1.5]"></i>
+                                    <span class="text-sm font-medium">Danzas</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="/user/edit"
-                                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-blue-600 {{ request()->is('user/edit') ? 'active' : '' }}">
-                                    <i data-lucide="settings-2" class="w-5 h-5 stroke-[1.5]"></i>
-                                    <span class="text-sm font-medium">Configuración</span>
+                                <a href="/admin/candelaria/resources/search"
+                                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-blue-600 {{ request()->is('admin/candelaria/resources*') ? 'active' : '' }}">
+                                    <i data-lucide="search" class="w-5 h-5 stroke-[1.5]"></i>
+                                    <span class="text-sm font-medium">Buscador de Recursos</span>
                                 </a>
                             </li>
                         </ul>
                     </div>
+
                 </nav>
             </div>
 
@@ -354,10 +355,18 @@
         function updateMenuVisibility(role) {
             const contentManagement = document.getElementById('content-management');
             const quickActions = document.getElementById('quick-actions');
+            const adminSection = document.getElementById('admin-section');
 
             if (role === 'tourist') {
                 if (contentManagement) contentManagement.style.display = 'none';
                 if (quickActions) quickActions.style.display = 'none';
+                if (adminSection) adminSection.style.display = 'none';
+            } else if (role === 'admin') {
+                // Mostrar sección de administración solo para admins
+                if (adminSection) adminSection.classList.remove('hidden');
+            } else if (role === 'socio') {
+                // Ocultar sección de administración para socios
+                if (adminSection) adminSection.style.display = 'none';
             }
         }
 

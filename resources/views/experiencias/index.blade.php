@@ -148,7 +148,7 @@
                                     <i data-lucide="calendar-check" class="w-6 h-6"></i>
                                     Reservar Experiencia
                                 </h3>
-                                <button onclick="closeModal()"
+                                <button data-action="close-modal"
                                     class="text-white/80 hover:text-white transition-colors p-1 rounded-full hover:bg-white/10">
                                     <i data-lucide="x" class="w-6 h-6"></i>
                                 </button>
@@ -169,7 +169,7 @@
                                 </div>
                             </div>
 
-                            <form id="booking-form" onsubmit="confirmBooking(event)" class="space-y-4">
+                            <form id="booking-form" class="space-y-4">
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-1">Nombre Completo</label>
                                     <div class="relative">
@@ -217,7 +217,7 @@
                                 <i data-lucide="message-circle" class="w-4 h-4"></i>
                                 Confirmar por WhatsApp
                             </button>
-                            <button type="button" onclick="closeModal()"
+                            <button type="button" data-action="close-modal"
                                 class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto border-0">Cancelar</button>
                         </div>
                     </div>
@@ -228,67 +228,162 @@
 
     @push('scripts')
         <script>
+            // Las utilidades ya están disponibles globalmente vía app.js compilado por Vite
+
             document.addEventListener('DOMContentLoaded', async () => {
                 lucide.createIcons();
                 await loadExperiencias();
             });
 
             async function loadExperiencias() {
+                const container = document.getElementById('experiencias-grid');
+
                 try {
                     const response = await axios.get('/api/experiencias');
-                    const container = document.getElementById('experiencias-grid');
+                    const { data: items, meta } = extractPaginatedData(response);
 
-                    const items = response.data.data.data ? response.data.data.data : response.data.data;
+                    clearContainer(container);
 
-                    if (response.data.success && Array.isArray(items) && items.length > 0) {
-                        container.innerHTML = items.map(item => `
-                    <article class="card hover:shadow-lg transition-all duration-300 group">
-                        <div style="position: relative; height: 220px; overflow: hidden;" class="rounded-t-xl bg-slate-200">
-                            <img src="${item.image_url || 'https://via.placeholder.com/400x200'}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            <span class="badge badge-primary shadow-lg" style="position: absolute; top: 12px; right: 12px; font-size: 0.9rem;">${item.price_pen ? 'S/ ' + parseFloat(item.price_pen).toFixed(0) : 'Consultar'}</span>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold text-slate-800 mb-2 leading-tight group-hover:text-primary transition-colors">${item.title}</h3>
-                            <p class="text-slate-500 mb-4 line-clamp-2 text-sm">${item.description || 'Sin descripción disponible.'}</p>
-                            
-                            <div class="flex items-center gap-4 text-xs text-slate-400 mb-6 border-t border-slate-100 pt-4">
-                                <div class="flex items-center gap-1">
-                                    <i data-lucide="clock" class="w-4 h-4"></i>
-                                    <span>${item.duration_hours ? item.duration_hours + ' h' : 'Flexible'}</span>
-                                </div>
-                                <div class="flex items-center gap-1">
-                                    <i data-lucide="map-pin" class="w-4 h-4"></i>
-                                    <span>${item.location || 'Puno'}</span>
-                                </div>
-                            </div>
+                    if (items.length > 0) {
+                        items.forEach(experiencia => {
+                            const card = createExperienciaCard(experiencia);
+                            container.appendChild(card);
+                        });
 
-                            <div class="grid grid-cols-2 gap-3">
-                                <button onclick="openModal('${item.title}', '${item.price_pen}')" class="btn btn-primary justify-center text-sm font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
-                                    Reservar
-                                </button>
-                                <a href="/experiencias/${item.id}" class="btn btn-outline justify-center text-sm font-bold border-2 hover:bg-slate-50">
-                                    Ver Más
-                                </a>
-                            </div>
-                        </div>
-                    </article>
-                `).join('');
+                        // Event delegation para botones
+                        container.addEventListener('click', handleCardClick);
+
                         lucide.createIcons();
                     } else {
-                        container.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 4rem;">
-                        <i data-lucide="compass" class="w-16 h-16 text-slate-300 mx-auto mb-4"></i>
-                        <h3 class="text-xl font-medium text-slate-600">No hay experiencias disponibles</h3>
-                        <p class="text-slate-400">Próximamente agregaremos nuevas aventuras.</p>
-                    </div>
-                `;
+                        const emptyDiv = document.createElement('div');
+                        emptyDiv.style.gridColumn = '1/-1';
+                        emptyDiv.style.textAlign = 'center';
+                        emptyDiv.style.padding = '4rem';
+
+                        const icon = document.createElement('i');
+                        icon.setAttribute('data-lucide', 'compass');
+                        icon.className = 'w-16 h-16 text-slate-300 mx-auto mb-4';
+
+                        const title = createElementWithText('h3', 'No hay experiencias disponibles', 'text-xl font-medium text-slate-600');
+                        const desc = createElementWithText('p', 'Próximamente agregaremos nuevas aventuras.', 'text-slate-400');
+
+                        emptyDiv.appendChild(icon);
+                        emptyDiv.appendChild(title);
+                        emptyDiv.appendChild(desc);
+                        container.appendChild(emptyDiv);
                         lucide.createIcons();
                     }
-                } catch (e) {
-                    console.error(e);
-                    document.getElementById('experiencias-grid').innerHTML =
-                        '<p class="col-span-3 text-center text-red-500 py-8">Error al cargar experiencias. Por favor intenta más tarde.</p>';
+                } catch (error) {
+                    const errorMessage = handleApiError(error);
+                    const errorP = createElementWithText('p', errorMessage, 'col-span-3 text-center text-red-500 py-8');
+                    clearContainer(container);
+                    container.appendChild(errorP);
+                }
+            }
+
+            /**
+             * Crea tarjeta de experiencia (sin XSS)
+             */
+            function createExperienciaCard(item) {
+                const article = document.createElement('article');
+                article.className = 'card hover:shadow-lg transition-all duration-300 group';
+
+                // Imagen
+                const imageDiv = document.createElement('div');
+                imageDiv.style.cssText = 'position: relative; height: 220px; overflow: hidden;';
+                imageDiv.className = 'rounded-t-xl bg-slate-200';
+
+                const img = document.createElement('img');
+                safeSetAttribute(img, 'src', item.image_url || 'https://via.placeholder.com/400x200');
+                safeSetAttribute(img, 'alt', item.title || 'Experiencia');
+                img.className = 'w-full h-full object-cover transition-transform duration-500 group-hover:scale-110';
+                imageDiv.appendChild(img);
+
+                const overlay = document.createElement('div');
+                overlay.className = 'absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300';
+                imageDiv.appendChild(overlay);
+
+                // Badge de precio
+                const priceBadge = createElementWithText(
+                    'span',
+                    item.price_pen ? `S/ ${parseFloat(item.price_pen).toFixed(0)}` : 'Consultar',
+                    'badge badge-primary shadow-lg'
+                );
+                priceBadge.style.cssText = 'position: absolute; top: 12px; right: 12px; font-size: 0.9rem;';
+                imageDiv.appendChild(priceBadge);
+
+                // Contenido
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'p-6';
+
+                const title = createElementWithText('h3', item.title || 'Sin título', 'text-xl font-bold text-slate-800 mb-2 leading-tight group-hover:text-primary transition-colors');
+                const desc = createElementWithText('p', item.description || 'Sin descripción disponible.', 'text-slate-500 mb-4 line-clamp-2 text-sm');
+
+                contentDiv.appendChild(title);
+                contentDiv.appendChild(desc);
+
+                // Metadata
+                const metaDiv = document.createElement('div');
+                metaDiv.className = 'flex items-center gap-4 text-xs text-slate-400 mb-6 border-t border-slate-100 pt-4';
+
+                const durationDiv = document.createElement('div');
+                durationDiv.className = 'flex items-center gap-1';
+                const clockIcon = document.createElement('i');
+                clockIcon.setAttribute('data-lucide', 'clock');
+                clockIcon.className = 'w-4 h-4';
+                const durationText = createElementWithText('span', item.duration_hours ? `${item.duration_hours} h` : 'Flexible');
+                durationDiv.appendChild(clockIcon);
+                durationDiv.appendChild(durationText);
+
+                const locationDiv = document.createElement('div');
+                locationDiv.className = 'flex items-center gap-1';
+                const mapIcon = document.createElement('i');
+                mapIcon.setAttribute('data-lucide', 'map-pin');
+                mapIcon.className = 'w-4 h-4';
+                const locationText = createElementWithText('span', item.location || 'Puno');
+                locationDiv.appendChild(mapIcon);
+                locationDiv.appendChild(locationText);
+
+                metaDiv.appendChild(durationDiv);
+                metaDiv.appendChild(locationDiv);
+                contentDiv.appendChild(metaDiv);
+
+                // Botones
+                const buttonsDiv = document.createElement('div');
+                buttonsDiv.className = 'grid grid-cols-2 gap-3';
+
+                const reservarBtn = document.createElement('button');
+                reservarBtn.textContent = 'Reservar';
+                reservarBtn.className = 'btn btn-primary justify-center text-sm font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5';
+                reservarBtn.dataset.action = 'reservar';
+                reservarBtn.dataset.title = item.title || '';
+                reservarBtn.dataset.price = item.price_pen || '';
+
+                const verMasLink = document.createElement('a');
+                safeSetAttribute(verMasLink, 'href', `/experiencias/${item.id}`);
+                verMasLink.textContent = 'Ver Más';
+                verMasLink.className = 'btn btn-outline justify-center text-sm font-bold border-2 hover:bg-slate-50';
+
+                buttonsDiv.appendChild(reservarBtn);
+                buttonsDiv.appendChild(verMasLink);
+                contentDiv.appendChild(buttonsDiv);
+
+                // Ensamblar
+                article.appendChild(imageDiv);
+                article.appendChild(contentDiv);
+
+                return article;
+            }
+
+            /**
+             * Event delegation para clicks
+             */
+            function handleCardClick(e) {
+                const button = e.target.closest('[data-action="reservar"]');
+                if (button) {
+                    const title = button.dataset.title;
+                    const price = button.dataset.price;
+                    openModal(title, price);
                 }
             }
 
@@ -298,13 +393,11 @@
             const panel = document.getElementById('modal-panel');
 
             function openModal(title, price) {
+                // Usar textContent (no innerHTML) para prevenir XSS
                 document.getElementById('modal-exp-title').textContent = title;
-                document.getElementById('modal-exp-price').textContent = price ? `S/ ${price} por persona` :
-                    'Precio a consultar';
+                document.getElementById('modal-exp-price').textContent = price ? `S/ ${price} por persona` : 'Precio a consultar';
 
-                // Show modal
                 modal.classList.remove('hidden');
-                // Animate in
                 setTimeout(() => {
                     backdrop.classList.remove('opacity-0');
                     panel.classList.remove('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
@@ -313,7 +406,6 @@
             }
 
             function closeModal() {
-                // Animate out
                 backdrop.classList.add('opacity-0');
                 panel.classList.remove('opacity-100', 'translate-y-0', 'sm:scale-100');
                 panel.classList.add('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
@@ -331,22 +423,31 @@
                 const date = document.getElementById('booking-date').value;
                 const people = document.getElementById('booking-people').value;
 
-                const message =
-                    `Hola Turiscovery, estoy interesado en reservar: *${title}*. \n\nMis datos son: \n- Nombre: ${name} \n- Fecha: ${date} \n- Cantidad: ${people} \n\nQuedo a la espera de su confirmación.`;
+                const message = `Hola Turiscovery, estoy interesado en reservar: *${title}*. \n\nMis datos son: \n- Nombre: ${name} \n- Fecha: ${date} \n- Cantidad: ${people} \n\nQuedo a la espera de su confirmación.`;
 
                 const phoneNumber = '51950000000'; // Replace with real number
                 const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
-                // Close modal and open WhatsApp
                 closeModal();
                 window.open(url, '_blank');
             }
 
-            // Close on click outside
+            // Event listeners
+            document.getElementById('booking-form').addEventListener('submit', confirmBooking);
+
             modal.addEventListener('click', (e) => {
                 if (e.target === backdrop) {
                     closeModal();
                 }
             });
+
+            // Cerrar modal con botones
+            document.querySelectorAll('[data-action="close-modal"]').forEach(btn => {
+                btn.addEventListener('click', closeModal);
+            });
+
+            // Hacer funciones globales para uso en otros scripts
+            window.openModal = openModal;
+            window.closeModal = closeModal;
         </script>
     @endpush

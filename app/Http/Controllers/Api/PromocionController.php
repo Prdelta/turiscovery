@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ValidatesPaginationTrait;
 use App\Models\Promocion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class PromocionController extends Controller
 {
+    use ValidatesPaginationTrait;
     /**
      * Display a listing of active Promociones (automatically filters expired)
      */
@@ -36,7 +38,8 @@ class PromocionController extends Controller
             });
         }
 
-        $perPage = $request->get('per_page', 15);
+        // Validar y limitar per_page para prevenir ataques DOS
+        $perPage = $this->getValidatedPerPage($request, 'promociones');
         $promociones = $query->latest('created_at')->paginate($perPage);
 
         return response()->json([

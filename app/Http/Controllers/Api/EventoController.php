@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ValidatesPaginationTrait;
 use App\Models\Evento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class EventoController extends Controller
 {
+    use ValidatesPaginationTrait;
     /**
      * Display a listing of active Eventos (automatically filters expired)
      */
@@ -47,7 +49,8 @@ class EventoController extends Controller
             });
         }
 
-        $perPage = $request->get('per_page', 15);
+        // Validar y limitar per_page para prevenir ataques DOS
+        $perPage = $this->getValidatedPerPage($request, 'eventos');
         $eventos = $query->latest('start_time')->paginate($perPage);
 
         return response()->json([

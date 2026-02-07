@@ -694,7 +694,9 @@
                 const galleryGrid = document.getElementById('galleryGrid');
                 const yearFilters = document.getElementById('yearFilters');
 
-                if (response.data.success && response.data.data.length > 0) {
+                console.log('Gallery Response:', response.data);
+
+                if (response.data.success && response.data.data && response.data.data.length > 0) {
                     const photos = response.data.data;
 
                     // Extraer años únicos
@@ -732,32 +734,74 @@
                             }
                         });
                     });
+                } else {
+                    console.warn('No gallery photos found');
+                    galleryGrid.innerHTML = '<div class="col-span-full text-center py-12 text-slate-400"><p>No hay imágenes en la galería aún.</p></div>';
                 }
             } catch (error) {
                 console.error('Error cargando galería:', error);
+                const galleryGrid = document.getElementById('galleryGrid');
+                galleryGrid.innerHTML = '<div class="col-span-full text-center py-12 text-red-500"><p>Error al cargar la galería. Por favor recarga la página.</p></div>';
             }
         }
 
         function renderGallery(photos) {
             const galleryGrid = document.getElementById('galleryGrid');
 
-            if (photos.length === 0) {
+            if (!photos || photos.length === 0) {
                 galleryGrid.innerHTML = '<div class="col-span-full text-center py-12 text-slate-400"><p>No hay imágenes para este año.</p></div>';
                 return;
             }
 
-            galleryGrid.innerHTML = photos.map(photo => `
-                <div class="card overflow-hidden hover:shadow-xl transition-all group border border-slate-200">
-                    <div class="aspect-video overflow-hidden bg-slate-100">
-                        <img src="${photo.image_url}" alt="${photo.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                    </div>
-                    <div class="p-4 bg-white">
-                        <span class="inline-block bg-slate-800 text-white px-2 py-1 rounded text-xs font-bold mb-2">${photo.year}</span>
-                        <h4 class="font-bold text-sm mb-1" style="color: var(--color-text);">${photo.title}</h4>
-                        ${photo.description ? `<p class="text-xs text-slate-500 line-clamp-2">${photo.description}</p>` : ''}
-                    </div>
-                </div>
-            `).join('');
+            console.log('Rendering', photos.length, 'photos');
+
+            // Usar DOM API en lugar de innerHTML para prevenir XSS
+            galleryGrid.innerHTML = '';
+
+            photos.forEach(photo => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'card overflow-hidden hover:shadow-xl transition-all group border border-slate-200';
+
+                const imageDiv = document.createElement('div');
+                imageDiv.className = 'aspect-video overflow-hidden bg-slate-100';
+
+                const img = document.createElement('img');
+                img.src = photo.image_url || '';
+                img.alt = photo.title || '';
+                img.className = 'w-full h-full object-cover group-hover:scale-110 transition-transform duration-500';
+                img.onerror = function() {
+                    this.src = '/images/placeholder.jpg';
+                    console.error('Failed to load image:', photo.image_url);
+                };
+
+                imageDiv.appendChild(img);
+
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'p-4 bg-white';
+
+                const yearBadge = document.createElement('span');
+                yearBadge.className = 'inline-block bg-slate-800 text-white px-2 py-1 rounded text-xs font-bold mb-2';
+                yearBadge.textContent = photo.year || '';
+
+                const title = document.createElement('h4');
+                title.className = 'font-bold text-sm mb-1';
+                title.style.color = 'var(--color-text)';
+                title.textContent = photo.title || '';
+
+                contentDiv.appendChild(yearBadge);
+                contentDiv.appendChild(title);
+
+                if (photo.description) {
+                    const desc = document.createElement('p');
+                    desc.className = 'text-xs text-slate-500 line-clamp-2';
+                    desc.textContent = photo.description;
+                    contentDiv.appendChild(desc);
+                }
+
+                cardDiv.appendChild(imageDiv);
+                cardDiv.appendChild(contentDiv);
+                galleryGrid.appendChild(cardDiv);
+            });
         }
 
         function filterGallery(year) {
@@ -769,45 +813,98 @@
                 const response = await axios.get('/api/candelaria-danzas');
                 const danzasGrid = document.getElementById('danzasGrid');
 
-                if (response.data.success && response.data.data.length > 0) {
+                console.log('Danzas Response:', response.data);
+
+                if (response.data.success && response.data.data && response.data.data.length > 0) {
                     const danzas = response.data.data;
 
-                    danzasGrid.innerHTML = danzas.map(danza => `
-                        <article class="card overflow-hidden hover:shadow-lg transition-all bg-white border border-slate-200">
-                            ${danza.image_url ? `
-                                <div class="aspect-video overflow-hidden bg-slate-100">
-                                    <img src="${danza.image_url}" alt="${danza.name}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
-                                </div>
-                            ` : `
-                                <div class="aspect-video overflow-hidden bg-slate-100 flex items-center justify-center">
-                                    <span class="text-4xl font-bold text-slate-300">${danza.name.charAt(0)}</span>
-                                </div>
-                            `}
-                            <div class="p-6">
-                                <div class="mb-3">
-                                    <span class="inline-block bg-slate-800 text-white px-3 py-1 rounded text-xs font-bold">
-                                        ${danza.type === 'autoctona' ? 'Danza Autóctona' : 'Danza Mestiza'}
-                                    </span>
-                                    ${danza.region ? `<span class="inline-block bg-slate-100 text-slate-600 px-3 py-1 rounded text-xs font-semibold ml-2">${danza.region}</span>` : ''}
-                                </div>
-                                <h3 class="text-xl font-bold mb-3" style="color: var(--color-text);">${danza.name}</h3>
-                                <p class="text-sm leading-relaxed mb-4 line-clamp-3" style="color: var(--color-text-light);">
-                                    ${danza.description}
-                                </p>
-                                ${danza.characteristics ? `
-                                    <div class="pt-3 border-t border-slate-100">
-                                        <p class="text-xs text-slate-500 line-clamp-2">${danza.characteristics}</p>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </article>
-                    `).join('');
+                    console.log('Rendering', danzas.length, 'danzas');
+
+                    // Usar DOM API en lugar de innerHTML
+                    danzasGrid.innerHTML = '';
+
+                    danzas.forEach(danza => {
+                        const article = document.createElement('article');
+                        article.className = 'card overflow-hidden hover:shadow-lg transition-all bg-white border border-slate-200';
+
+                        // Imagen o inicial
+                        const imageDiv = document.createElement('div');
+                        if (danza.image_url) {
+                            imageDiv.className = 'aspect-video overflow-hidden bg-slate-100';
+                            const img = document.createElement('img');
+                            img.src = danza.image_url;
+                            img.alt = danza.name || '';
+                            img.className = 'w-full h-full object-cover hover:scale-105 transition-transform duration-300';
+                            img.onerror = function() {
+                                this.parentElement.innerHTML = '<div class="w-full h-full flex items-center justify-center"><span class="text-4xl font-bold text-slate-300">' + (danza.name ? danza.name.charAt(0) : '?') + '</span></div>';
+                            };
+                            imageDiv.appendChild(img);
+                        } else {
+                            imageDiv.className = 'aspect-video overflow-hidden bg-slate-100 flex items-center justify-center';
+                            const initial = document.createElement('span');
+                            initial.className = 'text-4xl font-bold text-slate-300';
+                            initial.textContent = danza.name ? danza.name.charAt(0) : '?';
+                            imageDiv.appendChild(initial);
+                        }
+
+                        // Contenido
+                        const contentDiv = document.createElement('div');
+                        contentDiv.className = 'p-6';
+
+                        // Badges
+                        const badgesDiv = document.createElement('div');
+                        badgesDiv.className = 'mb-3';
+
+                        const typeBadge = document.createElement('span');
+                        typeBadge.className = 'inline-block bg-slate-800 text-white px-3 py-1 rounded text-xs font-bold';
+                        typeBadge.textContent = danza.type === 'autoctona' ? 'Danza Autóctona' : 'Danza Mestiza';
+                        badgesDiv.appendChild(typeBadge);
+
+                        if (danza.region) {
+                            const regionBadge = document.createElement('span');
+                            regionBadge.className = 'inline-block bg-slate-100 text-slate-600 px-3 py-1 rounded text-xs font-semibold ml-2';
+                            regionBadge.textContent = danza.region;
+                            badgesDiv.appendChild(regionBadge);
+                        }
+
+                        // Título
+                        const title = document.createElement('h3');
+                        title.className = 'text-xl font-bold mb-3';
+                        title.style.color = 'var(--color-text)';
+                        title.textContent = danza.name || '';
+
+                        // Descripción
+                        const desc = document.createElement('p');
+                        desc.className = 'text-sm leading-relaxed mb-4 line-clamp-3';
+                        desc.style.color = 'var(--color-text-light)';
+                        desc.textContent = danza.description || '';
+
+                        contentDiv.appendChild(badgesDiv);
+                        contentDiv.appendChild(title);
+                        contentDiv.appendChild(desc);
+
+                        // Características (opcional)
+                        if (danza.characteristics) {
+                            const charDiv = document.createElement('div');
+                            charDiv.className = 'pt-3 border-t border-slate-100';
+                            const charP = document.createElement('p');
+                            charP.className = 'text-xs text-slate-500 line-clamp-2';
+                            charP.textContent = danza.characteristics;
+                            charDiv.appendChild(charP);
+                            contentDiv.appendChild(charDiv);
+                        }
+
+                        article.appendChild(imageDiv);
+                        article.appendChild(contentDiv);
+                        danzasGrid.appendChild(article);
+                    });
                 } else {
+                    console.warn('No danzas found');
                     danzasGrid.innerHTML = '<div class="col-span-full text-center py-12 text-slate-400"><p>No hay danzas registradas aún.</p></div>';
                 }
             } catch (error) {
                 console.error('Error cargando danzas:', error);
-                document.getElementById('danzasGrid').innerHTML = '<div class="col-span-full text-center py-12 text-red-500"><p>Error al cargar danzas.</p></div>';
+                document.getElementById('danzasGrid').innerHTML = '<div class="col-span-full text-center py-12 text-red-500"><p>Error al cargar danzas. Por favor recarga la página.</p></div>';
             }
         }
     </script>

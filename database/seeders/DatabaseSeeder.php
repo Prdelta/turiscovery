@@ -396,10 +396,28 @@ class DatabaseSeeder extends Seeder
             'favoritable_id' => $createdCandelaria[0]->id,
         ]);
 
+        // 9. Seed Candelaria Gallery (Historical Photos)
+        $this->call(CandelariaGallerySeeder::class);
+
+        // 10. Seed Candelaria Danzas (Traditional Dances)
+        $this->call(CandelariaDanzasSeeder::class);
+
+        echo "\n";
+        echo "========================================\n";
         echo "✓ Database seeded successfully!\n";
+        echo "========================================\n";
         echo "\nTest Users:\n";
-        echo "Tourist: turista@example.com / password123\n";
-        echo "Socio: socio@example.com / password123\n";
-        echo "Admin: admin@example.com / password123\n";
+        echo "  Tourist: turista@example.com / password123\n";
+        echo "  Socio: socio@example.com / password123\n";
+        echo "  Admin: admin@example.com / password123\n";
+        echo "\nContent Created:\n";
+        echo "  → 5 Locales\n";
+        echo "  → 3 Experiencias\n";
+        echo "  → 3 Eventos\n";
+        echo "  → 3 Promociones\n";
+        echo "  → 3 Candelaria posts\n";
+        echo "  → 12 Historical photos (Gallery)\n";
+        echo "  → 13 Traditional dances (7 mestizas, 6 autóctonas)\n";
+        echo "========================================\n";
     }
 }

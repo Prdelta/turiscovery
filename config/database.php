@@ -96,6 +96,44 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
+
+            /*
+            |--------------------------------------------------------------------------
+            | Optimizaciones de Conexión y Pool
+            |--------------------------------------------------------------------------
+            |
+            | Configuración optimizada para conexiones persistentes y pool de conexiones.
+            | Estas opciones mejoran significativamente el rendimiento al reutilizar
+            | conexiones existentes en lugar de crear nuevas para cada petición.
+            |
+            */
+
+            'options' => extension_loaded('pdo_pgsql') ? [
+                // Conexión persistente (reutiliza conexiones entre requests)
+                // Esto es MUY importante para rendimiento - evita overhead de crear nueva conexión
+                PDO::ATTR_PERSISTENT => filter_var(env('DB_PERSISTENT', true), FILTER_VALIDATE_BOOLEAN),
+
+                // Tiempo máximo de espera para establecer conexión (5 segundos)
+                // Si la conexión tarda más, falla rápido en lugar de colgar
+                PDO::ATTR_TIMEOUT => (int) env('DB_CONNECT_TIMEOUT', 5),
+
+                // Modo de error: lanzar excepciones en lugar de retornar false
+                // Facilita debugging y manejo de errores
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+
+                // Deshabilitar emulación de prepared statements (usa nativos de PostgreSQL)
+                // Mejora rendimiento y seguridad
+                PDO::ATTR_EMULATE_PREPARES => false,
+
+                // Conversión automática de tipos NULL
+                PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
+
+                // Fetch mode por defecto
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
+
+                // Convertir columnas numéricas a tipos PHP nativos
+                PDO::ATTR_STRINGIFY_FETCHES => false,
+            ] : [],
         ],
 
         'sqlsrv' => [

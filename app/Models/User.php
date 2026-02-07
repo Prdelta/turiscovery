@@ -22,6 +22,9 @@ class User extends Authenticatable
         'phone',
         'bio',
         'preferences',
+        'is_active',
+        'deactivated_at',
+        'deactivated_by',
     ];
 
     protected $hidden = [
@@ -46,6 +49,11 @@ class User extends Authenticatable
     public function candelaria()
     {
         return $this->hasMany(Candelaria::class);
+    }
+
+    public function deactivatedBy()
+    {
+        return $this->belongsTo(User::class, 'deactivated_by');
     }
 
     public function experiencias()
