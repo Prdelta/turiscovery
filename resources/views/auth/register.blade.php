@@ -251,9 +251,21 @@
                     btn.innerHTML = '<i data-lucide="check-circle" class="w-5 h-5"></i> ¡Cuenta creada!';
                     lucide.createIcons();
 
-                    // Redirect to dashboard after short delay
+                    // Redirect based on user role
+                    const userRole = data.data.user.role;
+                    let redirectUrl = '/';
+
+                    if (userRole === 'admin') {
+                        redirectUrl = '/admin';
+                    } else if (userRole === 'socio') {
+                        redirectUrl = '/dashboard';
+                    } else {
+                        // Tourist and other roles
+                        redirectUrl = '/user';
+                    }
+
                     setTimeout(() => {
-                        window.location.href = '/dashboard';
+                        window.location.href = redirectUrl;
                     }, 1000);
                 } else {
                     // Handle validation errors
