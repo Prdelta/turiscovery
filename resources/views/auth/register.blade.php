@@ -46,7 +46,7 @@
         .auth-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.2));
+            background: rgba(89, 48, 232, 0.08));
             display: flex;
             flex-direction: column;
             justify-content: flex-end;

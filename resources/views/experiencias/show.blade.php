@@ -291,7 +291,7 @@
                     }
 
                     document.getElementById('detail-title').textContent = item.title;
-                    document.getElementById('detail-location').textContent = item.location || 'Puno, Perú';
+                    document.getElementById('detail-location').textContent = item.short_address || item.formatted_address || item.city || 'Puno, Perú';
                     document.getElementById('detail-duration').textContent = item.duration_hours ?
                         `${item.duration_hours} Horas` : 'Flexible';
                     document.getElementById('detail-price').textContent = `S/ ${Math.floor(Number(item.price_pen))}`;

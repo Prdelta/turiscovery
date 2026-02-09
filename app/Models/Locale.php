@@ -16,6 +16,16 @@ class Locale extends Model
         'name',
         'description',
         'address',
+        'street',
+        'street_number',
+        'district',
+        'city',
+        'region',
+        'country',
+        'postal_code',
+        'address_notes',
+        'latitude',
+        'longitude',
         'phone',
         'email',
         'website',
@@ -30,7 +40,7 @@ class Locale extends Model
         'is_active' => 'boolean',
     ];
 
-    protected $appends = ['image_url'];
+    protected $appends = ['image_url', 'formatted_address', 'short_address', 'coordinates'];
 
     // ========== Relationships ==========
 
@@ -141,5 +151,84 @@ class Locale extends Model
     public function getImageUrlAttribute()
     {
         return $this->images[0] ?? null;
+    }
+
+    /**
+     * Get formatted address (human-readable)
+     */
+    public function getFormattedAddressAttribute()
+    {
+        $parts = [];
+
+        // Calle y número
+        if ($this->street && $this->street_number) {
+            $parts[] = "{$this->street} N° {$this->street_number}";
+        } elseif ($this->street) {
+            $parts[] = $this->street;
+        }
+
+        // Distrito
+        if ($this->district) {
+            $parts[] = $this->district;
+        }
+
+        // Ciudad, Región
+        if ($this->city) {
+            $cityPart = $this->city;
+            if ($this->region && $this->region !== $this->city) {
+                $cityPart .= ", {$this->region}";
+            }
+            $parts[] = $cityPart;
+        }
+
+        // País
+        if ($this->country) {
+            $parts[] = $this->country;
+        }
+
+        // Si no hay partes detalladas, usar el campo address legacy
+        if (empty($parts) && $this->address) {
+            return $this->address;
+        }
+
+        return implode(', ', $parts) ?: 'Dirección no especificada';
+    }
+
+    /**
+     * Get short address (for cards/lists)
+     */
+    public function getShortAddressAttribute()
+    {
+        $parts = [];
+
+        if ($this->street && $this->street_number) {
+            $parts[] = "{$this->street} N° {$this->street_number}";
+        } elseif ($this->street) {
+            $parts[] = $this->street;
+        }
+
+        if ($this->district) {
+            $parts[] = $this->district;
+        } elseif ($this->city) {
+            $parts[] = $this->city;
+        }
+
+        // Si no hay partes detalladas, usar address legacy
+        if (empty($parts) && $this->address) {
+            return $this->address;
+        }
+
+        return implode(', ', $parts) ?: 'Sin dirección';
+    }
+
+    /**
+     * Get coordinates as array
+     */
+    public function getCoordinatesAttribute()
+    {
+        return [
+            'lat' => $this->latitude,
+            'lng' => $this->longitude
+        ];
     }
 }

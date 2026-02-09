@@ -29,7 +29,9 @@
                     <!-- Imagen -->
                     <div class="relative h-48 overflow-hidden bg-gray-100">
                         <img src="{{ $gallery->image_url }}" alt="{{ $gallery->title }}"
-                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            crossorigin="anonymous"
+                            onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23f3f4f6%22 width=%22400%22 height=%22300%22/%3E%3Ctext fill=%22%239ca3af%22 font-family=%22Arial%22 font-size=%2220%22 text-anchor=%22middle%22 x=%22200%22 y=%22150%22%3EImagen no disponible%3C/text%3E%3C/svg%3E';">
 
                         <!-- Badge de año -->
                         <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">

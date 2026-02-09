@@ -55,7 +55,7 @@
                             </h3>
                             <div class="flex items-center gap-2 text-xs text-slate-500">
                                 <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
-                                {{ $experiencia->location }}
+                                {{ $experiencia->short_address ?? $experiencia->city ?? 'Puno' }}
                             </div>
                         </div>
                     </div>

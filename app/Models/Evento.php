@@ -21,6 +21,16 @@ class Evento extends Model
         'end_time',
         'location',
         'address',
+        'street',
+        'street_number',
+        'district',
+        'city',
+        'region',
+        'country',
+        'postal_code',
+        'address_notes',
+        'latitude',
+        'longitude',
         'ticket_price',
         'category',
         'images',
@@ -35,7 +45,7 @@ class Evento extends Model
         'is_active' => 'boolean',
     ];
 
-    protected $appends = ['image_url'];
+    protected $appends = ['image_url', 'formatted_address', 'short_address', 'coordinates'];
 
     // ========== Relationships ==========
 
@@ -151,5 +161,40 @@ class Evento extends Model
     public function getImageUrlAttribute()
     {
         return $this->images[0] ?? null;
+    }
+
+    public function getFormattedAddressAttribute()
+    {
+        $parts = [];
+        if ($this->street && $this->street_number) {
+            $parts[] = "{$this->street} N° {$this->street_number}";
+        } elseif ($this->street) {
+            $parts[] = $this->street;
+        }
+        if ($this->district) $parts[] = $this->district;
+        if ($this->city) {
+            $cityPart = $this->city;
+            if ($this->region && $this->region !== $this->city) $cityPart .= ", {$this->region}";
+            $parts[] = $cityPart;
+        }
+        if ($this->country) $parts[] = $this->country;
+        if (empty($parts) && $this->address) return $this->address;
+        return implode(', ', $parts) ?: 'Dirección no especificada';
+    }
+
+    public function getShortAddressAttribute()
+    {
+        $parts = [];
+        if ($this->street && $this->street_number) $parts[] = "{$this->street} N° {$this->street_number}";
+        elseif ($this->street) $parts[] = $this->street;
+        if ($this->district) $parts[] = $this->district;
+        elseif ($this->city) $parts[] = $this->city;
+        if (empty($parts) && $this->address) return $this->address;
+        return implode(', ', $parts) ?: 'Sin dirección';
+    }
+
+    public function getCoordinatesAttribute()
+    {
+        return ['lat' => $this->latitude, 'lng' => $this->longitude];
     }
 }

@@ -14,14 +14,14 @@
         </div>
 
         <div class="card p-6">
-            <form action="{{ route('admin.candelaria.danzas.store') }}" method="POST">
+            <form action="{{ route('admin.candelaria.danzas.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
                 <!-- Nombre -->
                 <div class="form-group mb-6">
-                    <label for="name" class="form-label">Nombre de la Danza <span class="text-red-500">*</span></label>
+                    <label for="name" class="form-label text-base font-semibold">Nombre de la Danza <span class="text-red-500">*</span></label>
                     <input type="text" id="name" name="name" value="{{ old('name') }}"
-                        class="form-input @error('name') border-red-500 @enderror"
+                        class="form-input text-lg py-3 @error('name') border-red-500 @enderror"
                         placeholder="Ej: Diablada Puneña" required>
                     @error('name')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -56,9 +56,9 @@
 
                 <!-- Descripción -->
                 <div class="form-group mb-6">
-                    <label for="description" class="form-label">Descripción Breve <span class="text-red-500">*</span></label>
-                    <textarea id="description" name="description" rows="4"
-                        class="form-input @error('description') border-red-500 @enderror"
+                    <label for="description" class="form-label text-base font-semibold">Descripción Breve <span class="text-red-500">*</span></label>
+                    <textarea id="description" name="description" rows="5"
+                        class="form-input text-base py-3 @error('description') border-red-500 @enderror"
                         placeholder="Descripción breve de la danza (2-3 líneas)..." required>{{ old('description') }}</textarea>
                     @error('description')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -68,9 +68,9 @@
 
                 <!-- Historia -->
                 <div class="form-group mb-6">
-                    <label for="history" class="form-label">Historia y Origen</label>
-                    <textarea id="history" name="history" rows="6"
-                        class="form-input @error('history') border-red-500 @enderror"
+                    <label for="history" class="form-label text-base font-semibold">Historia y Origen</label>
+                    <textarea id="history" name="history" rows="8"
+                        class="form-input text-base py-3 @error('history') border-red-500 @enderror"
                         placeholder="Origen histórico, evolución, contexto cultural, época...">{{ old('history') }}</textarea>
                     @error('history')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -80,9 +80,9 @@
 
                 <!-- Características -->
                 <div class="form-group mb-6">
-                    <label for="characteristics" class="form-label">Características</label>
-                    <textarea id="characteristics" name="characteristics" rows="5"
-                        class="form-input @error('characteristics') border-red-500 @enderror"
+                    <label for="characteristics" class="form-label text-base font-semibold">Características</label>
+                    <textarea id="characteristics" name="characteristics" rows="7"
+                        class="form-input text-base py-3 @error('characteristics') border-red-500 @enderror"
                         placeholder="Trajes: descripción...&#10;Movimientos: descripción...&#10;Música: instrumentos...&#10;Personajes: roles principales...">{{ old('characteristics') }}</textarea>
                     @error('characteristics')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -90,29 +90,70 @@
                     <p class="text-sm text-slate-500 mt-1">Vestimenta, coreografía, música, personajes principales.</p>
                 </div>
 
-                <!-- URLs de Medios -->
-                <div class="grid grid-cols-2 gap-6 mb-6">
-                    <div class="form-group">
-                        <label for="image_url" class="form-label">URL de Imagen</label>
-                        <input type="url" id="image_url" name="image_url" value="{{ old('image_url') }}"
-                            class="form-input @error('image_url') border-red-500 @enderror"
-                            placeholder="https://ejemplo.com/imagen.jpg">
-                        @error('image_url')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                        <p class="text-sm text-slate-500 mt-1">Fotografía representativa de la danza.</p>
+                <!-- Imagen de la Danza -->
+                <div class="form-group mb-6">
+                    <div class="bg-gradient-to-br from-slate-700 to-slate-900 rounded-t-xl p-4">
+                        <div class="flex items-center gap-3 text-white">
+                            <div class="w-12 h-12 bg-white bg-opacity-20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                                <i data-lucide="image" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg">Imagen de la Danza</h3>
+                                <p class="text-sm text-slate-300">Fotografía representativa de la danza</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="video_url" class="form-label">URL de Video</label>
-                        <input type="url" id="video_url" name="video_url" value="{{ old('video_url') }}"
-                            class="form-input @error('video_url') border-red-500 @enderror"
-                            placeholder="https://youtube.com/watch?v=...">
-                        @error('video_url')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                        <p class="text-sm text-slate-500 mt-1">Video demostrativo (YouTube, Vimeo).</p>
+                    <div class="bg-slate-50 border-2 border-slate-300 border-t-0 rounded-b-xl p-6">
+                        <!-- Subir Archivo -->
+                        <div class="p-5 bg-white rounded-xl shadow-sm border-2 border-slate-300 hover:border-slate-500 transition-colors">
+                            <label for="image" class="flex items-center gap-2 text-base font-bold text-slate-800 mb-3">
+                                <div class="w-8 h-8 bg-gradient-to-br from-slate-600 to-slate-800 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="upload" class="w-5 h-5 text-white"></i>
+                                </div>
+                                Subir imagen desde tu computadora
+                            </label>
+                            <input type="file" id="image" name="image" accept="image/*"
+                                class="form-input @error('image') border-red-500 @enderror"
+                                onchange="previewImageFile(event)">
+                            @error('image')
+                                <p class="text-red-500 text-sm mt-2 flex items-center gap-1">
+                                    <i data-lucide="x-circle" class="w-4 h-4"></i>
+                                    {{ $message }}
+                                </p>
+                            @enderror
+                            <div class="mt-2 flex items-center gap-2 text-xs text-slate-600">
+                                <i data-lucide="info" class="w-4 h-4"></i>
+                                <span>Formatos: <strong>JPG, PNG, GIF, WEBP</strong> • Tamaño máximo: <strong>5MB</strong></span>
+                            </div>
+                        </div>
+
+                        <!-- Preview de imagen -->
+                        <div id="imagePreview" class="hidden mt-6 p-5 bg-green-50 border-2 border-green-300 rounded-xl">
+                            <div class="flex items-center gap-2 mb-3">
+                                <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="eye" class="w-5 h-5 text-white"></i>
+                                </div>
+                                <p class="text-sm font-bold text-green-800">Vista previa:</p>
+                            </div>
+                            <img id="previewImg" src="" alt="Preview" class="w-full rounded-lg border-4 border-white shadow-xl">
+                        </div>
                     </div>
+                </div>
+
+                <!-- URL de Video -->
+                <div class="form-group mb-6">
+                    <label for="video_url" class="form-label flex items-center gap-2">
+                        <i data-lucide="video" class="w-4 h-4"></i>
+                        URL de Video (Opcional)
+                    </label>
+                    <input type="url" id="video_url" name="video_url" value="{{ old('video_url') }}"
+                        class="form-input @error('video_url') border-red-500 @enderror"
+                        placeholder="https://youtube.com/watch?v=...">
+                    @error('video_url')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                    <p class="text-sm text-slate-500 mt-1">Video demostrativo de YouTube, Vimeo, etc.</p>
                 </div>
 
                 <!-- Orden -->
@@ -189,6 +230,32 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
+
+            // Auto-resize textareas
+            const textareas = document.querySelectorAll('textarea');
+            textareas.forEach(textarea => {
+                // Auto-resize on input
+                textarea.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
+
+                // Initial resize
+                textarea.style.height = 'auto';
+                textarea.style.height = (textarea.scrollHeight) + 'px';
+            });
         });
+
+        function previewImageFile(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
     </script>
 @endpush

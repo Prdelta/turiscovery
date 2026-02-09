@@ -200,7 +200,7 @@
             const title = createElementWithText('h3', evento.title || 'Sin título', 'text-xl font-bold mb-3 leading-tight text-slate-800 group-hover:text-primary transition-colors line-clamp-2');
             contentDiv.appendChild(title);
 
-            // Ubicación
+            // Ubicación (usando dirección formateada)
             const locationDiv = document.createElement('div');
             locationDiv.className = 'flex items-center gap-2 text-slate-500 text-sm mb-4 p-3 bg-white rounded-lg border border-slate-100';
 
@@ -208,7 +208,8 @@
             mapIcon.setAttribute('data-lucide', 'map-pin');
             mapIcon.className = 'w-4 h-4 text-red-500 flex-shrink-0';
 
-            const locationSpan = createElementWithText('span', evento.address || 'Puno, Perú', 'truncate font-medium');
+            // Usar short_address del backend si está disponible
+            const locationSpan = createElementWithText('span', evento.short_address || evento.formatted_address || evento.address || 'Puno, Perú', 'truncate font-medium');
 
             locationDiv.appendChild(mapIcon);
             locationDiv.appendChild(locationSpan);

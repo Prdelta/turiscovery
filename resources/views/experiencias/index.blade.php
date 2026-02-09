@@ -340,7 +340,8 @@
                 const mapIcon = document.createElement('i');
                 mapIcon.setAttribute('data-lucide', 'map-pin');
                 mapIcon.className = 'w-4 h-4';
-                const locationText = createElementWithText('span', item.location || 'Puno');
+                // Usar city o short_address desde el backend
+                const locationText = createElementWithText('span', item.city || item.short_address || item.formatted_address || 'Puno');
                 locationDiv.appendChild(mapIcon);
                 locationDiv.appendChild(locationText);
 

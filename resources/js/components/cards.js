@@ -90,7 +90,8 @@ export function createEventCard(evento) {
     }
 
     // Ubicación
-    if (evento.location) {
+    const locationValue = evento.short_address || evento.formatted_address || evento.city || evento.location;
+    if (locationValue) {
         const locationDiv = document.createElement('div');
         locationDiv.className = 'flex items-center gap-2 text-sm text-slate-500 mb-4';
 
@@ -98,7 +99,7 @@ export function createEventCard(evento) {
         mapIcon.setAttribute('data-lucide', 'map-pin');
         mapIcon.className = 'w-4 h-4';
 
-        const locationText = createElementWithText('span', evento.location);
+        const locationText = createElementWithText('span', locationValue);
 
         locationDiv.appendChild(mapIcon);
         locationDiv.appendChild(locationText);
@@ -389,7 +390,8 @@ export function createLocaleCard(locale) {
         metaDiv.appendChild(catDiv);
     }
 
-    if (locale.address) {
+    const addressValue = locale.short_address || locale.formatted_address || locale.address;
+    if (addressValue) {
         const addressDiv = document.createElement('div');
         addressDiv.className = 'flex items-center gap-2 text-sm text-slate-500';
 
@@ -397,7 +399,7 @@ export function createLocaleCard(locale) {
         mapIcon.setAttribute('data-lucide', 'map-pin');
         mapIcon.className = 'w-4 h-4';
 
-        const addressText = createElementWithText('span', locale.address);
+        const addressText = createElementWithText('span', addressValue);
 
         addressDiv.appendChild(mapIcon);
         addressDiv.appendChild(addressText);

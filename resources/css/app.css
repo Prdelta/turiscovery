@@ -5,34 +5,50 @@
 @source "../**/*.vue";
 
 @theme {
-    --color-primary: #5E5CE8;
-    --color-primary-light: #7674EC;
-    --color-primary-dark: #4542B8;
+    /* ========================================
+       PALETA OFICIAL TURISCOVERY
+       Identidad Visual de Marca
+       ======================================== */
 
-    --color-secondary: #78E181;
-    --color-secondary-dark: #60C866;
+    /* 1️⃣ Azul/Morado Vibrante - COLOR PRINCIPAL */
+    --color-primary: #5930E8;
+    --color-primary-light: #7654EC;
+    --color-primary-dark: #4426B8;
 
-    --color-accent: #FCB032;
-    --color-accent-dark: #E39A1E;
+    /* 2️⃣ Verde Menta/Neón - COLOR SECUNDARIO */
+    --color-secondary: #74FA8A;
+    --color-secondary-light: #8FFBA0;
+    --color-secondary-dark: #5FD973;
 
-    --color-info: #B2DFEB;
-    --color-info-dark: #8FCFDE;
+    /* 3️⃣ Gris Azulado - NEUTRO */
+    --color-gray: #B0C5C3;
+    --color-gray-dark: #8A9B99;
+    --color-gray-light: #D5E3E2;
 
-    --color-gray: #AEBBC3;
-    --color-gray-dark: #8A9BA6;
-    --color-gray-light: #E8EDEF;
+    /* 4️⃣ Amarillo/Dorado - ACENTO/PROMOCIONES */
+    --color-accent: #F2B914;
+    --color-accent-light: #FFD24D;
+    --color-accent-dark: #D19E0B;
 
+    /* 5️⃣ Celeste/Cyan Claro - INFORMACIÓN */
+    --color-info: #B6DFE7;
+    --color-info-light: #D0EBF1;
+    --color-info-dark: #9BCAD5;
+
+    /* Colores de Estado (usando paleta de marca) */
+    --color-success: #74FA8A;      /* Verde Menta */
+    --color-warning: #F2B914;      /* Amarillo/Dorado */
+    --color-danger: #E74C3C;       /* Rojo para errores */
+
+    /* Tipografía */
     --color-text: #2C3E50;
     --color-text-light: #5A6C7D;
     --color-text-muted: #95A5A6;
 
+    /* Fondos */
     --color-bg: #FFFFFF;
     --color-bg-light: #F8F9FA;
     --color-bg-gray: #ECEFF1;
-
-    --color-success: #78E181;
-    --color-warning: #FCB032;
-    --color-danger: #E74C3C;
 
     --font-heading: 'Montserrat', sans-serif;
     --font-sans: 'Open Sans', sans-serif;
@@ -99,13 +115,21 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+    background: var(--color-primary);
     @apply text-white shadow-md hover:shadow-lg hover:-translate-y-px;
 }
 
+.btn-primary:hover {
+    background: var(--color-primary-dark);
+}
+
 .btn-secondary {
-    background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-secondary-dark) 100%);
-    @apply text-white shadow-md hover:shadow-lg hover:-translate-y-px;
+    background: var(--color-secondary);
+    @apply text-slate-800 shadow-md hover:shadow-lg hover:-translate-y-px;
+}
+
+.btn-secondary:hover {
+    background: var(--color-secondary-dark);
 }
 
 .btn-outline {
@@ -125,7 +149,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .card-gradient {
-    background: linear-gradient(135deg, rgba(94, 92, 232, 0.05) 0%, rgba(255, 255, 255, 1) 100%);
+    background: var(--color-bg);
+    border-left: 4px solid var(--color-primary);
 }
 
 .card-image-overlay {
@@ -205,12 +230,10 @@ h1, h2, h3, h4, h5, h6 {
     overflow: hidden;
 }
 
-/* Gradient Text */
-.gradient-text {
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+/* Highlighted Text */
+.highlight-text {
+    color: var(--color-primary);
+    font-weight: 700;
 }
 
 /* Pulse Animation */

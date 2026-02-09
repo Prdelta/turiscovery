@@ -14,14 +14,14 @@
         </div>
 
         <div class="card p-6">
-            <form action="{{ route('admin.candelaria.gallery.store') }}" method="POST">
+            <form action="{{ route('admin.candelaria.gallery.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
                 <!-- Título -->
                 <div class="form-group mb-6">
-                    <label for="title" class="form-label">Título de la Fotografía <span class="text-red-500">*</span></label>
+                    <label for="title" class="form-label text-base font-semibold">Título de la Fotografía <span class="text-red-500">*</span></label>
                     <input type="text" id="title" name="title" value="{{ old('title') }}"
-                        class="form-input @error('title') border-red-500 @enderror"
+                        class="form-input text-lg py-3 @error('title') border-red-500 @enderror"
                         placeholder="Ej: Gran Corso de la Festividad 2024" required>
                     @error('title')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -30,9 +30,9 @@
 
                 <!-- Descripción -->
                 <div class="form-group mb-6">
-                    <label for="description" class="form-label">Descripción</label>
-                    <textarea id="description" name="description" rows="4"
-                        class="form-input @error('description') border-red-500 @enderror"
+                    <label for="description" class="form-label text-base font-semibold">Descripción</label>
+                    <textarea id="description" name="description" rows="6"
+                        class="form-input text-base py-3 @error('description') border-red-500 @enderror"
                         placeholder="Describe la fotografía y el momento histórico que captura...">{{ old('description') }}</textarea>
                     @error('description')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -40,16 +40,55 @@
                     <p class="text-sm text-slate-500 mt-1">Explica el contexto histórico de la fotografía.</p>
                 </div>
 
-                <!-- URL de Imagen -->
+                <!-- Imagen de la Galería -->
                 <div class="form-group mb-6">
-                    <label for="image_url" class="form-label">URL de la Imagen <span class="text-red-500">*</span></label>
-                    <input type="url" id="image_url" name="image_url" value="{{ old('image_url') }}"
-                        class="form-input @error('image_url') border-red-500 @enderror"
-                        placeholder="https://ejemplo.com/imagen.jpg" required>
-                    @error('image_url')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                    <p class="text-sm text-slate-500 mt-1">URL completa de la fotografía (debe iniciar con http:// o https://).</p>
+                    <div class="bg-gradient-to-br from-slate-700 to-slate-900 rounded-t-xl p-4">
+                        <div class="flex items-center gap-3 text-white">
+                            <div class="w-12 h-12 bg-white bg-opacity-20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                                <i data-lucide="camera" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg">Fotografía <span class="text-red-400">*</span></h3>
+                                <p class="text-sm text-slate-300">Imagen histórica de la Festividad</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 border-2 border-slate-300 border-t-0 rounded-b-xl p-6">
+                        <!-- Subir Archivo -->
+                        <div class="p-5 bg-white rounded-xl shadow-sm border-2 border-slate-300 hover:border-slate-500 transition-colors">
+                            <label for="image" class="flex items-center gap-2 text-base font-bold text-slate-800 mb-3">
+                                <div class="w-8 h-8 bg-gradient-to-br from-slate-600 to-slate-800 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="upload" class="w-5 h-5 text-white"></i>
+                                </div>
+                                Subir imagen desde tu computadora
+                            </label>
+                            <input type="file" id="image" name="image" accept="image/*" required
+                                class="form-input @error('image') border-red-500 @enderror"
+                                onchange="previewImageFile(event)">
+                            @error('image')
+                                <p class="text-red-500 text-sm mt-2 flex items-center gap-1">
+                                    <i data-lucide="x-circle" class="w-4 h-4"></i>
+                                    {{ $message }}
+                                </p>
+                            @enderror
+                            <div class="mt-2 flex items-center gap-2 text-xs text-slate-600">
+                                <i data-lucide="info" class="w-4 h-4"></i>
+                                <span>Formatos: <strong>JPG, PNG, GIF, WEBP</strong> • Tamaño máximo: <strong>5MB</strong></span>
+                            </div>
+                        </div>
+
+                        <!-- Preview de imagen -->
+                        <div id="imagePreview" class="hidden mt-6 p-5 bg-green-50 border-2 border-green-300 rounded-xl">
+                            <div class="flex items-center gap-2 mb-3">
+                                <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="eye" class="w-5 h-5 text-white"></i>
+                                </div>
+                                <p class="text-sm font-bold text-green-800">Vista previa:</p>
+                            </div>
+                            <img id="previewImg" src="" alt="Preview" class="w-full rounded-lg border-4 border-white shadow-xl">
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Año y Orden -->
@@ -136,7 +175,7 @@
                 <p class="text-sm text-slate-500 mb-4">Así se verá tu fotografía en la galería pública:</p>
                 <div class="card overflow-hidden hover:shadow-xl transition-all border border-slate-200">
                     <div class="aspect-video overflow-hidden bg-slate-100" id="previewImageContainer">
-                        <img id="previewImage" src="" alt="" class="w-full h-full object-cover">
+                        <img id="previewImage" src="" alt="" class="w-full h-full object-cover" crossorigin="anonymous">
                     </div>
                     <div class="p-4 bg-white">
                         <span id="previewYear" class="inline-block bg-slate-800 text-white px-2 py-1 rounded text-xs font-bold mb-2">2024</span>
@@ -153,6 +192,20 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
+
+            // Auto-resize textareas
+            const textareas = document.querySelectorAll('textarea');
+            textareas.forEach(textarea => {
+                // Auto-resize on input
+                textarea.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
+
+                // Initial resize
+                textarea.style.height = 'auto';
+                textarea.style.height = (textarea.scrollHeight) + 'px';
+            });
         });
 
         function showPreview() {
@@ -180,6 +233,18 @@
 
         function closePreview() {
             document.getElementById('previewModal').classList.add('hidden');
+        }
+
+        function previewImageFile(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
         }
     </script>
 @endpush

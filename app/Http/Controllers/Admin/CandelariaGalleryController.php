@@ -37,15 +37,22 @@ class CandelariaGalleryController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'image_url' => 'required|url|max:500',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB - REQUERIDO
             'year' => 'required|integer|min:1900|max:' . (date('Y') + 1),
             'order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
         ]);
 
+        // Procesar imagen subida (ahora siempre existe)
+        $path = $request->file('image')->store('candelaria/gallery', 'public');
+        $validated['image_url'] = Storage::url($path);
+
         $validated['user_id'] = auth()->id();
         $validated['order'] = $validated['order'] ?? 0;
         $validated['is_active'] = $request->has('is_active');
+
+        // Remover el campo 'image' antes de guardar
+        unset($validated['image']);
 
         CandelariaGallery::create($validated);
 
@@ -70,14 +77,29 @@ class CandelariaGalleryController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'image_url' => 'required|url|max:500',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB - Opcional en edición
             'year' => 'required|integer|min:1900|max:' . (date('Y') + 1),
             'order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
         ]);
 
+        // Procesar nueva imagen si se subió
+        if ($request->hasFile('image')) {
+            // Eliminar imagen anterior si existe
+            if ($gallery->image_url && strpos($gallery->image_url, '/storage/') !== false) {
+                $oldPath = str_replace('/storage/', '', parse_url($gallery->image_url, PHP_URL_PATH));
+                Storage::disk('public')->delete($oldPath);
+            }
+
+            $path = $request->file('image')->store('candelaria/gallery', 'public');
+            $validated['image_url'] = Storage::url($path);
+        }
+
         $validated['order'] = $validated['order'] ?? 0;
         $validated['is_active'] = $request->has('is_active');
+
+        // Remover el campo 'image' antes de guardar
+        unset($validated['image']);
 
         $gallery->update($validated);
 

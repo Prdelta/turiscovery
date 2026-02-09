@@ -134,14 +134,14 @@
 
         .filter-badge.active {
             border-color: rgba(0, 0, 0, 0.2);
-            box-shadow: 0 4px 12px rgba(94, 92, 232, 0.25);
+            box-shadow: 0 4px 12px rgba(89, 48, 232, 0.25);
         }
 
         input:focus,
         select:focus {
             outline: none;
             border-color: var(--color-primary) !important;
-            box-shadow: 0 0 0 3px rgba(94, 92, 232, 0.1);
+            box-shadow: 0 0 0 3px rgba(89, 48, 232, 0.1);
         }
     </style>
 @endpush
@@ -267,7 +267,7 @@
                         </p>
                         <div style="display: flex; align-items: center; gap: var(--spacing-xs); color: var(--color-text-muted); font-size: 0.875rem;">
                             <i data-lucide="map-pin" style="width: 16px; height: 16px;"></i>
-                            <span>${item.location || item.address || 'Puno'}</span>
+                            <span>${item.short_address || item.formatted_address || item.city || item.address || 'Puno'}</span>
                         </div>
                     </div>
                 </article>

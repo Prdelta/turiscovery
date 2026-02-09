@@ -58,7 +58,7 @@
         }
 
         .sidebar-link.active {
-            background-color: rgba(94, 92, 232, 0.1);
+            background-color: rgba(89, 48, 232, 0.1);
             /* primary with opacity */
             color: var(--color-primary);
             font-weight: 600;

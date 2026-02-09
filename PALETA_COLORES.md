@@ -12,7 +12,7 @@ Identidad visual de marca para Turiscovery. Paleta vibrante, moderna y energéti
 | Nombre | Hex | RGB | Carácter |
 |--------|-----|-----|----------|
 | **Primary** | `#5930E8` | `rgb(89, 48, 232)` | Moderno, tecnológico, confiable |
-| **Primary Light** | `#7654EC` | `rgb(118, 84, 236)` | Hover states, gradientes claros |
+| **Primary Light** | `#7654EC` | `rgb(118, 84, 236)` | Hover states, variantes de color claros |
 | **Primary Dark** | `#4426B8` | `rgb(68, 38, 184)` | Gradientes oscuros, sombras |
 
 **Variable CSS:** `var(--color-primary)`
@@ -173,19 +173,23 @@ color: var(--color-primary);
 </span>
 ```
 
-### Gradientes de Marca
+### Colores Sólidos y Estados
 ```css
-/* Gradiente Principal (Azul/Morado) */
-background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+/* Color Sólido Principal */
+background: var(--color-primary);
+color: white;
 
-/* Gradiente Secundario (Verde Menta) */
-background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-secondary-dark) 100%);
+/* Color Secundario */
+background: var(--color-secondary);
+color: var(--color-text);
 
-/* Gradiente con Opacidad */
-background: linear-gradient(135deg, rgba(89, 48, 232, 0.1) 0%, rgba(68, 38, 184, 0.05) 100%);
+/* Fondos con Opacidad (suaves) */
+background: rgba(89, 48, 232, 0.08);  /* Primary suave */
+background: rgba(116, 250, 138, 0.08); /* Secondary suave */
 
-/* Gradiente Multi-color (Hero) */
-background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+/* Bordes de Acento */
+border-left: 4px solid var(--color-primary);
+border: 2px solid var(--color-accent);
 ```
 
 ### En CSS

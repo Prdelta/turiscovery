@@ -118,7 +118,10 @@
                                     <div class="flex items-center gap-3">
                                         @if($danza->image_url)
                                             <img src="{{ $danza->image_url }}" alt="{{ $danza->name }}"
-                                                class="w-12 h-12 rounded-lg object-cover">
+                                                class="w-12 h-12 rounded-lg object-cover"
+                                                crossorigin="anonymous"
+                                                onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center\'><span class=\'text-2xl\'>{{ $danza->type === 'mestiza' ? '🎭' : '🗿' }}</span></div>';">
+
                                         @else
                                             <div class="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
                                                 <span class="text-2xl">{{ $danza->type === 'mestiza' ? '🎭' : '🗿' }}</span>

@@ -63,7 +63,7 @@
                             </p>
                             <div class="flex items-center gap-2 text-xs text-slate-500 mb-3">
                                 <i data-lucide="map-pin" class="w-3 h-3"></i>
-                                <span>{{ $favorite->favoritable->address ?? 'Puno, Perú' }}</span>
+                                <span>{{ $favorite->favoritable->short_address ?? $favorite->favoritable->formatted_address ?? $favorite->favoritable->city ?? $favorite->favoritable->address ?? 'Puno, Perú' }}</span>
                             </div>
                         </div>
                     </article>

@@ -242,7 +242,7 @@
             const contactDiv = document.createElement('div');
             contactDiv.className = 'space-y-2 mb-5 bg-white p-4 rounded-xl border border-slate-100';
 
-            // Dirección
+            // Dirección (usando dirección formateada)
             const addressRow = document.createElement('div');
             addressRow.className = 'flex items-center gap-3 text-sm text-slate-600';
             const addressIconDiv = document.createElement('div');
@@ -251,7 +251,8 @@
             mapPinIcon.setAttribute('data-lucide', 'map-pin');
             mapPinIcon.className = 'w-4 h-4 text-red-600';
             addressIconDiv.appendChild(mapPinIcon);
-            const addressSpan = createElementWithText('span', local.address || 'Jr. Lima 123, Puno Centro', 'truncate font-medium');
+            // Usar short_address del backend si está disponible
+            const addressSpan = createElementWithText('span', local.short_address || local.formatted_address || local.address || 'Puno, Perú', 'truncate font-medium');
             addressRow.appendChild(addressIconDiv);
             addressRow.appendChild(addressSpan);
             contactDiv.appendChild(addressRow);

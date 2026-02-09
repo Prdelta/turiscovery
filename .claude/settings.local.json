@@ -15,7 +15,11 @@
       "Bash(del:*)",
       "Bash(python -m json.tool:*)",
       "Bash(mysql:*)",
-      "WebFetch(domain:commons.wikimedia.org)"
+      "WebFetch(domain:commons.wikimedia.org)",
+      "Bash(dir:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(grep:*)"
     ]
   }
 }

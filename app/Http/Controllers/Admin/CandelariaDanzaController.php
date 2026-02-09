@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\CandelariaDanza;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CandelariaDanzaController extends Controller
 {
@@ -56,7 +57,7 @@ class CandelariaDanzaController extends Controller
             'type' => 'required|in:mestiza,autoctona',
             'description' => 'required|string',
             'history' => 'nullable|string',
-            'image_url' => 'nullable|url|max:500',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB - REQUERIDO
             'video_url' => 'nullable|url|max:500',
             'region' => 'nullable|string|max:255',
             'characteristics' => 'nullable|string',
@@ -65,10 +66,17 @@ class CandelariaDanzaController extends Controller
             'is_active' => 'boolean',
         ]);
 
+        // Procesar imagen subida (ahora siempre existe)
+        $path = $request->file('image')->store('candelaria/danzas', 'public');
+        $validated['image_url'] = Storage::url($path);
+
         $validated['user_id'] = auth()->id();
         $validated['order'] = $validated['order'] ?? 0;
         $validated['is_featured'] = $request->has('is_featured');
         $validated['is_active'] = $request->has('is_active');
+
+        // Remover el campo 'image' antes de guardar
+        unset($validated['image']);
 
         CandelariaDanza::create($validated);
 
@@ -95,7 +103,7 @@ class CandelariaDanzaController extends Controller
             'type' => 'required|in:mestiza,autoctona',
             'description' => 'required|string',
             'history' => 'nullable|string',
-            'image_url' => 'nullable|url|max:500',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB - Opcional en edición
             'video_url' => 'nullable|url|max:500',
             'region' => 'nullable|string|max:255',
             'characteristics' => 'nullable|string',
@@ -104,9 +112,24 @@ class CandelariaDanzaController extends Controller
             'is_active' => 'boolean',
         ]);
 
+        // Procesar nueva imagen si se subió
+        if ($request->hasFile('image')) {
+            // Eliminar imagen anterior si existe
+            if ($danza->image_url && strpos($danza->image_url, '/storage/') !== false) {
+                $oldPath = str_replace('/storage/', '', parse_url($danza->image_url, PHP_URL_PATH));
+                Storage::disk('public')->delete($oldPath);
+            }
+
+            $path = $request->file('image')->store('candelaria/danzas', 'public');
+            $validated['image_url'] = Storage::url($path);
+        }
+
         $validated['order'] = $validated['order'] ?? 0;
         $validated['is_featured'] = $request->has('is_featured');
         $validated['is_active'] = $request->has('is_active');
+
+        // Remover el campo 'image' antes de guardar
+        unset($validated['image']);
 
         $danza->update($validated);
 
