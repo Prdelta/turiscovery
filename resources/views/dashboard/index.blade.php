@@ -298,35 +298,17 @@
 
         async function loadStats() {
             try {
-                const userId = "{{ auth()->id() }}";
-                const userRole = "{{ auth()->user()->role }}";
+                // ✨ OPTIMIZADO: Solo carga conteos, no registros completos
+                const response = await axios.get('/api/stats');
 
-                const [locales, eventos, promociones, experiencias] = await Promise.all([
-                    axios.get('/api/locales?per_page=1000'),
-                    axios.get('/api/eventos?per_page=1000'),
-                    axios.get('/api/promociones?per_page=1000'),
-                    axios.get('/api/experiencias?per_page=1000')
-                ]);
+                if (response.data.success) {
+                    const stats = response.data.data;
 
-                // Helper para contar contenido
-                const countContent = (res) => {
-                    if (!res.data.success) return 0;
-                    const data = res.data.data.data || res.data.data;
-                    if (!Array.isArray(data)) return 0;
-
-                    // Si es admin, mostrar todo
-                    if (userRole === 'admin') {
-                        return data.length;
-                    }
-
-                    // Si no es admin, mostrar solo su contenido
-                    return data.filter(item => item.user_id == userId).length;
-                };
-
-                animateCounter('stat-locales', countContent(locales));
-                animateCounter('stat-eventos', countContent(eventos));
-                animateCounter('stat-promociones', countContent(promociones));
-                animateCounter('stat-experiencias', countContent(experiencias));
+                    animateCounter('stat-locales', stats.locales || 0);
+                    animateCounter('stat-eventos', stats.eventos || 0);
+                    animateCounter('stat-experiencias', stats.experiencias || 0);
+                    animateCounter('stat-promociones', stats.promociones || 0);
+                }
             } catch (error) {
                 console.error('Error loading stats:', error);
                 ['stat-locales', 'stat-eventos', 'stat-promociones', 'stat-experiencias'].forEach(id => {
@@ -340,64 +322,23 @@
             const container = document.getElementById('recent-content');
             if (!container) return;
 
-            const userId = "{{ auth()->id() }}";
             const userRole = "{{ auth()->user()->role }}";
 
             container.innerHTML =
                 '<div class="card"><div style="padding: var(--spacing-lg); text-align: center;"><i data-lucide="loader" class="animate-spin" style="color: var(--color-primary);"></i><p class="text-secondary mt-2">Cargando contenido...</p></div></div>';
             try {
-                let endpoints = [];
-                if (filter === 'all' || filter === 'locales') endpoints.push({
-                    type: 'locales',
-                    url: '/api/locales?per_page=100'
-                });
-                if (filter === 'all' || filter === 'eventos') endpoints.push({
-                    type: 'eventos',
-                    url: '/api/eventos?per_page=100'
-                });
-                if (filter === 'all' || filter === 'experiencias') endpoints.push({
-                    type: 'experiencias',
-                    url: '/api/experiencias?per_page=100'
-                });
-                if (filter === 'all' || filter === 'promociones') endpoints.push({
-                    type: 'promociones',
-                    url: '/api/promociones?per_page=100'
-                });
-
-                const responses = await Promise.all(
-                    endpoints.map(ep => axios.get(ep.url).then(res => ({
-                        ...res,
-                        contentType: ep.type
-                    })))
-                );
-
-                let items = [];
-                responses.forEach(res => {
-                    if (res.data.success) {
-                        const dataList = res.data.data.data ? res.data.data.data : res.data.data;
-
-                        if (Array.isArray(dataList)) {
-                            // Si es admin, mostrar todo el contenido
-                            if (userRole === 'admin') {
-                                dataList.forEach(item => items.push({
-                                    ...item,
-                                    contentType: res.contentType
-                                }));
-                            } else {
-                                // Si no es admin, filtrar solo su contenido
-                                const userItems = dataList.filter(item => item.user_id == userId);
-                                userItems.forEach(item => items.push({
-                                    ...item,
-                                    contentType: res.contentType
-                                }));
-                            }
-                        }
+                // ✨ OPTIMIZADO: Usa endpoint específico que ya filtra y limita
+                const response = await axios.get('/api/recent-content', {
+                    params: {
+                        filter: filter,
+                        limit: 6
                     }
                 });
 
-                // Ordenar por fecha y tomar solo los 6 más recientes
-                items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-                items = items.slice(0, 6);
+                let items = [];
+                if (response.data.success) {
+                    items = response.data.data;
+                }
 
                 if (items.length === 0) {
                     const emptyMessage = userRole === 'admin'

@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\{
     LocaleController,
     PromocionController,
     ReviewController,
+    StatsController,
     UserCouponController
 };
 use Illuminate\Http\Request;
@@ -75,6 +76,10 @@ Route::middleware(['auth:sanctum', 'validate.params'])->group(function () {
     // Session-Based Auth Routes
     Route::post('/session/logout', [SessionController::class, 'logout']);
     Route::get('/session/me', [SessionController::class, 'me']);
+
+    // ========== Stats & Dashboard (Optimized) ==========
+    Route::get('/stats', [StatsController::class, 'index']);
+    Route::get('/recent-content', [StatsController::class, 'recentContent']);
 
     // ========== Socio Routes (Partners can manage their own content) ==========
 
