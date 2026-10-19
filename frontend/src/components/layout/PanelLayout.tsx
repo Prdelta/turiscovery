@@ -9,6 +9,7 @@ import {
   LogOut,
   Megaphone,
   Music2,
+  Radio,
   Search,
   Settings,
   Sparkles,
@@ -62,6 +63,7 @@ const SECTIONS: Record<'cuenta' | 'dashboard' | 'admin', { title: string; items:
     items: [
       { to: '/admin', label: 'Supervisión', icon: BarChart3, end: true },
       { to: '/admin/usuarios', label: 'Usuarios y socios', icon: Users },
+      { to: '/admin/candelaria-vivo', label: 'Candelaria en vivo', icon: Radio },
       { to: '/admin/danzas', label: 'Danzas', icon: Music2 },
       { to: '/admin/galeria', label: 'Galería Candelaria', icon: Images },
       { to: '/admin/recursos', label: 'Buscar recursos', icon: Search },

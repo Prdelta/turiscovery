@@ -36,7 +36,7 @@ class FavoriteController extends Controller
     public function toggle(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'favoritable_type' => 'required|string|in:App\Models\Locale,App\Models\Candelaria,App\Models\Experiencia,App\Models\Evento,App\Models\Promocion',
+            'favoritable_type' => 'required|string|in:App\Models\Locale,App\Models\Candelaria,App\Models\CandelariaDanza,App\Models\Experiencia,App\Models\Evento,App\Models\Promocion',
             'favoritable_id' => 'required|integer',
         ]);
 

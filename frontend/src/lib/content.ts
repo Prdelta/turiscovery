@@ -1,4 +1,4 @@
-import type { AnyContent } from './types'
+import type { AnyContent, ProgramType } from './types'
 
 /** Tipos de contenido que publican los socios */
 export type ContentType = 'experiencias' | 'eventos' | 'promociones' | 'locales' | 'candelaria'
@@ -109,13 +109,23 @@ export function titleOf(item: Partial<AnyContent> & { name?: string; title?: str
 
 /** Imagen de respaldo por tipo cuando el contenido no tiene fotos */
 const FALLBACK_IMAGES: Record<ContentType, string> = {
-  experiencias: '/images/exp_titicaca.png',
-  eventos: '/images/evt_candelaria.png',
-  promociones: '/images/promo_food.png',
-  locales: '/images/loc_restaurant.png',
-  candelaria: '/images/candelaria_hist.png',
+  experiencias: '/images/exp_titicaca.webp',
+  eventos: '/images/evt_candelaria.webp',
+  promociones: '/images/promo_food.webp',
+  locales: '/images/loc_restaurant.webp',
+  candelaria: '/images/candelaria_hist.webp',
 }
 
 export function imageOf(item: { image_url?: string | null; images?: string[] | null }, type: ContentType) {
   return item.image_url || item.images?.[0] || FALLBACK_IMAGES[type]
+}
+
+/** Tipos de jornada del programa de la Candelaria */
+export const PROGRAM_TYPES: Record<ProgramType, string> = {
+  misa: 'Misa',
+  procesion: 'Procesión',
+  concurso: 'Concurso',
+  entrada: 'Entrada',
+  parada: 'Parada',
+  otro: 'Actividad',
 }

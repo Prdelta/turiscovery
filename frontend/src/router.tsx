@@ -24,6 +24,7 @@ const user = () => import('./pages/user/UserPages')
 const dash = () => import('./pages/dashboard/DashboardPages')
 const admin = () => import('./pages/admin/AdminPages')
 const list = () => import('./pages/ListPage')
+const liveAdmin = () => import('./pages/admin/CandelariaLiveAdmin')
 
 export const router = createBrowserRouter([
   {
@@ -32,6 +33,7 @@ export const router = createBrowserRouter([
       { path: '/', element: <Home /> },
 
       { path: '/candelaria', element: page(candelaria, 'default') },
+      { path: '/candelaria/en-vivo', element: page(() => import('./pages/CandelariaLivePage'), 'default') },
       { path: '/candelaria/danzas/:id', element: page(candelaria, 'DanzaDetail') },
       { path: '/candelaria/publicaciones/:id', element: page(details, 'CandelariaPostDetail') },
 
@@ -48,6 +50,7 @@ export const router = createBrowserRouter([
       { path: '/search', element: <Navigate to="/buscar" replace /> },
       { path: '/mapa', element: page(() => import('./pages/MapPage'), 'default') },
       { path: '/puno-3d', element: page(() => import('./pages/Puno3DPage'), 'default') },
+      { path: '/planificador', element: page(() => import('./pages/PlannerPage'), 'default') },
 
       { path: '/login', element: page(auth, 'LoginPage') },
       { path: '/registro', element: page(auth, 'RegisterPage') },
@@ -107,6 +110,8 @@ export const router = createBrowserRouter([
           { path: 'danzas', element: page(admin, 'DanzasAdmin') },
           { path: 'galeria', element: page(admin, 'GalleryAdmin') },
           { path: 'recursos', element: page(admin, 'ResourceSearchPage') },
+          { path: 'candelaria-vivo', element: page(liveAdmin, 'ProgramAdmin') },
+          { path: 'candelaria-vivo/:id', element: page(liveAdmin, 'LiveControl') },
         ],
       },
 

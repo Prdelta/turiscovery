@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { api, ensureCsrf } from '../lib/api'
+import { clearPrivateCaches } from '../lib/offline'
 import type { Role, User } from '../lib/types'
 
 interface RegisterInput {
@@ -45,6 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(
     async (email: string, password: string, remember = false) => {
       await ensureCsrf(true)
+      await clearPrivateCaches()
       const res = await api.post<{ data: { user: User } }>('/session/login', { email, password, remember })
       // La sesión se regenera al iniciar sesión: se pide un token CSRF nuevo
       await ensureCsrf(true)
@@ -73,6 +75,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setUser(null)
       queryClient.clear()
+      // Que la siguiente persona en este dispositivo no vea cupones ni reservas guardados sin conexión
+      await clearPrivateCaches()
       await ensureCsrf(true)
     }
   }, [queryClient])

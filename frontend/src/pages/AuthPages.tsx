@@ -18,7 +18,7 @@ function AuthLayout({ title, text, children }: { title: string; text: string; ch
   return (
     <div className="grid min-h-[calc(100dvh-4rem)] lg:grid-cols-2">
       <div className="relative hidden bg-lake lg:block">
-        <img src="/images/login_bg.png" alt="" className="absolute inset-0 size-full object-cover" />
+        <img src="/images/login_bg.webp" alt="" className="absolute inset-0 size-full object-cover" />
         <div className="absolute inset-x-0 bottom-0 bg-lake-deep/80 p-10 text-white">
           <p className="font-display text-3xl font-extrabold text-white">Guarda lo que te gusta, reserva y obtén cupones.</p>
         </div>

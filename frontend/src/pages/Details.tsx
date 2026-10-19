@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { clsx } from 'clsx'
 import { CalendarDays, CalendarPlus, ChevronLeft, Clock, Globe, Mail, MapPin, Phone, Share2, Ticket, Users } from 'lucide-react'
 import { lazy, Suspense, useState, type FormEvent, type ReactNode } from 'react'
-import { Link, useNavigate, useParams } from 'react-router'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router'
 import { useAuth } from '../auth/AuthContext'
 import { ContentCard } from '../components/ContentCard'
 import { FavoriteButton } from '../components/FavoriteButton'
@@ -11,6 +11,7 @@ import { Button, ButtonLink } from '../components/ui/Button'
 import { Alert, Badge, ErrorState, Spinner } from '../components/ui/Feedback'
 import { TextArea, TextField } from '../components/ui/Field'
 import { useToast } from '../components/ui/Toast'
+import { altitudeWarningFor } from '../lib/altitude'
 import { api, parseApiError } from '../lib/api'
 import { CANDELARIA_CATEGORIES, CONTENT, DIFFICULTY, EVENT_CATEGORIES, LOCALE_CATEGORIES, imageOf, titleOf, type ContentType } from '../lib/content'
 import { daysUntil, formatDate, formatPrice, formatTime, googleCalendarUrl, relativeDays, toDateInput } from '../lib/format'
@@ -215,8 +216,11 @@ export function ExperienciaDetail() {
 function BookingCard({ experiencia }: { experiencia: Experiencia }) {
   const { user } = useAuth()
   const notify = useToast()
+  const [params] = useSearchParams()
   const tomorrow = toDateInput(new Date(Date.now() + 86_400_000).toISOString())
-  const [date, setDate] = useState(tomorrow)
+  const fromPlan = params.get('fecha')
+  const [date, setDate] = useState(fromPlan && fromPlan >= tomorrow ? fromPlan : tomorrow)
+  const altitudeWarning = date ? altitudeWarningFor(experiencia.difficulty, date) : null
   const [participants, setParticipants] = useState(1)
   const [phone, setPhone] = useState(user?.phone ?? '')
   const [notes, setNotes] = useState('')
@@ -260,6 +264,11 @@ function BookingCard({ experiencia }: { experiencia: Experiencia }) {
       ) : user ? (
         <form onSubmit={onSubmit} className="flex flex-col gap-4">
           <TextField label="Fecha" type="date" min={tomorrow} value={date} onChange={(e) => setDate(e.target.value)} required />
+          {altitudeWarning && (
+            <Alert tone="info">
+              {altitudeWarning} <Link to="/planificador" className="font-semibold text-primary">Ver mi plan</Link>
+            </Alert>
+          )}
           <TextField
             label="Personas"
             type="number"
@@ -279,6 +288,7 @@ function BookingCard({ experiencia }: { experiencia: Experiencia }) {
           {error && <Alert tone="error">{error}</Alert>}
           <Button type="submit" loading={book.isPending}>Reservar</Button>
           <p className="text-xs text-ink-soft">No se cobra nada ahora. El socio confirma la disponibilidad contigo.</p>
+          <Link to="/planificador" className="text-sm font-semibold text-primary">¿Qué día te conviene según la altura?</Link>
         </form>
       ) : (
         <LoginPrompt action="reservar" />

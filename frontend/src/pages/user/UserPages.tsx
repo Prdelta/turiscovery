@@ -4,6 +4,7 @@ import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
 import { useAuth } from '../../auth/AuthContext'
 import { ContentCard } from '../../components/ContentCard'
+import { SaveForTripButton } from '../../components/OfflineTools'
 import { PageHeader } from '../../components/layout/PanelLayout'
 import { Button, ButtonLink } from '../../components/ui/Button'
 import { Alert, Badge, EmptyState, ErrorState, Pagination, Spinner, Stars } from '../../components/ui/Feedback'
@@ -50,6 +51,13 @@ export function AccountHome() {
           <Link to={user.role === 'admin' ? '/admin' : '/dashboard'} className="font-semibold text-primary">panel</Link>.
         </Alert>
       )}
+      <section className="mt-10 flex flex-col gap-3 rounded-[var(--radius-card)] bg-white p-6 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-lg font-bold">¿Vas al lago o a las islas?</h2>
+          <p className="text-sm text-ink-soft">Allí casi no hay señal. Guarda tus cupones, reservas y tu plan antes de salir.</p>
+        </div>
+        <SaveForTripButton variant="primary" />
+      </section>
       <div className="mt-10 flex flex-wrap gap-3">
         <ButtonLink to="/experiencias">Explorar experiencias</ButtonLink>
         <ButtonLink to="/eventos" variant="secondary">Ver próximos eventos</ButtonLink>

@@ -2,12 +2,13 @@
 
 use App\Http\Controllers\Auth\{LoginController, RegisterController, SessionController};
 use App\Http\Controllers\Admin\ResourceSearchController;
-use App\Http\Controllers\Api\Admin\{CandelariaContentController, UserController as AdminUserController};
+use App\Http\Controllers\Api\Admin\{CandelariaContentController, CandelariaLiveAdminController, UserController as AdminUserController};
 use App\Http\Controllers\Api\{
     BookingController,
     CandelariaController,
     CandelariaDanzaController,
     CandelariaGalleryController,
+    CandelariaLiveController,
     EventAttendeeController,
     EventoController,
     ExperienciaController,
@@ -68,6 +69,11 @@ Route::middleware(['validate.params', 'api.cache'])->group(function () {
     Route::get('/candelaria-danzas/featured', [CandelariaDanzaController::class, 'featured']);
     Route::get('/candelaria-danzas/{id}', [CandelariaDanzaController::class, 'show']);
 });
+
+// Candelaria en vivo: programa y conjunto que está pasando (sin caché, cambia a cada minuto)
+Route::get('/candelaria-live', [CandelariaLiveController::class, 'live']);
+Route::get('/candelaria-program', [CandelariaLiveController::class, 'program']);
+Route::get('/candelaria-program/{id}', [CandelariaLiveController::class, 'show'])->whereNumber('id');
 
 // Reseñas públicas de un contenido y asistentes a un evento
 Route::get('/reviews', [ReviewController::class, 'index']);
@@ -179,6 +185,17 @@ Route::middleware(['auth:sanctum', 'user.active', 'validate.params'])->group(fun
         // Listados completos de Candelaria (incluye inactivos)
         Route::get('/admin/candelaria-gallery', [CandelariaContentController::class, 'gallery']);
         Route::get('/admin/candelaria-danzas', [CandelariaContentController::class, 'danzas']);
+
+        // Candelaria en vivo: programa y control de conjuntos
+        Route::get('/admin/candelaria-program', [CandelariaLiveAdminController::class, 'index']);
+        Route::post('/admin/candelaria-program', [CandelariaLiveAdminController::class, 'store']);
+        Route::put('/admin/candelaria-program/{item}', [CandelariaLiveAdminController::class, 'update']);
+        Route::delete('/admin/candelaria-program/{item}', [CandelariaLiveAdminController::class, 'destroy']);
+        Route::get('/admin/candelaria-program/{item}/performances', [CandelariaLiveAdminController::class, 'performances']);
+        Route::post('/admin/candelaria-program/{item}/performances', [CandelariaLiveAdminController::class, 'addPerformances']);
+        Route::post('/admin/candelaria-program/{item}/advance', [CandelariaLiveAdminController::class, 'advance']);
+        Route::put('/admin/candelaria-performances/{performance}', [CandelariaLiveAdminController::class, 'updatePerformance']);
+        Route::delete('/admin/candelaria-performances/{performance}', [CandelariaLiveAdminController::class, 'destroyPerformance']);
 
         // Búsqueda de recursos (Wikipedia / Wikimedia Commons)
         Route::get('/admin/resources/search-images', [ResourceSearchController::class, 'searchImages']);

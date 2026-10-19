@@ -138,6 +138,12 @@ La aplicación estará disponible en:
 - `frontend/src/three/`: escena 3D del lago (`LakeScene.tsx`) y visor de modelos (`ModelViewer.tsx`).
 - Modelos 3D: copia archivos `.glb` a `frontend/public/models/` y regístralos en `manifest.json`. Los modelos de ejemplo se regeneran con `node frontend/scripts/generate-models.mjs`.
 
+### Funciones propias de Puno
+
+- **Planificador con aclimatación** (`/planificador`): reparte las experiencias y eventos elegidos según la altura (3 812 m). El día de llegada solo propone actividades fáciles y cortas; las exigentes, desde el día 3 (o el 2 si el viajero viene de otra ciudad alta). El plan vive en la URL (se comparte por WhatsApp) y se guarda en el dispositivo; al reservar una actividad exigente para el día de llegada, la ficha avisa. Lógica en `frontend/src/lib/altitude.ts`.
+- **Candelaria en vivo** (`/candelaria/en-vivo`): programa de la festividad y desfile en tiempo real: conjunto que está pasando, próximos conjuntos y hora estimada según el ritmo real. El visitante marca sus danzas y recibe un aviso cuando están a tres conjuntos o menos. Los administradores lo controlan desde *Administración → Candelaria en vivo*: crean las jornadas, dibujan el recorrido, pegan la lista de conjuntos y pulsan "Pasó, sigue el siguiente". Tablas `candelaria_program_items` y `candelaria_performances`; lógica en `app/Services/CandelariaLive.php`.
+- **App instalable y sin conexión**: el frontend es una PWA. Al instalarla guarda la app, las fotos y los modelos 3D; las respuestas de la API y los mosaicos del mapa ya vistos quedan disponibles sin señal (lago e islas). "Guardar para usar sin conexión" (en Mi cuenta y en el planificador) descarga cupones, reservas y el plan antes de salir. Al cerrar sesión se borran del dispositivo los datos personales guardados. Íconos: `npx pwa-assets-generator` dentro de `frontend/` a partir de `public/icon.svg`.
+
 ### Producción
 
 1. `npm --prefix frontend run build` genera `frontend/dist/`, que se puede publicar en cualquier hosting estático (Vercel, Netlify, Nginx). Configura el hosting para que todas las rutas sirvan `index.html`.

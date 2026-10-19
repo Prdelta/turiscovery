@@ -1,4 +1,4 @@
-import { ArrowDown, Box, Search } from 'lucide-react'
+import { ArrowDown, Box, Mountain, Search } from 'lucide-react'
 import { lazy, Suspense, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { ContentCard } from '../components/ContentCard'
@@ -11,10 +11,10 @@ import { webglAvailable } from '../three/support'
 const LakeScene = lazy(() => import('../three/LakeScene'))
 
 const PILLARS = [
-  { to: '/candelaria', title: 'Candelaria', text: 'Danzas, historia y galería de la fiesta de febrero.', img: '/images/puno_dancers.png' },
-  { to: '/experiencias', title: 'Experiencias', text: 'Tours al lago, caminatas y talleres con guías locales.', img: '/images/exp_titicaca.png' },
-  { to: '/eventos', title: 'Eventos', text: 'Conciertos, ferias y fiestas con fecha y lugar.', img: '/images/evt_candelaria.png' },
-  { to: '/promociones', title: 'Promociones', text: 'Descuentos vigentes en restaurantes y hoteles.', img: '/images/promo_food.png' },
+  { to: '/candelaria', title: 'Candelaria', text: 'Danzas, historia y galería de la fiesta de febrero.', img: '/images/puno_dancers.webp' },
+  { to: '/experiencias', title: 'Experiencias', text: 'Tours al lago, caminatas y talleres con guías locales.', img: '/images/exp_titicaca.webp' },
+  { to: '/eventos', title: 'Eventos', text: 'Conciertos, ferias y fiestas con fecha y lugar.', img: '/images/evt_candelaria.webp' },
+  { to: '/promociones', title: 'Promociones', text: 'Descuentos vigentes en restaurantes y hoteles.', img: '/images/promo_food.webp' },
 ]
 
 export default function Home() {
@@ -46,7 +46,7 @@ function Hero() {
     <section className="relative h-[100svh] min-h-[560px] overflow-hidden bg-lake text-white">
       <div className="absolute inset-0" aria-hidden>
         {/* La foto queda debajo mientras la escena 3D carga (el canvas es transparente hasta su primer cuadro) */}
-        <img src="/images/lake_titicaca.png" alt="" className="absolute inset-0 size-full object-cover" />
+        <img src="/images/lake_titicaca.webp" alt="" className="absolute inset-0 size-full object-cover" />
         {canRender3D && (
           <Suspense fallback={null}>
             <div className="absolute inset-0">
@@ -76,6 +76,9 @@ function Hero() {
           </button>
         </form>
         <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-white/85">
+          <Link to="/planificador" className="inline-flex items-center gap-2 font-semibold hover:text-mint">
+            <Mountain className="size-4" aria-hidden /> Planifica tu viaje según la altura
+          </Link>
           <Link to="/puno-3d" className="inline-flex items-center gap-2 font-semibold hover:text-mint">
             <Box className="size-4" aria-hidden /> Recorre el lago en 3D
           </Link>
@@ -172,7 +175,7 @@ function CandelariaBand() {
   return (
     <section className="bg-lake-deep text-white">
       <div className="container-page grid items-center gap-10 py-20 lg:grid-cols-2">
-        <img src="/images/puno_dancers.png" alt="Danzantes de la Festividad de la Virgen de la Candelaria" loading="lazy" className="aspect-[4/3] w-full rounded-[var(--radius-card)] object-cover" />
+        <img src="/images/puno_dancers.webp" alt="Danzantes de la Festividad de la Virgen de la Candelaria" loading="lazy" className="aspect-[4/3] w-full rounded-[var(--radius-card)] object-cover" />
         <div>
           <h2 className="text-4xl font-extrabold text-white sm:text-5xl">Festividad de la Virgen de la Candelaria</h2>
           <p className="prose-measure mt-5 text-lg text-white/85">

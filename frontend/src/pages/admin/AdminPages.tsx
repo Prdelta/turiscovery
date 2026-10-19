@@ -289,7 +289,7 @@ export function DanzasAdmin() {
         <ul className="flex flex-col gap-2">
           {data.map((d) => (
             <li key={d.id} className={clsx('flex flex-wrap items-center gap-4 rounded-[var(--radius-card)] bg-white p-4', !d.is_active && 'opacity-70')}>
-              <img src={d.image_url || '/images/puno_dancers.png'} alt="" className="size-14 rounded-xl object-cover" />
+              <img src={d.image_url || '/images/puno_dancers.webp'} alt="" className="size-14 rounded-xl object-cover" />
               <div className="min-w-0 flex-1">
                 <p className="font-bold">{d.name}</p>
                 <p className="text-sm text-ink-soft">{d.type === 'autoctona' ? 'Autóctona' : 'Mestiza'}{d.region ? ` · ${d.region}` : ''} · orden {d.order ?? 0}</p>

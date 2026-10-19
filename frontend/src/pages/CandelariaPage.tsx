@@ -4,6 +4,8 @@ import { ChevronLeft, MapPin, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { ContentCard } from '../components/ContentCard'
+import { ButtonLink } from '../components/ui/Button'
+import { LiveBanner } from './CandelariaLivePage'
 import { CardGridSkeleton, ErrorState, Spinner } from '../components/ui/Feedback'
 import { getData, parseApiError } from '../lib/api'
 import { useContentList, useDanzas, useDocumentTitle, useGallery } from '../lib/hooks'
@@ -15,6 +17,7 @@ export default function CandelariaPage() {
   useDocumentTitle('Candelaria')
   return (
     <>
+      <LiveBanner />
       <section className="bg-lake-deep text-white">
         <div className="container-page grid items-end gap-10 py-16 sm:py-24 lg:grid-cols-[1.2fr_1fr]">
           <div>
@@ -27,6 +30,9 @@ export default function CandelariaPage() {
             Durante la primera mitad de febrero, conjuntos de danza autóctona —de las comunidades quechuas y aimaras— y de trajes de luces
             —mestizos, con bandas de metales— recorren Puno en honor a la Virgen. Aquí reunimos sus danzas, su historia y fotos de cada año.
           </p>
+          <div className="lg:col-start-2">
+            <ButtonLink to="/candelaria/en-vivo" variant="mint">Programa y desfile en vivo</ButtonLink>
+          </div>
         </div>
       </section>
       <DanzasSection />
@@ -70,7 +76,7 @@ function DanzasSection() {
           {danzas.map((d) => (
             <Link key={d.id} to={`/candelaria/danzas/${d.id}`} className="group flex flex-col">
               <div className="overflow-hidden rounded-[var(--radius-card)] bg-line">
-                <img src={d.image_url || '/images/puno_dancers.png'} alt="" loading="lazy" className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+                <img src={d.image_url || '/images/puno_dancers.webp'} alt="" loading="lazy" className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
               </div>
               <p className="mt-3 text-sm font-semibold text-primary">{TYPE_LABEL[d.type]}{d.region ? ` · ${d.region}` : ''}</p>
               <h3 className="text-xl font-bold group-hover:text-primary">{d.name}</h3>
@@ -176,7 +182,7 @@ export function DanzaDetail() {
         <ChevronLeft className="size-4" /> Volver
       </button>
       <div className="grid gap-10 lg:grid-cols-2">
-        <img src={d.image_url || '/images/puno_dancers.png'} alt={d.name} className="aspect-[4/5] w-full rounded-[var(--radius-card)] object-cover" />
+        <img src={d.image_url || '/images/puno_dancers.webp'} alt={d.name} className="aspect-[4/5] w-full rounded-[var(--radius-card)] object-cover" />
         <div>
           <p className="font-semibold text-primary">Danza {TYPE_LABEL[d.type].toLowerCase()}</p>
           <h1 className="mt-2 text-5xl font-extrabold">{d.name}</h1>

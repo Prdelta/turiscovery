@@ -185,3 +185,49 @@ export interface UserCoupon {
 }
 
 export type AnyContent = Locale | Experiencia | Evento | Promocion | Candelaria
+
+/* ---------- Candelaria en vivo ---------- */
+
+export type ProgramType = 'misa' | 'procesion' | 'concurso' | 'entrada' | 'parada' | 'otro'
+
+export interface ProgramItem {
+  id: number
+  title: string
+  description?: string | null
+  type: ProgramType
+  starts_at: string
+  ends_at: string
+  location_name?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  route?: [number, number][] | null
+  is_active: boolean
+  performances_count?: number
+  done_count?: number
+}
+
+export interface Performance {
+  id: number
+  program_item_id: number
+  candelaria_danza_id?: number | null
+  danza?: Pick<Danza, 'id' | 'name' | 'type' | 'image_url'> | null
+  group_name: string
+  order_number: number
+  status: 'pending' | 'performing' | 'done' | 'skipped'
+  started_at?: string | null
+  finished_at?: string | null
+  position?: number
+  eta?: string
+}
+
+export interface LiveState {
+  live: boolean
+  item: ProgramItem | null
+  next_item?: ProgramItem | null
+  current?: Performance | null
+  upcoming?: Performance[]
+  done_count?: number
+  total?: number
+  minutes_per_group?: number
+  updated_at?: string
+}

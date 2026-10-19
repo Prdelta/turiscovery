@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, ScrollRestoration, useLocation, useNavigate } from 'react-router'
 import { homeForRole, useAuth } from '../../auth/AuthContext'
 import { initials } from '../../lib/format'
+import { InstallAppButton, OfflineBanner } from '../OfflineTools'
 import { ButtonLink } from '../ui/Button'
 
 const NAV = [
@@ -12,6 +13,7 @@ const NAV = [
   { to: '/eventos', label: 'Eventos' },
   { to: '/promociones', label: 'Promociones' },
   { to: '/locales', label: 'Locales' },
+  { to: '/planificador', label: 'Planifica' },
   { to: '/mapa', label: 'Mapa' },
   { to: '/puno-3d', label: 'Puno en 3D' },
 ]
@@ -27,6 +29,7 @@ export function SiteLayout() {
         Saltar al contenido
       </a>
       <Navbar overlay={overlay} />
+      <OfflineBanner />
       <main id="contenido" className="flex-1">
         <Outlet />
       </main>
@@ -199,9 +202,10 @@ function Footer() {
           <p className="max-w-xs text-sm">
             Guía de Puno hecha con quienes viven aquí: socios locales publican experiencias, eventos y promociones reales.
           </p>
+          <InstallAppButton className="mt-2 self-start" />
         </div>
         <FooterCol title="Descubre" links={[['/candelaria', 'Candelaria'], ['/experiencias', 'Experiencias'], ['/eventos', 'Eventos'], ['/promociones', 'Promociones']]} />
-        <FooterCol title="Explora" links={[['/locales', 'Locales'], ['/mapa', 'Mapa'], ['/puno-3d', 'Puno en 3D'], ['/buscar', 'Buscar']]} />
+        <FooterCol title="Explora" links={[['/planificador', 'Planifica tu viaje'], ['/locales', 'Locales'], ['/mapa', 'Mapa'], ['/puno-3d', 'Puno en 3D']]} />
         <FooterCol title="Turiscovery" links={[['/sobre-nosotros', 'Sobre nosotros'], ['/contacto', 'Contacto'], ['/terminos', 'Términos y condiciones'], ['/privacidad', 'Política de privacidad']]} />
       </div>
       <div className="border-t border-white/10">
