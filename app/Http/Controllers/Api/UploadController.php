@@ -18,6 +18,7 @@ class UploadController extends Controller
         'candelaria',
         'candelaria/gallery',
         'candelaria/danzas',
+        'anfitriones',
     ];
 
     /**
@@ -37,6 +38,26 @@ class UploadController extends Controller
             'data' => [
                 // URL según el host de la petición: funciona detrás del proxy de Vite
                 // en desarrollo y con el dominio de la API en producción
+                'url' => $request->getSchemeAndHttpHost() . '/storage/' . $path,
+                'path' => $path,
+            ],
+        ], 201);
+    }
+
+    /**
+     * Subir el saludo grabado de un anfitrión (archivo o grabación del navegador)
+     */
+    public function audio(Request $request)
+    {
+        $request->validate([
+            'audio' => 'required|file|max:10240|mimetypes:audio/mpeg,audio/mp4,audio/x-m4a,audio/aac,audio/ogg,audio/webm,audio/wav,audio/x-wav,video/webm',
+        ]);
+
+        $path = $request->file('audio')->store('anfitriones/audio', 'public');
+
+        return response()->json([
+            'success' => true,
+            'data' => [
                 'url' => $request->getSchemeAndHttpHost() . '/storage/' . $path,
                 'path' => $path,
             ],

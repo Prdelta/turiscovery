@@ -138,6 +138,13 @@ La aplicación estará disponible en:
 - `frontend/src/three/`: escena 3D del lago (`LakeScene.tsx`) y visor de modelos (`ModelViewer.tsx`).
 - Modelos 3D: copia archivos `.glb` a `frontend/public/models/` y regístralos en `manifest.json`. Los modelos de ejemplo se regeneran con `node frontend/scripts/generate-models.mjs`.
 
+### Identidad: lo que hace distinto a Turiscovery
+
+- **El lago es la interfaz**: la portada es el Titicaca en 3D con seis lugares (Puno, los Uros, Taquile, Amantaní, Sillustani y Chucuito). Al tocar uno, la cámara vuela hasta él y un panel muestra lo publicado ahí. Cada contenido se asigna a su lugar por cercanía a las coordenadas reales (`frontend/src/lib/places.ts`). La escena está en `frontend/src/three/LakeScene.tsx`.
+- **Identidad textil**: cada tipo de contenido tiene un motivo tejido (tocapu) dibujado como una cuadrícula de 8 × 8 puntadas y un color de tinte natural: experiencias = olas en añil, eventos = chakana en cochinilla, promociones = rombo en q'olle, locales = llave escalonada en chilca y Candelaria = estrella en morado. Componentes en `frontend/src/components/textile/Weave.tsx`.
+- **Almanaque vivo** (`/hoy` y el panel "Hoy en Puno" de la portada): fiestas y rituales que se repiten cada año (tabla `almanac_entries`, editable en *Administración → Almanaque*), eventos de los socios, programa de la Candelaria, fase de la luna vista desde el hemisferio sur, época del año en el altiplano y viento en el lago con las mejores horas para navegar (datos de Open-Meteo, sin clave). El `AlmanacSeeder` trae seis fechas conocidas; revísalas cada año.
+- **Anfitriones con voz** (`/anfitriones`): cada experiencia puede presentar a la persona que recibe al viajero, con su retrato, su historia, los idiomas que habla y un saludo grabado en su idioma. El socio los gestiona en *Panel → Anfitriones* y puede grabar el saludo desde el navegador. Tabla `anfitriones` y columna `experiencias.anfitrion_id`.
+
 ### Funciones propias de Puno
 
 - **Planificador con aclimatación** (`/planificador`): reparte las experiencias y eventos elegidos según la altura (3 812 m). El día de llegada solo propone actividades fáciles y cortas; las exigentes, desde el día 3 (o el 2 si el viajero viene de otra ciudad alta). El plan vive en la URL (se comparte por WhatsApp) y se guarda en el dispositivo; al reservar una actividad exigente para el día de llegada, la ficha avisa. Lógica en `frontend/src/lib/altitude.ts`.

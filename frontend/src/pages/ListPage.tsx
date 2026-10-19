@@ -1,6 +1,7 @@
 import { Search } from 'lucide-react'
 import { useSearchParams } from 'react-router'
 import { ContentCard } from '../components/ContentCard'
+import { Tocapu, WovenBand } from '../components/textile/Weave'
 import { CardGridSkeleton, EmptyState, ErrorState, Pagination } from '../components/ui/Feedback'
 import { CONTENT, DIFFICULTY, DISCOUNT_TYPES, EVENT_CATEGORIES, LOCALE_CATEGORIES, type ContentType } from '../lib/content'
 import { useContentList, useDebounced, useDocumentTitle } from '../lib/hooks'
@@ -62,8 +63,12 @@ export default function ListPage({ type }: { type: ContentType }) {
   return (
     <div className="container-page py-12 sm:py-16">
       <header className="mb-10">
-        <h1 className="text-4xl font-extrabold sm:text-5xl">{info.title}</h1>
-        <p className="prose-measure mt-3 text-lg text-ink-soft">{info.text}</p>
+        <div className="flex items-center gap-4">
+          <Tocapu motif={CONTENT[type].motif} dye={CONTENT[type].dye} size={48} />
+          <h1 className="text-4xl font-extrabold sm:text-5xl">{info.title}</h1>
+        </div>
+        <p className="prose-measure mt-4 text-lg text-ink-soft">{info.text}</p>
+        <WovenBand motif={CONTENT[type].motif} dye={CONTENT[type].dye} height={12} className="mt-6 rounded-sm" />
       </header>
 
       <div className="mb-10 flex flex-wrap items-end gap-3" role="search">

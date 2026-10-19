@@ -71,6 +71,8 @@ export interface Experiencia extends BaseContent, WithAddress {
   price_pen?: string | number | null
   max_participants?: number | null
   tags?: string[] | null
+  anfitrion_id?: number | null
+  anfitrion?: Anfitrion | null
 }
 
 export interface Evento extends BaseContent, WithAddress {
@@ -230,4 +232,25 @@ export interface LiveState {
   total?: number
   minutes_per_group?: number
   updated_at?: string
+}
+
+/* ---------- Anfitriones ---------- */
+
+export type HostLanguage = 'quechua' | 'aimara' | 'espanol' | 'ingles'
+
+export interface Anfitrion {
+  id: number
+  user_id?: number
+  name: string
+  community?: string | null
+  role_title?: string | null
+  languages?: HostLanguage[] | null
+  photo_url?: string | null
+  story?: string | null
+  greeting?: string | null
+  greeting_translation?: string | null
+  audio_url?: string | null
+  is_active?: boolean
+  experiencias_count?: number
+  experiencias?: Experiencia[]
 }

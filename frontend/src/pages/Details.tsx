@@ -6,7 +6,9 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router'
 import { useAuth } from '../auth/AuthContext'
 import { ContentCard } from '../components/ContentCard'
 import { FavoriteButton } from '../components/FavoriteButton'
+import { HostCard } from '../components/HostVoice'
 import { ReviewsSection } from '../components/ReviewsSection'
+import { WovenBand } from '../components/textile/Weave'
 import { Button, ButtonLink } from '../components/ui/Button'
 import { Alert, Badge, ErrorState, Spinner } from '../components/ui/Feedback'
 import { TextArea, TextField } from '../components/ui/Field'
@@ -52,7 +54,10 @@ function Gallery({ item, type }: { item: AnyContent; type: ContentType }) {
   const [active, setActive] = useState(0)
   return (
     <div className="flex flex-col gap-3">
-      <img src={images[active]} alt="" className="aspect-[16/10] w-full rounded-[var(--radius-card)] bg-line object-cover" />
+      <div>
+        <img src={images[active]} alt="" className="aspect-[16/10] w-full rounded-t-[var(--radius-card)] bg-line object-cover" />
+        <WovenBand motif={CONTENT[type].motif} dye={CONTENT[type].dye} height={16} />
+      </div>
       {images.length > 1 && (
         <div className="flex gap-2 overflow-x-auto pb-1">
           {images.map((src, i) => (
@@ -203,6 +208,11 @@ export function ExperienciaDetail() {
       }
       aside={<BookingCard experiencia={e} />}
     >
+      {e.anfitrion && (
+        <div className="mt-10">
+          <HostCard host={e.anfitrion} />
+        </div>
+      )}
       {e.content && (
         <section className="mt-10">
           <h2 className="mb-3 text-2xl font-extrabold">Itinerario y detalles</h2>

@@ -5,17 +5,18 @@ import { Link, NavLink, Outlet, ScrollRestoration, useLocation, useNavigate } fr
 import { homeForRole, useAuth } from '../../auth/AuthContext'
 import { initials } from '../../lib/format'
 import { InstallAppButton, OfflineBanner } from '../OfflineTools'
+import { SiteBand } from '../textile/Weave'
 import { ButtonLink } from '../ui/Button'
 
 const NAV = [
   { to: '/candelaria', label: 'Candelaria' },
   { to: '/experiencias', label: 'Experiencias' },
+  { to: '/anfitriones', label: 'Anfitriones' },
   { to: '/eventos', label: 'Eventos' },
   { to: '/promociones', label: 'Promociones' },
-  { to: '/locales', label: 'Locales' },
+  { to: '/hoy', label: 'Hoy' },
   { to: '/planificador', label: 'Planifica' },
   { to: '/mapa', label: 'Mapa' },
-  { to: '/puno-3d', label: 'Puno en 3D' },
 ]
 
 export function SiteLayout() {
@@ -193,6 +194,7 @@ export function Avatar({ name, src, size = 'sm' }: { name: string; src?: string 
 function Footer() {
   return (
     <footer className="bg-lake-deep text-white/80">
+      <SiteBand />
       <div className="container-page grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2.5 text-white">
@@ -205,7 +207,7 @@ function Footer() {
           <InstallAppButton className="mt-2 self-start" />
         </div>
         <FooterCol title="Descubre" links={[['/candelaria', 'Candelaria'], ['/experiencias', 'Experiencias'], ['/eventos', 'Eventos'], ['/promociones', 'Promociones']]} />
-        <FooterCol title="Explora" links={[['/planificador', 'Planifica tu viaje'], ['/locales', 'Locales'], ['/mapa', 'Mapa'], ['/puno-3d', 'Puno en 3D']]} />
+        <FooterCol title="Explora" links={[['/hoy', 'Almanaque'], ['/planificador', 'Planifica tu viaje'], ['/anfitriones', 'Anfitriones'], ['/locales', 'Locales'], ['/mapa', 'Mapa'], ['/puno-3d', 'Modelos 3D']]} />
         <FooterCol title="Turiscovery" links={[['/sobre-nosotros', 'Sobre nosotros'], ['/contacto', 'Contacto'], ['/terminos', 'Términos y condiciones'], ['/privacidad', 'Política de privacidad']]} />
       </div>
       <div className="border-t border-white/10">

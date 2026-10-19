@@ -4,6 +4,8 @@ use App\Http\Controllers\Auth\{LoginController, RegisterController, SessionContr
 use App\Http\Controllers\Admin\ResourceSearchController;
 use App\Http\Controllers\Api\Admin\{CandelariaContentController, CandelariaLiveAdminController, UserController as AdminUserController};
 use App\Http\Controllers\Api\{
+    AlmanacController,
+    AnfitrionController,
     BookingController,
     CandelariaController,
     CandelariaDanzaController,
@@ -75,6 +77,13 @@ Route::get('/candelaria-live', [CandelariaLiveController::class, 'live']);
 Route::get('/candelaria-program', [CandelariaLiveController::class, 'program']);
 Route::get('/candelaria-program/{id}', [CandelariaLiveController::class, 'show'])->whereNumber('id');
 
+// Almanaque vivo: fiestas, eventos y programa de la Candelaria entre dos fechas
+Route::get('/almanaque', [AlmanacController::class, 'index']);
+
+// Anfitriones (personas que reciben al viajero)
+Route::get('/anfitriones', [AnfitrionController::class, 'index']);
+Route::get('/anfitriones/{id}', [AnfitrionController::class, 'show'])->whereNumber('id');
+
 // Reseñas públicas de un contenido y asistentes a un evento
 Route::get('/reviews', [ReviewController::class, 'index']);
 Route::get('/event-attendances/count/{eventoId}', [EventAttendeeController::class, 'count'])->whereNumber('eventoId');
@@ -107,6 +116,13 @@ Route::middleware(['auth:sanctum', 'user.active', 'validate.params'])->group(fun
         Route::get('/my/{type}', [MyContentController::class, 'index'])
             ->whereIn('type', ['locales', 'eventos', 'experiencias', 'promociones', 'candelaria']);
         Route::post('/uploads', [UploadController::class, 'store']);
+        Route::post('/uploads/audio', [UploadController::class, 'audio']);
+
+        // Anfitriones del socio
+        Route::get('/my-anfitriones', [AnfitrionController::class, 'mine']);
+        Route::post('/anfitriones', [AnfitrionController::class, 'store']);
+        Route::put('/anfitriones/{anfitrion}', [AnfitrionController::class, 'update']);
+        Route::delete('/anfitriones/{anfitrion}', [AnfitrionController::class, 'destroy']);
 
         // Reservas recibidas en las experiencias del socio
         Route::get('/partner/bookings', [PartnerBookingController::class, 'index']);
@@ -196,6 +212,12 @@ Route::middleware(['auth:sanctum', 'user.active', 'validate.params'])->group(fun
         Route::post('/admin/candelaria-program/{item}/advance', [CandelariaLiveAdminController::class, 'advance']);
         Route::put('/admin/candelaria-performances/{performance}', [CandelariaLiveAdminController::class, 'updatePerformance']);
         Route::delete('/admin/candelaria-performances/{performance}', [CandelariaLiveAdminController::class, 'destroyPerformance']);
+
+        // Almanaque: fechas que se repiten cada año
+        Route::get('/admin/almanaque', [AlmanacController::class, 'adminIndex']);
+        Route::post('/admin/almanaque', [AlmanacController::class, 'store']);
+        Route::put('/admin/almanaque/{entry}', [AlmanacController::class, 'update']);
+        Route::delete('/admin/almanaque/{entry}', [AlmanacController::class, 'destroy']);
 
         // Búsqueda de recursos (Wikipedia / Wikimedia Commons)
         Route::get('/admin/resources/search-images', [ResourceSearchController::class, 'searchImages']);

@@ -1,6 +1,6 @@
 import { CANDELARIA_CATEGORIES, DIFFICULTY, DISCOUNT_TYPES, EVENT_CATEGORIES, LOCALE_CATEGORIES, type ContentType } from '../../lib/content'
 
-export type FieldKind = 'text' | 'textarea' | 'number' | 'select' | 'date' | 'datetime' | 'url' | 'email' | 'tel' | 'tags' | 'checkbox' | 'locale'
+export type FieldKind = 'text' | 'textarea' | 'number' | 'select' | 'date' | 'datetime' | 'url' | 'email' | 'tel' | 'tags' | 'checkbox' | 'locale' | 'anfitrion'
 
 export interface FieldDef {
   name: string
@@ -48,6 +48,7 @@ export const FORM_CONFIG: Record<ContentType, FormConfig> = {
       { name: 'title', label: 'Título', kind: 'text', required: true, wide: true },
       { name: 'difficulty', label: 'Dificultad', kind: 'select', options: DIFFICULTY, required: true },
       { name: 'locale_id', label: 'Local que la ofrece', kind: 'locale' },
+      { name: 'anfitrion_id', label: 'Quién recibe al viajero', kind: 'anfitrion', hint: 'Preséntalo en la sección Anfitriones con su foto y su saludo.' },
       { name: 'price_pen', label: 'Precio por persona (S/)', kind: 'number', min: 0, step: '0.01', hint: 'Usa 0 si es gratis.' },
       { name: 'duration_hours', label: 'Duración (horas)', kind: 'number', min: 1 },
       { name: 'max_participants', label: 'Cupo máximo por fecha', kind: 'number', min: 1, hint: 'Vacío = sin límite.' },

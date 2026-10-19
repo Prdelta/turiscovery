@@ -1,13 +1,15 @@
-import { Html, OrbitControls, Sky } from '@react-three/drei'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { useMemo, useRef, type ReactNode } from 'react'
+import { OrbitControls, Sky } from '@react-three/drei'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { useEffect, useMemo, useRef, type ReactNode } from 'react'
 import * as THREE from 'three'
-import type { Hotspot } from './support'
+import { DYES } from '../components/textile/Weave'
+import { PLACES, type Place } from '../lib/places'
 
 /*
   Lago Titicaca generado por código:
   agua animada con shader propio, cordillera con nieve en el horizonte,
-  islas flotantes de totora de los Uros con casas y balsas, y la isla de Taquile.
+  islas de totora de los Uros, Taquile, Amantaní, Sillustani, Chucuito y la ciudad de Puno
+  en una geografía estilizada. Es la interfaz de la portada: se navega tocando cada lugar.
   No usa archivos externos, así que carga rápido y funciona sin conexión a un CDN de modelos.
 */
 
@@ -106,6 +108,21 @@ function Water({ sunDir, fogColor, animate }: { sunDir: THREE.Vector3; fogColor:
 
 /* ---------- Cordillera y orillas ---------- */
 
+/** Altura del terreno: lago al centro, lomas en la orilla y la cordillera nevada a lo lejos */
+export function terrainHeight(x: number, z: number) {
+  const dist = Math.hypot(x, z)
+  const r = dist + noise2(x * 0.6, z * 0.6) * 14
+  if (r < LAKE_RADIUS - 4) return -4
+  // Lomas suaves del altiplano junto a la orilla
+  const shoreRamp = THREE.MathUtils.smoothstep(r, LAKE_RADIUS - 4, LAKE_RADIUS + 60)
+  const hills = shoreRamp * (4 + (noise2(x * 1.3, z * 1.3) + 1) * 6)
+  // Cordillera Real lejana, sobre todo hacia el norte y el este
+  const far = THREE.MathUtils.smoothstep(dist, 260, 420)
+  const north = 0.3 + Math.max(0, -z / Math.max(dist, 1)) * 0.9
+  const ridge = Math.max(0, noise2(x * 1.1, z * 1.1) + 0.35) + Math.max(0, noise2(x * 2.6 + 40, z * 2.6)) * 0.35
+  return hills + far * north * ridge * 42
+}
+
 function Terrain() {
   const geometry = useMemo(() => {
     const geo = new THREE.PlaneGeometry(1100, 1100, 300, 300)
@@ -121,20 +138,7 @@ function Terrain() {
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i)
       const z = pos.getZ(i)
-      const dist = Math.hypot(x, z)
-      const r = dist + noise2(x * 0.6, z * 0.6) * 14
-      let h = -4
-      if (r >= LAKE_RADIUS - 4) {
-        // Lomas suaves del altiplano junto a la orilla
-        const shoreRamp = THREE.MathUtils.smoothstep(r, LAKE_RADIUS - 4, LAKE_RADIUS + 60)
-        const hills = shoreRamp * (4 + (noise2(x * 1.3, z * 1.3) + 1) * 6)
-        // Cordillera Real lejana, sobre todo hacia el norte y el este
-        const far = THREE.MathUtils.smoothstep(dist, 260, 420)
-        const north = 0.3 + Math.max(0, -z / Math.max(dist, 1)) * 0.9
-        const ridge = Math.max(0, noise2(x * 1.1, z * 1.1) + 0.35) + Math.max(0, noise2(x * 2.6 + 40, z * 2.6)) * 0.35
-        const peaks = far * north * ridge * 42
-        h = hills + peaks
-      }
+      const h = terrainHeight(x, z)
       pos.setY(i, h)
 
       if (h > 46) c.copy(snow)
@@ -244,54 +248,217 @@ function UrosIsland({ position, radius, seed, animate }: { position: [number, nu
   )
 }
 
-function Taquile() {
+/* ---------- Lugares ---------- */
+
+const SUN = new THREE.Vector3(80, 38, -140)
+const FOG = '#bcd3ea'
+
+function groundAt(x: number, z: number) {
+  return Math.max(0, terrainHeight(x, z))
+}
+
+/** Casas de adobe con techo de calamina y una iglesia de dos torres */
+function Town({ position, houses, seed, church = true }: { position: [number, number, number]; houses: number; seed: number; church?: boolean }) {
+  const items = useMemo(() => {
+    const rnd = seeded(seed)
+    const walls = ['#e7dcc6', '#d9c3a0', '#c98f63', '#efe7da']
+    return Array.from({ length: houses }, () => {
+      const x = position[0] + (rnd() - 0.5) * 22
+      const z = position[2] + (rnd() - 0.5) * 22
+      const h = 1.2 + rnd() * 2.2
+      return { x, z, y: groundAt(x, z), h, w: 1.6 + rnd() * 1.6, d: 1.6 + rnd() * 1.6, color: walls[Math.floor(rnd() * walls.length)], rot: rnd() * Math.PI }
+    })
+  }, [position, houses, seed])
+  const cy = groundAt(position[0], position[2])
+
+  return (
+    <group>
+      {items.map((b, i) => (
+        <group key={i} position={[b.x, b.y, b.z]} rotation-y={b.rot}>
+          <mesh position-y={b.h / 2} castShadow>
+            <boxGeometry args={[b.w, b.h, b.d]} />
+            <meshStandardMaterial color={b.color} roughness={0.9} />
+          </mesh>
+          <mesh position-y={b.h + 0.08}>
+            <boxGeometry args={[b.w + 0.2, 0.16, b.d + 0.2]} />
+            <meshStandardMaterial color="#9aa1a8" metalness={0.4} roughness={0.5} />
+          </mesh>
+        </group>
+      ))}
+      {church && (
+        <group position={[position[0], cy, position[2]]}>
+          <mesh position-y={3} castShadow>
+            <boxGeometry args={[4, 6, 8]} />
+            <meshStandardMaterial color="#c9b49a" roughness={0.9} />
+          </mesh>
+          {[-1.4, 1.4].map((x) => (
+            <group key={x} position={[x, 0, 4.4]}>
+              <mesh position-y={4.6} castShadow>
+                <boxGeometry args={[1.6, 9.2, 1.6]} />
+                <meshStandardMaterial color="#c2ab8e" roughness={0.9} />
+              </mesh>
+              <mesh position-y={9.9}>
+                <coneGeometry args={[1, 1.6, 4]} />
+                <meshStandardMaterial color="#8a6a4a" roughness={0.9} />
+              </mesh>
+            </group>
+          ))}
+        </group>
+      )}
+    </group>
+  )
+}
+
+/** Isla con terrazas de cultivo (Taquile, Amantaní) */
+function TerracedIsland({ position, radius, stretch = [1.6, 0.8], seed }: { position: [number, number, number]; radius: number; stretch?: [number, number]; seed: number }) {
   const geometry = useMemo(() => {
-    const geo = new THREE.SphereGeometry(16, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2)
+    const geo = new THREE.SphereGeometry(radius, 56, 28, 0, Math.PI * 2, 0, Math.PI / 2)
     const pos = geo.attributes.position as THREE.BufferAttribute
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i)
       const z = pos.getZ(i)
       const y = pos.getY(i)
-      // Terrazas de cultivo: alturas escalonadas
-      const terraced = Math.round(y * 0.42 * (1 + noise2(x * 3, z * 3) * 0.2) * 2.2) / 2.2
+      const terraced = Math.round(y * 0.42 * (1 + noise2(x * 3 + seed, z * 3) * 0.2) * 2.2) / 2.2
       pos.setY(i, terraced)
     }
     geo.computeVertexNormals()
     return geo
-  }, [])
+  }, [radius, seed])
 
   return (
-    <mesh geometry={geometry} position={[62, -0.6, -48]} scale={[1.6, 1, 0.8]} castShadow receiveShadow>
+    <mesh geometry={geometry} position={[position[0], -0.6, position[2]]} scale={[stretch[0], 1, stretch[1]]} castShadow receiveShadow>
       <meshStandardMaterial color="#7a8a4a" roughness={1} flatShading />
     </mesh>
   )
 }
 
-/* ---------- Escena ---------- */
+const CHULLPAS: [number, number, number][] = [
+  [0, 0, 7],
+  [6, -3, 5.5],
+  [-5, 3, 6],
+  [3, 6, 4.5],
+]
 
-const SUN = new THREE.Vector3(80, 38, -140)
-const FOG = '#bcd3ea'
+/** Chullpas de Sillustani junto a la laguna Umayo */
+function Sillustani({ position }: { position: [number, number, number] }) {
+  const lagoonY = groundAt(position[0] + 14, position[2] + 8) + 0.25
+  return (
+    <group>
+      {CHULLPAS.map(([dx, dz, h], i) => {
+        const x = position[0] + dx
+        const z = position[2] + dz
+        const y = groundAt(x, z)
+        return (
+          <group key={i} position={[x, y, z]}>
+            {/* Más anchas arriba que abajo, como las chullpas reales */}
+            <mesh position-y={h / 2} castShadow>
+              <cylinderGeometry args={[1.5, 1.1, h, 14]} />
+              <meshStandardMaterial color="#8d8172" roughness={1} flatShading />
+            </mesh>
+            <mesh position-y={h + 0.2}>
+              <cylinderGeometry args={[1.62, 1.55, 0.4, 14]} />
+              <meshStandardMaterial color="#776c5e" roughness={1} />
+            </mesh>
+          </group>
+        )
+      })}
+      <mesh rotation-x={-Math.PI / 2} position={[position[0] + 14, lagoonY, position[2] + 8]}>
+        <circleGeometry args={[9, 32]} />
+        <meshStandardMaterial color="#2a5d93" roughness={0.3} metalness={0.1} />
+      </mesh>
+    </group>
+  )
+}
 
-function Islands({ animate }: { animate: boolean }) {
+function scenePos(id: string) {
+  return PLACES.find((p) => p.id === id)!.scene
+}
+
+function Places({ animate }: { animate: boolean }) {
+  const [px, , pz] = scenePos('puno')
+  const [ux, , uz] = scenePos('uros')
+  const [tx, , tz] = scenePos('taquile')
+  const [ax, , az] = scenePos('amantani')
+  const [cx, , cz] = scenePos('chucuito')
   return (
     <>
-      <UrosIsland position={[-6, 0, 6]} radius={6} seed={3} animate={animate} />
-      <UrosIsland position={[12, 0, -4]} radius={4.5} seed={7} animate={animate} />
-      <UrosIsland position={[-20, 0, -10]} radius={3.6} seed={11} animate={animate} />
-      <UrosIsland position={[4, 0, 22]} radius={3.2} seed={17} animate={animate} />
-      <ReedBoat position={[22, 0.15, 14]} rotation={2.2} bob={1.4} animate={animate} />
-      <ReedBoat position={[-14, 0.15, 24]} rotation={-0.6} bob={2.7} animate={animate} />
-      <Taquile />
+      <Town position={[px, 0, pz]} houses={70} seed={5} />
+      <UrosIsland position={[ux, 0, uz]} radius={6} seed={3} animate={animate} />
+      <UrosIsland position={[ux + 14, 0, uz - 9]} radius={4.5} seed={7} animate={animate} />
+      <UrosIsland position={[ux - 6, 0, uz - 15]} radius={3.6} seed={11} animate={animate} />
+      <UrosIsland position={[ux + 8, 0, uz + 13]} radius={3.2} seed={17} animate={animate} />
+      <ReedBoat position={[ux + 24, 0.15, uz + 4]} rotation={2.2} bob={1.4} animate={animate} />
+      <ReedBoat position={[ux - 14, 0.15, uz + 12]} rotation={-0.6} bob={2.7} animate={animate} />
+      <TerracedIsland position={[tx, 0, tz]} radius={16} seed={1} />
+      <TerracedIsland position={[ax, 0, az]} radius={22} stretch={[1.3, 1]} seed={9} />
+      <Sillustani position={scenePos('sillustani')} />
+      <Town position={[cx, 0, cz]} houses={18} seed={13} />
     </>
   )
 }
 
-function AutoOrbit({ enabled }: { enabled: boolean }) {
-  useFrame(({ camera, clock }) => {
-    if (!enabled) return
-    const t = clock.elapsedTime * 0.04
-    camera.position.set(Math.sin(t) * 62, 17 + Math.sin(t * 2) * 2, Math.cos(t) * 62)
-    camera.lookAt(0, 2, 0)
+/* ---------- Cámara ---------- */
+
+// Vista general desde el sureste, baja para ver el horizonte; los lugares quedan en la mitad superior
+const OVERVIEW = { position: new THREE.Vector3(30, 62, 250), target: new THREE.Vector3(-45, 0, 20) }
+
+function viewFor(place?: Place) {
+  if (!place) return OVERVIEW
+  const [x, , z] = place.scene
+  const target = new THREE.Vector3(x, groundAt(x, z), z)
+  return { target, position: target.clone().add(new THREE.Vector3(22, 34, 52)) }
+}
+
+/** Lleva la cámara suavemente al lugar elegido; después el usuario puede girar libremente */
+function CameraRig({ focus, animate }: { focus?: Place; animate: boolean }) {
+  const camera = useThree((s) => s.camera)
+  const controls = useThree((s) => s.controls) as unknown as { target: THREE.Vector3; update: () => void } | null
+  const goal = useRef<ReturnType<typeof viewFor> | null>(null)
+
+  useEffect(() => {
+    goal.current = viewFor(focus)
+    if (!animate && controls) {
+      camera.position.copy(goal.current.position)
+      controls.target.copy(goal.current.target)
+      controls.update()
+      goal.current = null
+    }
+  }, [focus, animate, camera, controls])
+
+  useFrame((_, delta) => {
+    const g = goal.current
+    if (!g || !controls) return
+    const k = 1 - Math.pow(0.02, delta)
+    camera.position.lerp(g.position, k)
+    controls.target.lerp(g.target, k)
+    controls.update()
+    if (camera.position.distanceTo(g.position) < 0.5 && controls.target.distanceTo(g.target) < 0.5) goal.current = null
+  })
+  return null
+}
+
+/** Proyecta la posición 3D de cada lugar a la pantalla y mueve su etiqueta */
+function LabelProjector({ places, labels }: { places: Place[]; labels: React.RefObject<Record<string, HTMLButtonElement | null>> }) {
+  const camera = useThree((s) => s.camera)
+  const size = useThree((s) => s.size)
+  const points = useMemo(
+    () => places.map((p) => ({ id: p.id, v: new THREE.Vector3(p.scene[0], groundAt(p.scene[0], p.scene[2]) + 14, p.scene[2]) })),
+    [places],
+  )
+  const tmp = useMemo(() => new THREE.Vector3(), [])
+
+  useFrame(() => {
+    for (const { id, v } of points) {
+      const el = labels.current?.[id]
+      if (!el) continue
+      tmp.copy(v).project(camera)
+      const visible = tmp.z < 1 && Math.abs(tmp.x) < 1.1 && Math.abs(tmp.y) < 1.1
+      el.style.visibility = visible ? 'visible' : 'hidden'
+      if (!visible) continue
+      const x = ((tmp.x + 1) / 2) * size.width
+      const y = ((1 - tmp.y) / 2) * size.height
+      el.style.transform = `translate(-50%, -50%) translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`
+    }
   })
   return null
 }
@@ -300,70 +467,86 @@ function prefersReducedMotion() {
   return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
+/* ---------- Escena ---------- */
+
 interface LakeSceneProps {
-  /** Exploración libre con el ratón (página Puno 3D); si es false, la cámara orbita sola */
-  interactive?: boolean
-  hotspots?: Hotspot[]
-  onHotspot?: (h: Hotspot) => void
-  activeHotspot?: string | null
+  /** Muestra las etiquetas de los lugares y permite elegir uno */
+  places?: Place[]
+  selected?: string | null
+  onSelect?: (id: string | null) => void
+  /** Solo para fondo: sin controles y girando despacio */
+  decorative?: boolean
   children?: ReactNode
 }
 
-export default function LakeScene({ interactive = false, hotspots, onHotspot, activeHotspot, children }: LakeSceneProps) {
+export default function LakeScene({ places, selected, onSelect, decorative = false, children }: LakeSceneProps) {
   const animate = !prefersReducedMotion()
+  const focus = places?.find((p) => p.id === selected)
+  const labels = useRef<Record<string, HTMLButtonElement | null>>({})
 
   return (
+    <div className="relative size-full overflow-hidden">
     <Canvas
       shadows
       dpr={[1, 1.75]}
-      camera={{ position: [0, 17, 62], fov: 45, near: 0.5, far: 1200 }}
+      camera={{ position: OVERVIEW.position.toArray(), fov: 42, near: 0.5, far: 1400 }}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
-      frameloop={animate || interactive ? 'always' : 'demand'}
     >
-      <fog attach="fog" args={[FOG, 220, 760]} />
+      <fog attach="fog" args={[FOG, 260, 820]} />
       <Sky distance={1000} sunPosition={SUN.toArray()} turbidity={2.5} rayleigh={0.6} mieCoefficient={0.004} mieDirectionalG={0.85} />
       <hemisphereLight args={['#dfeeff', '#6b5a3c', 0.9]} />
       <directionalLight
         position={SUN.toArray()}
         intensity={2.2}
         castShadow
-        shadow-mapSize={[1024, 1024]}
-        shadow-camera-left={-40}
-        shadow-camera-right={40}
-        shadow-camera-top={40}
-        shadow-camera-bottom={-40}
+        shadow-mapSize={[2048, 2048]}
+        shadow-camera-left={-200}
+        shadow-camera-right={200}
+        shadow-camera-top={200}
+        shadow-camera-bottom={-200}
       />
       <Water sunDir={SUN} fogColor={FOG} animate={animate} />
       <Terrain />
-      <Islands animate={animate} />
+      <Places animate={animate} />
 
-      {hotspots?.map((h) => (
-        <Html key={h.label} position={h.position} center zIndexRange={[20, 0]}>
-          <button
-            onClick={() => onHotspot?.(h)}
-            className={`whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-semibold shadow-md transition-colors ${
-              activeHotspot === h.label ? 'bg-mint text-ink' : 'bg-white text-ink hover:bg-mint'
-            }`}
-          >
-            {h.label}
-          </button>
-        </Html>
-      ))}
+      {places && <LabelProjector places={places} labels={labels} />}
 
-      {interactive ? (
-        <OrbitControls
-          target={[0, 2, 0]}
-          enableDamping
-          maxPolarAngle={Math.PI / 2.15}
-          minDistance={12}
-          maxDistance={260}
-          autoRotate={animate && !activeHotspot}
-          autoRotateSpeed={0.35}
-        />
-      ) : (
-        <AutoOrbit enabled={animate} />
-      )}
+      <OrbitControls
+        makeDefault
+        enabled={!decorative}
+        target={OVERVIEW.target.toArray()}
+        enableDamping
+        maxPolarAngle={Math.PI / 2.2}
+        minDistance={20}
+        maxDistance={420}
+        autoRotate={animate && decorative}
+        autoRotateSpeed={decorative ? 0.25 : 0.12}
+      />
+      {!decorative && <CameraRig focus={focus} animate={animate} />}
       {children}
     </Canvas>
+      {/* Etiquetas de los lugares: botones normales del DOM, ubicados en cada cuadro por LabelProjector */}
+      {places?.map((p) => {
+        const active = selected === p.id
+        return (
+          <button
+            key={p.id}
+            ref={(el) => {
+              labels.current[p.id] = el
+            }}
+            onClick={() => onSelect?.(active ? null : p.id)}
+            aria-pressed={active}
+            style={{ position: 'absolute', left: 0, top: 0, visibility: 'hidden' }}
+            className={
+              'flex items-center gap-1.5 whitespace-nowrap rounded-full py-1 pl-1 pr-3 text-sm font-semibold shadow-lg transition-colors ' +
+              (active ? 'bg-mint text-ink' : 'bg-white/95 text-ink hover:bg-mint')
+            }
+          >
+            <span className="inline-block size-5 rounded-full" style={{ background: DYES[p.dye] }} aria-hidden />
+            {p.name}
+          </button>
+        )
+      })}
+    </div>
   )
 }

@@ -14,6 +14,7 @@ class Experiencia extends Model
     protected $fillable = [
         'user_id',
         'locale_id',
+        'anfitrion_id',
         'title',
         'description',
         'content',
@@ -54,6 +55,11 @@ class Experiencia extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function anfitrion()
+    {
+        return $this->belongsTo(Anfitrion::class);
     }
 
     public function locale()

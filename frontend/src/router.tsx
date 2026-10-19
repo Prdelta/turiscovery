@@ -25,6 +25,7 @@ const dash = () => import('./pages/dashboard/DashboardPages')
 const admin = () => import('./pages/admin/AdminPages')
 const list = () => import('./pages/ListPage')
 const liveAdmin = () => import('./pages/admin/CandelariaLiveAdmin')
+const hosts = () => import('./pages/HostsPages')
 
 export const router = createBrowserRouter([
   {
@@ -50,6 +51,9 @@ export const router = createBrowserRouter([
       { path: '/search', element: <Navigate to="/buscar" replace /> },
       { path: '/mapa', element: page(() => import('./pages/MapPage'), 'default') },
       { path: '/puno-3d', element: page(() => import('./pages/Puno3DPage'), 'default') },
+      { path: '/anfitriones', element: page(hosts, 'default') },
+      { path: '/anfitriones/:id', element: page(hosts, 'HostDetail') },
+      { path: '/hoy', element: page(() => import('./pages/AlmanacPage'), 'default') },
       { path: '/planificador', element: page(() => import('./pages/PlannerPage'), 'default') },
 
       { path: '/login', element: page(auth, 'LoginPage') },
@@ -90,6 +94,7 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: page(dash, 'DashboardHome') },
           { path: 'reservas', element: page(dash, 'PartnerBookingsPage') },
+          { path: 'anfitriones', element: page(() => import('./pages/dashboard/HostsManager'), 'default') },
           { path: ':type', element: page(dash, 'ContentManager') },
           { path: ':type/nuevo', element: page(dash, 'ContentFormPage') },
           { path: ':type/:id', element: page(dash, 'ContentFormPage') },
@@ -110,6 +115,7 @@ export const router = createBrowserRouter([
           { path: 'danzas', element: page(admin, 'DanzasAdmin') },
           { path: 'galeria', element: page(admin, 'GalleryAdmin') },
           { path: 'recursos', element: page(admin, 'ResourceSearchPage') },
+          { path: 'almanaque', element: page(() => import('./pages/admin/AlmanacAdmin'), 'default') },
           { path: 'candelaria-vivo', element: page(liveAdmin, 'ProgramAdmin') },
           { path: 'candelaria-vivo/:id', element: page(liveAdmin, 'LiveControl') },
         ],

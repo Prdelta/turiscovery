@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ValidatesPaginationTrait;
+use App\Models\Anfitrion;
 use App\Models\Experiencia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -16,7 +17,7 @@ class ExperienciaController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Experiencia::with(['user:id,name,avatar', 'locale'])
+        $query = Experiencia::with(['user:id,name,avatar', 'locale', 'anfitrion:id,name,community,role_title,photo_url,audio_url,greeting,greeting_translation,languages'])
             ->active();
 
         // Filter by difficulty
@@ -65,7 +66,7 @@ class ExperienciaController extends Controller
      */
     public function show($id)
     {
-        $experiencia = Experiencia::with(['user:id,name,avatar', 'locale', 'reviews.user:id,name,avatar'])
+        $experiencia = Experiencia::with(['user:id,name,avatar', 'locale', 'reviews.user:id,name,avatar', 'anfitrion'])
             ->findOrFail($id);
 
         return response()->json([
@@ -84,6 +85,7 @@ class ExperienciaController extends Controller
             'description' => 'required|string',
             'content' => 'nullable|string',
             'locale_id' => 'nullable|exists:locales,id',
+            'anfitrion_id' => 'nullable|exists:anfitriones,id',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
             'address' => 'nullable|string',
@@ -104,6 +106,10 @@ class ExperienciaController extends Controller
 
         $data = $validator->validated();
         $data['user_id'] = $request->user()->id;
+
+        if ($error = $this->foreignAnfitrion($request, $data['anfitrion_id'] ?? null)) {
+            return $error;
+        }
 
         $experiencia = new Experiencia($data);
 
@@ -139,6 +145,7 @@ class ExperienciaController extends Controller
             'description' => 'sometimes|required|string',
             'content' => 'nullable|string',
             'locale_id' => 'nullable|exists:locales,id',
+            'anfitrion_id' => 'nullable|exists:anfitriones,id',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
             'address' => 'nullable|string',
@@ -156,6 +163,10 @@ class ExperienciaController extends Controller
                 'success' => false,
                 'errors' => $validator->errors()
             ], 422);
+        }
+
+        if ($error = $this->foreignAnfitrion($request, $request->input('anfitrion_id'))) {
+            return $error;
         }
 
         $experiencia->fill($validator->validated());
@@ -193,5 +204,22 @@ class ExperienciaController extends Controller
             'success' => true,
             'message' => 'Experiencia deleted successfully',
         ], 200);
+    }
+
+    /**
+     * Un socio solo puede asignar anfitriones propios (los admins, cualquiera)
+     */
+    private function foreignAnfitrion(Request $request, $anfitrionId)
+    {
+        if (!$anfitrionId || $request->user()->isAdmin()) {
+            return null;
+        }
+
+        $owned = Anfitrion::whereKey($anfitrionId)->where('user_id', $request->user()->id)->exists();
+
+        return $owned ? null : response()->json([
+            'success' => false,
+            'errors' => ['anfitrion_id' => ['Ese anfitrión no pertenece a tu cuenta.']],
+        ], 422);
     }
 }

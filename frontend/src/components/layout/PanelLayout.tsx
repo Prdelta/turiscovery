@@ -8,6 +8,7 @@ import {
   Images,
   LogOut,
   Megaphone,
+  Mic,
   Music2,
   Radio,
   Search,
@@ -15,6 +16,7 @@ import {
   Sparkles,
   Star,
   Store,
+  Sun,
   Ticket,
   UserCog,
   Users,
@@ -51,6 +53,7 @@ const SECTIONS: Record<'cuenta' | 'dashboard' | 'admin', { title: string; items:
     items: [
       { to: '/dashboard', label: 'Resumen', icon: BarChart3, end: true },
       { to: '/dashboard/reservas', label: 'Reservas recibidas', icon: Ticket },
+      { to: '/dashboard/anfitriones', label: 'Anfitriones', icon: Mic },
       { to: '/dashboard/locales', label: 'Locales', icon: Store },
       { to: '/dashboard/experiencias', label: 'Experiencias', icon: Compass },
       { to: '/dashboard/eventos', label: 'Eventos', icon: CalendarDays },
@@ -63,6 +66,7 @@ const SECTIONS: Record<'cuenta' | 'dashboard' | 'admin', { title: string; items:
     items: [
       { to: '/admin', label: 'Supervisión', icon: BarChart3, end: true },
       { to: '/admin/usuarios', label: 'Usuarios y socios', icon: Users },
+      { to: '/admin/almanaque', label: 'Almanaque', icon: Sun },
       { to: '/admin/candelaria-vivo', label: 'Candelaria en vivo', icon: Radio },
       { to: '/admin/danzas', label: 'Danzas', icon: Music2 },
       { to: '/admin/galeria', label: 'Galería Candelaria', icon: Images },

@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 import { clsx } from 'clsx'
-import { FileUp, MousePointer2 } from 'lucide-react'
+import { FileUp } from 'lucide-react'
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router'
 import { Spinner } from '../components/ui/Feedback'
 import { useDocumentTitle } from '../lib/hooks'
-import { LAKE_HOTSPOTS, webglAvailable, type Hotspot } from '../three/support'
+import { webglAvailable } from '../three/support'
 
-const LakeScene = lazy(() => import('../three/LakeScene'))
 const ModelViewer = lazy(() => import('../three/ModelViewer'))
 
 interface ModelEntry {
@@ -20,7 +20,6 @@ interface ModelEntry {
 export default function Puno3DPage() {
   useDocumentTitle('Puno en 3D')
   const [canRender] = useState(() => webglAvailable())
-  const [active, setActive] = useState<Hotspot | null>(null)
 
   if (!canRender) {
     return (
@@ -33,28 +32,13 @@ export default function Puno3DPage() {
 
   return (
     <>
-      <section aria-labelledby="lago-3d" className="relative h-[78svh] min-h-[520px] bg-lake">
-        <Suspense fallback={<Spinner label="Preparando el lago…" />}>
-          <LakeScene interactive hotspots={LAKE_HOTSPOTS} activeHotspot={active?.label} onHotspot={setActive} />
-        </Suspense>
-        <div className="pointer-events-none absolute inset-x-0 top-0">
-          <div className="container-page pt-8">
-            <div className="pointer-events-auto max-w-md rounded-[var(--radius-card)] bg-white/95 p-5 shadow-sm">
-              <h1 id="lago-3d" className="text-3xl font-extrabold">Lago Titicaca en 3D</h1>
-              {active ? (
-                <>
-                  <h2 className="mt-3 text-lg font-bold text-primary">{active.label}</h2>
-                  <p className="mt-1 text-ink-soft">{active.description}</p>
-                  <button onClick={() => setActive(null)} className="pointer-events-auto mt-3 text-sm font-semibold text-primary">Seguir explorando</button>
-                </>
-              ) : (
-                <p className="mt-2 flex items-start gap-2 text-ink-soft">
-                  <MousePointer2 className="mt-1 size-4 shrink-0" aria-hidden />
-                  Arrastra para girar, usa la rueda o pellizca para acercarte y toca las etiquetas para saber más.
-                </p>
-              )}
-            </div>
-          </div>
+      <section className="bg-lake-deep text-white">
+        <div className="container-page py-12 sm:py-16">
+          <h1 className="font-display text-[clamp(2.4rem,6vw,4.2rem)] font-extrabold leading-none text-white">Puno en 3D</h1>
+          <p className="prose-measure mt-4 text-lg text-white/85">
+            Piezas y lugares para mirar de cerca. Para recorrer el lago completo,{' '}
+            <Link to="/" className="font-semibold text-mint underline-offset-4 hover:underline">vuelve a la portada</Link>.
+          </p>
         </div>
       </section>
       <ModelsSection />

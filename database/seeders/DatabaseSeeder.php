@@ -402,6 +402,9 @@ class DatabaseSeeder extends Seeder
         // 10. Seed Candelaria Danzas (Traditional Dances)
         $this->call(CandelariaDanzasSeeder::class);
 
+        // Almanaque: fiestas y fechas que se repiten cada año
+        $this->call(AlmanacSeeder::class);
+
         echo "\n";
         echo "========================================\n";
         echo "✓ Database seeded successfully!\n";

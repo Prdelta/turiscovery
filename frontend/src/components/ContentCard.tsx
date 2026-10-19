@@ -4,15 +4,19 @@ import { CONTENT, DIFFICULTY, EVENT_CATEGORIES, LOCALE_CATEGORIES, imageOf, titl
 import { formatPrice, formatShortDate, formatTime } from '../lib/format'
 import type { AnyContent, Evento, Experiencia, Locale, Promocion } from '../lib/types'
 import { FavoriteButton } from './FavoriteButton'
+import { Tocapu, WovenBand } from './textile/Weave'
 
-/** Tarjeta de contenido con la información clave de cada tipo */
+/**
+ * Tarjeta de contenido: la foto lleva debajo la faja tejida de su categoría,
+ * y el tocapu identifica el tipo sin necesidad de etiquetas.
+ */
 export function ContentCard({ item, type }: { item: AnyContent; type: ContentType }) {
   const meta = CONTENT[type]
   const href = `${meta.path}/${item.id}`
 
   return (
     <article className="group relative flex flex-col">
-      <Link to={href} className="relative block overflow-hidden rounded-[var(--radius-card)] bg-line">
+      <Link to={href} className="relative block overflow-hidden rounded-t-[var(--radius-card)] bg-line">
         <img
           src={imageOf(item, type)}
           alt=""
@@ -21,10 +25,15 @@ export function ContentCard({ item, type }: { item: AnyContent; type: ContentTyp
         />
         <CardFlag item={item} type={type} />
       </Link>
+      <WovenBand motif={meta.motif} dye={meta.dye} height={14} />
       <div className="absolute right-3 top-3">
         <FavoriteButton type={type} id={item.id} compact />
       </div>
       <div className="flex flex-1 flex-col gap-1.5 pt-3.5">
+        <p className="flex items-center gap-2 text-xs font-semibold text-ink-soft">
+          <Tocapu motif={meta.motif} dye={meta.dye} size={16} />
+          {meta.singular}
+        </p>
         <h3 className="text-lg font-bold leading-snug">
           <Link to={href} className="hover:text-primary">
             {titleOf(item as never)}
@@ -71,6 +80,17 @@ function CardMeta({ item, type }: { item: AnyContent; type: ContentType }) {
             ) : null}
             Dificultad {DIFFICULTY[e.difficulty]?.toLowerCase()}
           </p>
+          {e.anfitrion && (
+            <p className="flex items-center gap-2 text-sm">
+              {e.anfitrion.photo_url ? (
+                <img src={e.anfitrion.photo_url} alt="" className="size-6 rounded-full object-cover" />
+              ) : (
+                <Tocapu motif="persona" dye="cochinilla" size={18} />
+              )}
+              Te recibe <strong className="font-semibold">{e.anfitrion.name}</strong>
+              {e.anfitrion.audio_url && <span className="text-xs text-cochinilla">· con saludo</span>}
+            </p>
+          )}
           <p className="mt-auto pt-1 font-display text-lg font-bold text-primary">{formatPrice(e.price_pen) ?? 'Consultar precio'}</p>
         </>
       )

@@ -82,6 +82,17 @@ export default defineConfig(({ mode }) => {
               },
             },
             {
+              // Clima del lago: sin conexión se muestra el último pronóstico guardado
+              urlPattern: ({ url }) => url.hostname === 'api.open-meteo.com',
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'turiscovery-clima',
+                networkTimeoutSeconds: 5,
+                expiration: { maxEntries: 10, maxAgeSeconds: 2 * 24 * 60 * 60 },
+                cacheableResponse: { statuses: [200] },
+              },
+            },
+            {
               urlPattern: ({ url }) => url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com',
               handler: 'CacheFirst',
               options: {

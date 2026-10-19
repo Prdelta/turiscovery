@@ -1,3 +1,4 @@
+import type { Dye, Motif } from '../components/textile/Weave'
 import type { AnyContent, ProgramType } from './types'
 
 /** Tipos de contenido que publican los socios */
@@ -12,6 +13,9 @@ export interface ContentMeta {
   /** Ruta pública del detalle */
   path: string
   color: string
+  /** Motivo tejido y tinte que identifican al tipo en todo el sitio */
+  motif: Motif
+  dye: Dye
 }
 
 export const CONTENT: Record<ContentType, ContentMeta> = {
@@ -22,6 +26,8 @@ export const CONTENT: Record<ContentType, ContentMeta> = {
     modelClass: 'App\\Models\\Experiencia',
     path: '/experiencias',
     color: 'bg-primary',
+    motif: 'olas',
+    dye: 'anil',
   },
   eventos: {
     type: 'eventos',
@@ -30,6 +36,8 @@ export const CONTENT: Record<ContentType, ContentMeta> = {
     modelClass: 'App\\Models\\Evento',
     path: '/eventos',
     color: 'bg-lake',
+    motif: 'chakana',
+    dye: 'cochinilla',
   },
   promociones: {
     type: 'promociones',
@@ -38,6 +46,8 @@ export const CONTENT: Record<ContentType, ContentMeta> = {
     modelClass: 'App\\Models\\Promocion',
     path: '/promociones',
     color: 'bg-sun',
+    motif: 'ojo',
+    dye: 'qolle',
   },
   locales: {
     type: 'locales',
@@ -46,6 +56,8 @@ export const CONTENT: Record<ContentType, ContentMeta> = {
     modelClass: 'App\\Models\\Locale',
     path: '/locales',
     color: 'bg-mint-dark',
+    motif: 'llave',
+    dye: 'chilca',
   },
   candelaria: {
     type: 'candelaria',
@@ -54,6 +66,8 @@ export const CONTENT: Record<ContentType, ContentMeta> = {
     modelClass: 'App\\Models\\Candelaria',
     path: '/candelaria/publicaciones',
     color: 'bg-primary-dark',
+    motif: 'estrella',
+    dye: 'morado',
   },
 }
 

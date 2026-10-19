@@ -14,7 +14,7 @@ import { api, getData, parseApiError, type Paginated } from '../../lib/api'
 import { CONTENT, imageOf, titleOf, type ContentType } from '../../lib/content'
 import { formatDate, formatPrice, toDateInput, toDateTimeInput } from '../../lib/format'
 import { useDebounced, useDocumentTitle } from '../../lib/hooks'
-import type { AnyContent, Booking, Locale, User } from '../../lib/types'
+import type { Anfitrion, AnyContent, Booking, Locale, User } from '../../lib/types'
 import { FORM_CONFIG, type FieldDef } from './contentFields'
 
 const LocationPicker = lazy(() => import('../../components/Map').then((m) => ({ default: m.LocationPicker })))
@@ -251,7 +251,7 @@ function toPayload(type: ContentType, values: Values, isEdit: boolean) {
       body[f.name] = !!raw
     } else if (f.kind === 'datetime') {
       body[f.name] = raw ? new Date(String(raw)).toISOString() : null
-    } else if (f.kind === 'locale') {
+    } else if (f.kind === 'locale' || f.kind === 'anfitrion') {
       body[f.name] = raw ? Number(raw) : null
     } else {
       const s = String(raw ?? '').trim()
@@ -303,6 +303,13 @@ function ContentForm({ type, item }: { type: ContentType; item?: AnyContent }) {
     enabled: needsLocales,
   })
 
+  const needsHosts = config.fields.some((f) => f.kind === 'anfitrion')
+  const hosts = useQuery({
+    queryKey: ['my-anfitriones'],
+    queryFn: () => getData<Anfitrion[]>('/my-anfitriones'),
+    enabled: needsHosts,
+  })
+
   const save = useMutation({
     mutationFn: () => {
       const body = toPayload(type, values, !!item)
@@ -340,6 +347,7 @@ function ContentForm({ type, item }: { type: ContentType; item?: AnyContent }) {
   }
 
   const localeOptions = Object.fromEntries((locales.data?.data ?? []).map((l) => [String(l.id), l.name]))
+  const hostOptions = Object.fromEntries((hosts.data ?? []).map((h) => [String(h.id), h.community ? `${h.name} (${h.community})` : h.name]))
 
   return (
     <>
@@ -355,8 +363,8 @@ function ContentForm({ type, item }: { type: ContentType; item?: AnyContent }) {
                 value={values[f.name]}
                 error={errors[f.name]}
                 onChange={(v) => set(f.name, v)}
-                localeOptions={localeOptions}
-                localesLoading={locales.isLoading}
+                localeOptions={f.kind === 'anfitrion' ? hostOptions : localeOptions}
+                localesLoading={f.kind === 'anfitrion' ? hosts.isLoading : locales.isLoading}
               />
             ),
           )}
@@ -422,6 +430,16 @@ function FieldInput({
       return <TextArea {...common} value={String(value ?? '')} onChange={(e) => onChange(e.target.value)} />
     case 'select':
       return <SelectField {...common} options={f.options ?? {}} placeholder="Elige una opción" value={String(value ?? '')} onChange={(e) => onChange(e.target.value)} />
+    case 'anfitrion':
+      return (
+        <SelectField
+          {...common}
+          options={localeOptions}
+          placeholder={localesLoading ? 'Cargando anfitriones…' : Object.keys(localeOptions).length ? 'Sin anfitrión' : 'Aún no presentas anfitriones'}
+          value={String(value ?? '')}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      )
     case 'locale':
       return (
         <SelectField

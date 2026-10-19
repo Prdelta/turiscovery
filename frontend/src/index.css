@@ -26,6 +26,14 @@
   --color-info: #b6dfe7;
   --color-danger: #d23b3b;
 
+  /* Tintes naturales de los tejidos del altiplano (identidad textil) */
+  --color-cochinilla: #b3243b;
+  --color-anil: #2b3a8c;
+  --color-qolle: #d99a1e;
+  --color-chilca: #4c7a3a;
+  --color-tierra: #8a5a2b;
+  --color-lana: #f6efe3;
+
   --radius-card: 18px;
 }
 
