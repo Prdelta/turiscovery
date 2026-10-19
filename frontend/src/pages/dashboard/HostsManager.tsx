@@ -51,7 +51,7 @@ export default function HostsManager() {
                   {[h.role_title, h.community].filter(Boolean).join(' · ') || 'Sin descripción'} · {h.experiencias_count ?? 0} experiencias
                 </p>
               </div>
-              {h.audio_url ? <Badge className="bg-cochinilla/10 text-cochinilla">Con saludo</Badge> : <Badge>Sin saludo</Badge>}
+              {h.audio_url ? <Badge className="border-2 border-ink bg-qolle/25 text-ink">Con saludo</Badge> : <Badge>Sin saludo</Badge>}
               <button onClick={() => setEditing(h)} aria-label="Editar" className="inline-flex size-10 items-center justify-center rounded-full hover:bg-ink/5"><Pencil className="size-4.5" /></button>
               <button
                 onClick={() => confirm(`¿Eliminar a ${h.name}? Sus experiencias quedarán sin anfitrión.`) && remove.mutate(h.id)}

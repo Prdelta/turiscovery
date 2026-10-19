@@ -47,7 +47,7 @@ export const CONTENT: Record<ContentType, ContentMeta> = {
     path: '/promociones',
     color: 'bg-sun',
     motif: 'ojo',
-    dye: 'qolle',
+    dye: 'chilca',
   },
   locales: {
     type: 'locales',
@@ -57,7 +57,7 @@ export const CONTENT: Record<ContentType, ContentMeta> = {
     path: '/locales',
     color: 'bg-mint-dark',
     motif: 'llave',
-    dye: 'chilca',
+    dye: 'tierra',
   },
   candelaria: {
     type: 'candelaria',

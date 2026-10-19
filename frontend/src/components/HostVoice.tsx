@@ -6,12 +6,18 @@ import { api, parseApiError } from '../lib/api'
 import type { Anfitrion, HostLanguage } from '../lib/types'
 import { Avatar } from './layout/SiteLayout'
 import { Tocapu, WovenBand } from './textile/Weave'
+import { NativePhrase, type NativeLanguage } from './ui/NativePhrase'
 
 export const LANGUAGE_LABEL: Record<HostLanguage, string> = {
   quechua: 'Quechua',
   aimara: 'Aimara',
   espanol: 'Español',
   ingles: 'Inglés',
+}
+
+/** Primera lengua originaria que habla el anfitrión (para el atributo lang del saludo) */
+function nativeLanguageOf(host: Anfitrion): NativeLanguage | null {
+  return (host.languages?.find((l) => l === 'quechua' || l === 'aimara') as NativeLanguage | undefined) ?? null
 }
 
 /** Reproductor del saludo grabado: un botón grande y una faja que avanza como un tejido */
@@ -37,7 +43,7 @@ export function VoicePlayer({ src, label, dark = false }: { src: string; label: 
       <div className="min-w-0 flex-1">
         <div className="relative h-3.5 overflow-hidden rounded-sm bg-ink/10" aria-hidden>
           <div className="absolute inset-y-0 left-0 overflow-hidden" style={{ width: `${progress * 100}%` }}>
-            <WovenBand motif="persona" dye="cochinilla" height={14} className="w-[600px]" />
+            <WovenBand motif="persona" dye="qolle" height={14} className="w-[600px]" />
           </div>
         </div>
         <p className={clsx('mt-1 text-xs', dark ? 'text-white/70' : 'text-ink-soft')}>
@@ -65,7 +71,7 @@ export function VoicePlayer({ src, label, dark = false }: { src: string; label: 
 export function HostCard({ host, compact = false }: { host: Anfitrion; compact?: boolean }) {
   return (
     <section className="overflow-hidden rounded-[var(--radius-card)] bg-lake-deep text-white" aria-label={`Anfitrión: ${host.name}`}>
-      <WovenBand motif="persona" dye="cochinilla" height={14} />
+      <WovenBand motif="persona" dye="qolle" height={14} />
       <div className={clsx('flex gap-4 p-5', compact ? 'items-center' : 'flex-col sm:flex-row')}>
         {host.photo_url ? (
           <img src={host.photo_url} alt={host.name} className={clsx('shrink-0 rounded-2xl object-cover', compact ? 'size-16' : 'size-28')} />
@@ -83,8 +89,7 @@ export function HostCard({ host, compact = false }: { host: Anfitrion; compact?:
           </p>
           {!compact && host.greeting && (
             <blockquote className="mt-4">
-              <p className="font-display text-xl font-bold text-white">“{host.greeting}”</p>
-              {host.greeting_translation && <p className="mt-1 text-white/75">{host.greeting_translation}</p>}
+              <NativePhrase original={host.greeting} translation={host.greeting_translation} language={nativeLanguageOf(host)} dark />
             </blockquote>
           )}
           {host.audio_url && (
@@ -107,7 +112,7 @@ export function HostPortrait({ host }: { host: Anfitrion }) {
           <img src={host.photo_url} alt="" loading="lazy" className="aspect-[3/4] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
         ) : (
           <div className="flex aspect-[3/4] items-center justify-center">
-            <Tocapu motif="persona" dye="cochinilla" size={96} />
+            <Tocapu motif="persona" dye="qolle" size={96} />
           </div>
         )}
         {host.audio_url && (
@@ -116,13 +121,13 @@ export function HostPortrait({ host }: { host: Anfitrion }) {
           </span>
         )}
       </div>
-      <WovenBand motif="persona" dye="cochinilla" height={12} />
+      <WovenBand motif="persona" dye="qolle" height={12} />
       <h3 className="mt-3 text-xl font-bold group-hover:text-primary">{host.name}</h3>
       <p className="text-sm text-ink-soft">{[host.role_title, host.community].filter(Boolean).join(' · ')}</p>
       {host.languages?.length ? (
         <p className="mt-1 flex flex-wrap gap-1">
           {host.languages.map((l) => (
-            <span key={l} className="rounded-full bg-cochinilla/10 px-2 py-0.5 text-xs font-semibold text-cochinilla">{LANGUAGE_LABEL[l]}</span>
+            <span key={l} className="rounded-[var(--radius-chip)] bg-qolle/25 px-2 py-0.5 text-xs font-bold text-ink">{LANGUAGE_LABEL[l]}</span>
           ))}
         </p>
       ) : null}

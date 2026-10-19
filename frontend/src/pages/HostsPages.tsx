@@ -23,13 +23,13 @@ export default function HostsPage() {
     <div className="container-page py-12 sm:py-16">
       <header className="mb-10">
         <div className="flex items-center gap-4">
-          <Tocapu motif="persona" dye="cochinilla" size={48} />
+          <Tocapu motif="persona" dye="qolle" size={48} />
           <h1 className="text-4xl font-extrabold sm:text-5xl">Quién te recibe</h1>
         </div>
         <p className="prose-measure mt-4 text-lg text-ink-soft">
           Familias de las islas flotantes, tejedores de Taquile, guías de Sillustani. Escucha cómo te saludan en su idioma antes de conocerlos.
         </p>
-        <WovenBand motif="persona" dye="cochinilla" height={12} className="mt-6 rounded-sm" />
+        <WovenBand motif="persona" dye="qolle" height={12} className="mt-6 rounded-sm" />
       </header>
 
       <div role="group" aria-label="Idioma" className="mb-8 flex flex-wrap gap-2">
@@ -40,7 +40,7 @@ export default function HostsPage() {
             aria-pressed={language === l}
             className={clsx(
               'rounded-full border px-4 py-2 text-sm font-semibold',
-              language === l ? 'border-cochinilla bg-cochinilla text-white' : 'border-line bg-white hover:border-ink/40',
+              language === l ? 'border-ink bg-ink text-white' : 'border-ink bg-white hover:bg-sky',
             )}
           >
             {l ? `Habla ${LANGUAGE_LABEL[l].toLowerCase()}` : 'Todos'}
@@ -86,10 +86,10 @@ export function HostDetail() {
             <img src={host.photo_url} alt={host.name} className="aspect-[4/5] w-full rounded-t-[var(--radius-card)] object-cover" />
           ) : (
             <div className="flex aspect-[4/5] items-center justify-center rounded-t-[var(--radius-card)] bg-lake">
-              <Tocapu motif="persona" dye="cochinilla" size={140} />
+              <Tocapu motif="persona" dye="qolle" size={140} />
             </div>
           )}
-          <WovenBand motif="persona" dye="cochinilla" height={18} />
+          <WovenBand motif="persona" dye="qolle" height={18} />
         </div>
         <div className="flex flex-col gap-6">
           <HostCard host={host} />

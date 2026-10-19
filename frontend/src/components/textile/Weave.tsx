@@ -51,8 +51,10 @@ export const DYES = {
   chilca: '#4c7a3a',
   morado: '#5930e8',
   tierra: '#8a5a2b',
+  solOscuro: '#a67c00',
   lago: '#10295c',
   lana: '#f6efe3',
+  mint: '#74fa8a',
 } as const
 
 export type Dye = keyof typeof DYES
@@ -139,9 +141,95 @@ export function SiteBand({ height = 22, className }: { height?: number; classNam
     <div className={clsx('flex', className)} aria-hidden>
       <WovenBand motif="olas" dye="anil" height={height} className="flex-1" />
       <WovenBand motif="chakana" dye="cochinilla" height={height} className="flex-1" />
-      <WovenBand motif="ojo" dye="qolle" height={height} className="flex-1" />
-      <WovenBand motif="llave" dye="chilca" height={height} className="flex-1" />
+      <WovenBand motif="ojo" dye="chilca" height={height} className="flex-1" />
+      <WovenBand motif="llave" dye="tierra" height={height} className="flex-1" />
       <WovenBand motif="estrella" dye="morado" height={height} className="flex-1" />
+      <WovenBand motif="persona" dye="qolle" height={height} className="flex-1" />
+    </div>
+  )
+}
+
+/**
+ * Separador de sección: una fila de puntadas de 8px en el tinte de la sección que empieza.
+ */
+export function StitchRow({ dye = 'morado', className }: { dye?: Dye; className?: string }) {
+  const id = useId().replace(/:/g, '')
+  return (
+    <svg width="100%" height="8" className={clsx('block', className)} aria-hidden shapeRendering="crispEdges">
+      <defs>
+        <pattern id={`s${id}`} width="12" height="8" patternUnits="userSpaceOnUse">
+          {/* Rombo pequeño de 3 × 3 puntadas (2px cada una) */}
+          <rect x="2" y="0" width="2" height="2" fill={DYES[dye]} />
+          <rect x="0" y="2" width="6" height="2" fill={DYES[dye]} />
+          <rect x="2" y="4" width="2" height="2" fill={DYES[dye]} />
+        </pattern>
+      </defs>
+      <rect width="100%" height="8" fill={`url(#s${id})`} />
+    </svg>
+  )
+}
+
+/**
+ * Faja de progreso: cada paso es un motivo; los hechos van en el tinte
+ * y los pendientes en color línea. Sirve para el audio, el desfile y los pasos de reserva.
+ */
+export function ProgressBand({
+  total,
+  done,
+  motif = 'olas',
+  dye = 'morado',
+  size = 16,
+  label,
+}: {
+  total: number
+  done: number
+  motif?: Motif
+  dye?: Dye
+  size?: number
+  /** Texto para lectores de pantalla, por ejemplo "Paso 2 de 3" */
+  label?: string
+}) {
+  return (
+    <div
+      role="progressbar"
+      aria-valuemin={0}
+      aria-valuemax={total}
+      aria-valuenow={done}
+      aria-label={label ?? `${done} de ${total}`}
+      className="flex flex-wrap gap-1"
+    >
+      {Array.from({ length: total }, (_, i) => (
+        <svg key={i} width={size} height={size} viewBox="0 0 8 8" shapeRendering="crispEdges" aria-hidden>
+          <path d={motifPath(motif)} fill={i < done ? DYES[dye] : '#d8deea'} />
+        </svg>
+      ))}
+    </div>
+  )
+}
+
+/**
+ * Tira de motivos sobre tinta, cada uno en su color (versión clara de su tinte
+ * cuando el original no contrasta con la tinta). Es la faja de presentación de la marca.
+ */
+const ON_INK: Record<Motif, string> = {
+  olas: '#b6dfe7',
+  chakana: '#e0405a',
+  ojo: '#74fa8a',
+  llave: '#d99a1e',
+  estrella: '#7654ec',
+  sol: '#f2b914',
+  persona: '#ffffff',
+  isla: '#b6dfe7',
+}
+
+export function MotifStrip({ motifs, size = 28, className }: { motifs: Motif[]; size?: number; className?: string }) {
+  return (
+    <div className={clsx('flex items-center gap-3 overflow-hidden rounded-[var(--radius-control)] bg-ink px-4 py-3', className)} aria-hidden>
+      {motifs.map((m, i) => (
+        <svg key={m + i} width={size} height={size} viewBox="0 0 8 8" shapeRendering="crispEdges" className="shrink-0">
+          <path d={motifPath(m)} fill={ON_INK[m]} />
+        </svg>
+      ))}
     </div>
   )
 }

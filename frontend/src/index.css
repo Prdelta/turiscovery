@@ -2,39 +2,51 @@
 @import "leaflet/dist/leaflet.css";
 
 /*
-  Turiscovery — tokens de diseño.
-  Colores sólidos (sin degradados), tomados de la paleta oficial de la marca
-  y del paisaje de Puno: tinta índigo, azul profundo del Titicaca, cielo del altiplano.
+  Turiscovery — tokens de la guía de estilo "Telar" (v1).
+  Fondo lana, tinta de 2px, tintes naturales a plena saturación y la faja como navegación.
+  Solo colores sólidos: nada de degradados.
+
+  Espaciado (escala de Tailwind, 1 unidad = 4px):
+    sp-1 = 1 (4px, ícono-texto) · sp-2 = 2 (8px, dentro de chips) · sp-3 = 3 (12px, entre filas)
+    sp-4 = 4 (16px, margen móvil) · sp-6 = 6 (24px, tarjeta interna) · sp-8 = 8 (32px, margen escritorio)
+    sp-12 = 12 (48px, entre secciones) · sp-18 = 18 (72px, secciones de página)
 */
 @theme {
   --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
 
-  --color-ink: #1b1a3a;
-  --color-ink-soft: #4a4968;
-  --color-sky: #eef2f8;
-  --color-line: #d8deea;
-  --color-primary: #5930e8;
+  /* Base */
+  --color-ink: #1b1a3a;        /* Tinta: texto, bordes de 2px, faja de navegación */
+  --color-ink-soft: #4a4968;   /* Tinta suave: texto secundario, nunca más claro */
+  --color-lana: #f6efe3;       /* Lana: fondo principal */
+  --color-sky: #eef2f8;        /* Cielo: fondo de paneles y pantallas largas */
+  --color-line: #d8deea;       /* Línea: divisores, puntadas pendientes */
+
+  /* Acción y estados */
+  --color-primary: #5930e8;      /* Acción principal, foco */
   --color-primary-light: #7654ec;
-  --color-primary-dark: #4426b8;
-  --color-lake: #10295c;
+  --color-primary-dark: #4426b8; /* Hover, enlaces */
+  --color-lake: #10295c;         /* Lugares, hero 3D */
   --color-lake-deep: #0a1b40;
-  --color-mint: #74fa8a;
+  --color-mint: #74fa8a;         /* Éxito, "EN VIVO" sobre oscuro */
   --color-mint-dark: #2f9e45;
-  --color-sun: #f2b914;
+  --color-sun: #f2b914;          /* Selección en mapa, aviso */
   --color-sun-dark: #a67c00;
   --color-info: #b6dfe7;
-  --color-danger: #d23b3b;
+  --color-danger: #d23b3b;       /* Errores, cancelar */
 
-  /* Tintes naturales de los tejidos del altiplano (identidad textil) */
-  --color-cochinilla: #b3243b;
-  --color-anil: #2b3a8c;
-  --color-qolle: #d99a1e;
-  --color-chilca: #4c7a3a;
-  --color-tierra: #8a5a2b;
-  --color-lana: #f6efe3;
+  /* Tintes de los tejidos: identifican cada tipo de contenido */
+  --color-cochinilla: #b3243b;   /* Eventos, en vivo */
+  --color-anil: #2b3a8c;         /* Experiencias */
+  --color-chilca: #4c7a3a;       /* Promociones */
+  --color-tierra: #8a5a2b;       /* Locales */
+  --color-qolle: #d99a1e;        /* Anfitriones (solo relleno: no alcanza contraste como texto) */
 
-  --radius-card: 18px;
+  /* Radios por jerarquía */
+  --radius-chip: 8px;
+  --radius-control: 12px;  /* inputs y botones */
+  --radius-card: 18px;     /* tarjetas */
+  --radius-panel: 24px;    /* paneles */
 }
 
 @layer base {
@@ -43,7 +55,7 @@
     text-rendering: optimizeLegibility;
   }
   body {
-    @apply bg-sky font-sans text-ink;
+    @apply bg-lana font-sans text-ink;
     font-size: 1rem;
     line-height: 1.6;
   }
@@ -56,10 +68,10 @@
   p {
     text-wrap: pretty;
   }
+  /* Foco: contorno de 3px en primario, visible sobre lana y sobre tinta */
   :focus-visible {
     outline: 3px solid var(--color-primary);
     outline-offset: 2px;
-    border-radius: 6px;
   }
   ::selection {
     background: var(--color-mint);
@@ -69,17 +81,95 @@
 
 @layer components {
   .container-page {
-    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-7xl px-4 lg:px-8;
   }
   .prose-measure {
     max-width: 68ch;
   }
+
+  /* ---------- Escala tipográfica (tamaño / interlineado) ---------- */
+  .t-display {
+    @apply font-display font-extrabold text-ink;
+    font-size: clamp(2.5rem, 6vw, 3.5rem); /* 56px en escritorio */
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+  }
+  .t-h1 {
+    @apply font-display font-extrabold text-ink;
+    font-size: clamp(2rem, 4.2vw, 2.5rem); /* 40px */
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+  }
+  .t-h2 {
+    @apply font-display font-extrabold text-ink;
+    font-size: 1.75rem; /* 28px */
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+  }
+  .t-h3 {
+    @apply font-display font-bold text-ink;
+    font-size: 1.25rem; /* 20px */
+    line-height: 1.08;
+  }
+  .t-body {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  .t-small {
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.5;
+  }
+  .t-label {
+    font-size: 0.75rem; /* 12px */
+    font-weight: 800;
+    line-height: 1.3;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* ---------- Superficies ---------- */
+  .card {
+    @apply border-2 border-ink bg-white;
+    border-radius: var(--radius-card);
+  }
+  .panel {
+    @apply border-2 border-ink bg-white;
+    border-radius: var(--radius-panel);
+  }
+
+  /* ---------- Campos ---------- */
   .field-input {
-    @apply w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-ink placeholder:text-ink-soft/60 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/25 disabled:opacity-60;
+    @apply min-h-13 w-full border-2 border-ink bg-white px-4 py-2.5 text-base text-ink transition-colors placeholder:text-ink-soft/70;
+    border-radius: var(--radius-control);
   }
+  .field-input:focus {
+    @apply border-primary outline-none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 35%, transparent);
+  }
+  .field-input[aria-invalid="true"] {
+    @apply border-danger;
+  }
+  .field-input:disabled {
+    @apply cursor-not-allowed border-line bg-sky text-ink-soft;
+  }
+
+  /* Skeleton: sin brillo animado; el motivo del tipo aparece estático */
   .skeleton {
-    @apply animate-pulse rounded-xl bg-line/70;
+    @apply rounded-xl bg-line/70;
   }
+}
+
+/* La faja "se teje" de izquierda a derecha (solo si el usuario permite movimiento) */
+@keyframes tejer {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+.animate-tejer {
+  animation: tejer 1.2s steps(24, end) both;
 }
 
 /* Leaflet dentro de tarjetas redondeadas */

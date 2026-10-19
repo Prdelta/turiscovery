@@ -18,9 +18,9 @@ import { Tocapu, type Dye, type Motif } from './textile/Weave'
 
 const KIND_WEAVE: Record<AlmanacKind, { motif: Motif; dye: Dye }> = {
   fiesta: { motif: 'chakana', dye: 'cochinilla' },
-  ritual: { motif: 'sol', dye: 'qolle' },
+  ritual: { motif: 'sol', dye: 'solOscuro' },
   agricola: { motif: 'llave', dye: 'chilca' },
-  civica: { motif: 'ojo', dye: 'anil' },
+  civica: { motif: 'isla', dye: 'lago' },
   evento: { motif: 'chakana', dye: 'cochinilla' },
   candelaria: { motif: 'estrella', dye: 'morado' },
 }

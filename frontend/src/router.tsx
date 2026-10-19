@@ -53,6 +53,7 @@ export const router = createBrowserRouter([
       { path: '/puno-3d', element: page(() => import('./pages/Puno3DPage'), 'default') },
       { path: '/anfitriones', element: page(hosts, 'default') },
       { path: '/anfitriones/:id', element: page(hosts, 'HostDetail') },
+      { path: '/guia-de-estilo', element: page(() => import('./pages/StyleGuidePage'), 'default') },
       { path: '/hoy', element: page(() => import('./pages/AlmanacPage'), 'default') },
       { path: '/planificador', element: page(() => import('./pages/PlannerPage'), 'default') },
 

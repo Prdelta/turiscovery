@@ -1,25 +1,47 @@
-import { clsx } from 'clsx'
-import { CheckCircle2, X, XCircle } from 'lucide-react'
+import { CheckCircle2, WifiOff, X, XCircle } from 'lucide-react'
 import { createContext, useCallback, useContext, useState, type ReactNode } from 'react'
+
+/*
+  Toasts de la guía Telar: fondo de tinta, texto blanco y, si corresponde,
+  una acción en menta ("Deshacer"). La variante sin conexión avisa que algo
+  se enviará cuando vuelva la señal.
+*/
+
+type ToastTone = 'success' | 'error' | 'offline'
+
+interface ToastAction {
+  label: string
+  onClick: () => void
+}
 
 interface Toast {
   id: number
-  tone: 'success' | 'error'
+  tone: ToastTone
   message: string
+  action?: ToastAction
 }
 
-const ToastContext = createContext<(message: string, tone?: Toast['tone']) => void>(() => {})
+type Notify = (message: string, tone?: ToastTone, options?: { action?: ToastAction }) => void
+
+const ToastContext = createContext<Notify>(() => {})
+
+const ICON: Record<ToastTone, ReactNode> = {
+  success: <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-mint" aria-hidden />,
+  error: <XCircle className="mt-0.5 size-5 shrink-0 text-[#ff8a8a]" aria-hidden />,
+  offline: <WifiOff className="mt-0.5 size-5 shrink-0 text-sun" aria-hidden />,
+}
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])
 
   const dismiss = useCallback((id: number) => setToasts((t) => t.filter((x) => x.id !== id)), [])
 
-  const notify = useCallback(
-    (message: string, tone: Toast['tone'] = 'success') => {
+  const notify = useCallback<Notify>(
+    (message, tone = 'success', options) => {
       const id = Date.now() + Math.random()
-      setToasts((t) => [...t, { id, tone, message }])
-      setTimeout(() => dismiss(id), 4500)
+      setToasts((t) => [...t, { id, tone, message, action: options?.action }])
+      // Con acción se da más tiempo para usarla
+      setTimeout(() => dismiss(id), options?.action ? 8000 : 4500)
     },
     [dismiss],
   )
@@ -27,18 +49,27 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={notify}>
       {children}
-      <div aria-live="polite" className="pointer-events-none fixed inset-x-4 bottom-4 z-[2000] flex flex-col items-center gap-2 sm:inset-x-auto sm:right-6 sm:items-end">
+      <div aria-live="polite" className="pointer-events-none fixed inset-x-4 bottom-20 z-[2000] flex flex-col items-center gap-2 sm:inset-x-auto sm:bottom-6 sm:right-6 sm:items-end">
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={clsx(
-              'pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-2xl px-4 py-3 text-sm shadow-lg',
-              t.tone === 'success' ? 'bg-ink text-white' : 'bg-danger text-white',
-            )}
+            role={t.tone === 'error' ? 'alert' : 'status'}
+            className="pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-[var(--radius-control)] border-2 border-ink bg-ink px-4 py-3 text-sm text-white"
           >
-            {t.tone === 'success' ? <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-mint" /> : <XCircle className="mt-0.5 size-4 shrink-0" />}
+            {ICON[t.tone]}
             <p className="flex-1">{t.message}</p>
-            <button onClick={() => dismiss(t.id)} aria-label="Cerrar aviso" className="opacity-70 hover:opacity-100">
+            {t.action && (
+              <button
+                onClick={() => {
+                  t.action!.onClick()
+                  dismiss(t.id)
+                }}
+                className="font-bold text-mint underline decoration-2 underline-offset-4"
+              >
+                {t.action.label}
+              </button>
+            )}
+            <button onClick={() => dismiss(t.id)} aria-label="Cerrar aviso" className="-m-1 inline-flex size-8 items-center justify-center opacity-70 hover:opacity-100">
               <X className="size-4" />
             </button>
           </div>

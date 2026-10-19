@@ -85,10 +85,10 @@ function CardMeta({ item, type }: { item: AnyContent; type: ContentType }) {
               {e.anfitrion.photo_url ? (
                 <img src={e.anfitrion.photo_url} alt="" className="size-6 rounded-full object-cover" />
               ) : (
-                <Tocapu motif="persona" dye="cochinilla" size={18} />
+                <Tocapu motif="persona" dye="qolle" size={18} />
               )}
               Te recibe <strong className="font-semibold">{e.anfitrion.name}</strong>
-              {e.anfitrion.audio_url && <span className="text-xs text-cochinilla">· con saludo</span>}
+              {e.anfitrion.audio_url && <span className="text-xs text-ink-soft">· con saludo</span>}
             </p>
           )}
           <p className="mt-auto pt-1 font-display text-lg font-bold text-primary">{formatPrice(e.price_pen) ?? 'Consultar precio'}</p>

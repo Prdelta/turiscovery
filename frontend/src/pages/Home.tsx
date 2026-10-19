@@ -234,7 +234,7 @@ function HostsStrip() {
     <section aria-labelledby="anfitriones-home" className="container-page py-20">
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div className="flex items-center gap-4">
-          <Tocapu motif="persona" dye="cochinilla" size={44} />
+          <Tocapu motif="persona" dye="qolle" size={44} />
           <div>
             <h2 id="anfitriones-home" className="text-3xl font-extrabold sm:text-4xl">Quién te recibe</h2>
             <p className="mt-1 text-ink-soft">Escucha su saludo antes de conocerlos.</p>

@@ -33,7 +33,7 @@ export const PLACES: Place[] = [
     radiusKm: 5,
     scene: [-124, 0, 22],
     motif: 'llave',
-    dye: 'chilca',
+    dye: 'tierra',
   },
   {
     id: 'uros',
