@@ -39,6 +39,8 @@ class Experiencia extends Model
     ];
 
     protected $casts = [
+        'latitude' => 'float',
+        'longitude' => 'float',
         'images' => 'array',
         'tags' => 'array',
         'price_pen' => 'decimal:2',

@@ -1,0 +1,90 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+/*
+  Turiscovery — tokens de diseño.
+  Colores sólidos (sin degradados), tomados de la paleta oficial de la marca
+  y del paisaje de Puno: tinta índigo, azul profundo del Titicaca, cielo del altiplano.
+*/
+@theme {
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+
+  --color-ink: #1b1a3a;
+  --color-ink-soft: #4a4968;
+  --color-sky: #eef2f8;
+  --color-line: #d8deea;
+  --color-primary: #5930e8;
+  --color-primary-light: #7654ec;
+  --color-primary-dark: #4426b8;
+  --color-lake: #10295c;
+  --color-lake-deep: #0a1b40;
+  --color-mint: #74fa8a;
+  --color-mint-dark: #2f9e45;
+  --color-sun: #f2b914;
+  --color-sun-dark: #a67c00;
+  --color-info: #b6dfe7;
+  --color-danger: #d23b3b;
+
+  --radius-card: 18px;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-sky font-sans text-ink;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display text-ink;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  ::selection {
+    background: var(--color-mint);
+    color: var(--color-ink);
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+  .prose-measure {
+    max-width: 68ch;
+  }
+  .field-input {
+    @apply w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-ink placeholder:text-ink-soft/60 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/25 disabled:opacity-60;
+  }
+  .skeleton {
+    @apply animate-pulse rounded-xl bg-line/70;
+  }
+}
+
+/* Leaflet dentro de tarjetas redondeadas */
+.leaflet-container {
+  font-family: var(--font-sans);
+  border-radius: var(--radius-card);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

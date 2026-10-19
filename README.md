@@ -5,7 +5,8 @@ Turiscovery es una plataforma web que conecta a turistas con la oferta local de 
 ## Stack Tecnológico
 
 - **Backend**: Laravel 12 + PostgreSQL con PostGIS
-- **Frontend**: Laravel Blade + Tailwind CSS v4 (Premium Design System) + Leaflet (OpenStreetMap) + Lucide Icons
+- **Frontend**: React 19 + TypeScript + Vite (carpeta `frontend/`), Tailwind CSS v4, React Router, TanStack Query, Leaflet (OpenStreetMap), Lucide Icons
+- **3D**: Three.js con React Three Fiber y Drei (escena del lago Titicaca generada por código y visor de modelos `.glb`)
 - **Autenticación**: Laravel Sanctum + Google OAuth (Socialite)
 - **Seguridad**: RBAC (Role-Based Access Control)
 
@@ -91,41 +92,56 @@ SANCTUM_STATEFUL_DOMAINS=localhost,localhost:3000,localhost:8000
 # Instalar dependencias PHP
 composer install
 
-# Instalar dependencias Node.js
-npm install
+# Instalar dependencias del frontend React
+npm install --prefix frontend
 
-# Compilar assets (Tailwind CSS)
-npm run build
-
-# Ejecutar migraciones (esto habilitará PostGIS automáticamente)
+# Ejecutar migraciones (habilita PostGIS y copia coordenadas a columnas numéricas)
 php artisan migrate
 
-# Generar datos de prueba e Imágenes
+# Enlace público para las imágenes que suben los socios
+php artisan storage:link
+
+# Datos de prueba. Define SEED_USER_PASSWORD en .env o el seeder genera una
+# contraseña aleatoria y la muestra en la consola.
 php artisan db:seed
-# Nota: Si faltan imágenes, ejecutar:
-php artisan db:seed --class=FixImagesSeeder
 ```
 
 ### 7. Iniciar Aplicación
 
 ```powershell
-# Opción 1: Modo desarrollo (backend + frontend + queue)
+# Opción 1: todo junto (API + cola + frontend React)
 composer dev
 
-# Opción 2: Iniciar servicios por separado
-# Terminal 1: Backend
+# Opción 2: por separado
+# Terminal 1: API Laravel
 php artisan serve
+# Terminal 2: Frontend React (Vite, reenvía /api, /sanctum y /storage a Laravel)
+npm --prefix frontend run dev
+```
 
-# Terminal 2: Frontend (Vite)
-npm run dev
+Variables necesarias en `.env` para la SPA:
 
-# Terminal 3: Queue worker (opcional)
-php artisan queue:listen
+```env
+FRONTEND_URL=http://localhost:5173
+SANCTUM_STATEFUL_DOMAINS=localhost:5173,127.0.0.1:5173,localhost,127.0.0.1,127.0.0.1:8000,localhost:8000
+GOOGLE_REDIRECT_URI=http://localhost:5173/api/auth/google/callback
 ```
 
 La aplicación estará disponible en:
-- **Backend API**: http://localhost:8000/api
-- **Frontend**: http://localhost:8000
+- **Frontend React**: http://localhost:5173
+- **API Laravel**: http://localhost:8000/api (las rutas web de Laravel redirigen al frontend)
+
+### Arquitectura
+
+- `frontend/`: SPA en React. Se autentica con la cookie de sesión de Sanctum (httpOnly + XSRF), sin tokens en `localStorage`.
+- `app/Http/Controllers/Api`: API REST que consume la SPA. Laravel ya no renderiza vistas Blade.
+- `frontend/src/three/`: escena 3D del lago (`LakeScene.tsx`) y visor de modelos (`ModelViewer.tsx`).
+- Modelos 3D: copia archivos `.glb` a `frontend/public/models/` y regístralos en `manifest.json`. Los modelos de ejemplo se regeneran con `node frontend/scripts/generate-models.mjs`.
+
+### Producción
+
+1. `npm --prefix frontend run build` genera `frontend/dist/`, que se puede publicar en cualquier hosting estático (Vercel, Netlify, Nginx). Configura el hosting para que todas las rutas sirvan `index.html`.
+2. Si el frontend y la API están en dominios distintos, define `VITE_API_URL=https://api.tu-dominio.com` al compilar, `FRONTEND_URL` y `SANCTUM_STATEFUL_DOMAINS` con el dominio del frontend, y `SESSION_DOMAIN=.tu-dominio.com` para compartir la cookie entre subdominios.
 
 ---
 

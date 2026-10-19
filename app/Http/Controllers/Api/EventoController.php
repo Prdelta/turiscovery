@@ -16,7 +16,7 @@ class EventoController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Evento::with(['user', 'locale'])
+        $query = Evento::with(['user:id,name,avatar', 'locale'])
             ->active(); // This scope filters end_time > now()
 
         // Filter by category
@@ -37,7 +37,7 @@ class EventoController extends Controller
         if ($request->has('lat') && $request->has('lng')) {
             $radius = $request->get('radius', 5000); // Default 5km
             $query = Evento::nearby($request->lat, $request->lng, $radius)
-                ->with(['user', 'locale']);
+                ->with(['user:id,name,avatar', 'locale']);
         }
 
         // Search
@@ -64,7 +64,7 @@ class EventoController extends Controller
      */
     public function show($id)
     {
-        $evento = Evento::with(['user', 'locale', 'reviews.user'])
+        $evento = Evento::with(['user:id,name,avatar', 'locale', 'reviews.user:id,name,avatar'])
             ->findOrFail($id);
 
         return response()->json([

@@ -16,7 +16,7 @@ class CandelariaController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Candelaria::with(['user', 'locale'])
+        $query = Candelaria::with(['user:id,name,avatar', 'locale'])
             ->active();
 
         // Filter by category
@@ -53,7 +53,7 @@ class CandelariaController extends Controller
      */
     public function show($id)
     {
-        $candelaria = Candelaria::with(['user', 'locale', 'reviews.user'])
+        $candelaria = Candelaria::with(['user:id,name,avatar', 'locale', 'reviews.user:id,name,avatar'])
             ->findOrFail($id);
 
         return response()->json([

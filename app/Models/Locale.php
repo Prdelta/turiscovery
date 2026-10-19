@@ -36,6 +36,8 @@ class Locale extends Model
     ];
 
     protected $casts = [
+        'latitude' => 'float',
+        'longitude' => 'float',
         'images' => 'array',
         'is_active' => 'boolean',
     ];
@@ -122,30 +124,6 @@ class Locale extends Model
     {
         $this->location = DB::raw("ST_GeogFromText('POINT({$longitude} {$latitude})')");
         return $this;
-    }
-
-    /**
-     * Get latitude from location
-     */
-    public function getLatitudeAttribute()
-    {
-        if ($this->location) {
-            $result = DB::selectOne("SELECT ST_Y(location::geometry) as lat FROM locales WHERE id = ?", [$this->id]);
-            return $result ? $result->lat : null;
-        }
-        return null;
-    }
-
-    /**
-     * Get longitude from location
-     */
-    public function getLongitudeAttribute()
-    {
-        if ($this->location) {
-            $result = DB::selectOne("SELECT ST_X(location::geometry) as lng FROM locales WHERE id = ?", [$this->id]);
-            return $result ? $result->lng : null;
-        }
-        return null;
     }
 
     public function getImageUrlAttribute()

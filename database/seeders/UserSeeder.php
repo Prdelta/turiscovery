@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
@@ -13,11 +14,21 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        // Contraseña de las cuentas de ejemplo: SEED_USER_PASSWORD en .env o una aleatoria.
+        // Nunca se usa una contraseña fija conocida.
+        $plain = env('SEED_USER_PASSWORD') ?: Str::password(16);
+        $password = Hash::make($plain);
+
+        if (!env('SEED_USER_PASSWORD')) {
+            $this->command?->warn("Contraseña generada para las cuentas de ejemplo: {$plain}");
+            $this->command?->warn('Guárdala ahora o define SEED_USER_PASSWORD en .env antes de sembrar.');
+        }
+
         // Admin user
         User::create([
             'name' => 'Admin Turiscovery',
             'email' => 'admin@turiscovery.com',
-            'password' => Hash::make('password'),
+            'password' => $password,
             'role' => 'admin',
             'email_verified_at' => now(),
         ]);
@@ -26,7 +37,7 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'Carlos Mendoza',
             'email' => 'carlos@turiscovery.com',
-            'password' => Hash::make('password'),
+            'password' => $password,
             'role' => 'socio',
             'phone' => '+51 987 654 321',
             'bio' => 'Propietario de varios locales en el centro de Puno',
@@ -36,7 +47,7 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'María López',
             'email' => 'maria@turiscovery.com',
-            'password' => Hash::make('password'),
+            'password' => $password,
             'role' => 'socio',
             'phone' => '+51 912 345 678',
             'bio' => 'Organizadora de eventos culturales en Puno',
@@ -47,7 +58,7 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'Juan Pérez',
             'email' => 'juan@example.com',
-            'password' => Hash::make('password'),
+            'password' => $password,
             'role' => 'tourist',
             'phone' => '+51 999 888 777',
             'bio' => 'Amante de la cultura andina y la gastronomía peruana',
@@ -58,7 +69,7 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'Ana García',
             'email' => 'ana@example.com',
-            'password' => Hash::make('password'),
+            'password' => $password,
             'role' => 'tourist',
             'phone' => '+51 988 777 666',
             'bio' => 'Viajera frecuente interesada en experiencias auténticas',
@@ -69,11 +80,13 @@ class UserSeeder extends Seeder
         // Generate additional random tourists using factory
         User::factory()->count(10)->create([
             'role' => 'tourist',
+            'password' => $password,
         ]);
 
         // Generate additional random socios using factory
         User::factory()->count(3)->create([
             'role' => 'socio',
+            'password' => $password,
         ]);
     }
 }

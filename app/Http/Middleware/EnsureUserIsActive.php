@@ -15,18 +15,23 @@ class EnsureUserIsActive
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Verificar si el usuario está autenticado
-        if (auth()->check()) {
-            $user = auth()->user();
+        $user = $request->user();
 
-            // Si el usuario no está activo, cerrar sesión y redirigir
-            if (!$user->is_active) {
-                auth()->logout();
+        // Si el usuario no está activo, cerrar sesión y bloquear
+        if ($user && !$user->is_active) {
+            if ($request->hasSession()) {
+                auth()->guard('web')->logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
-
-                return redirect('/login')->with('error', 'Tu cuenta ha sido desactivada por un administrador. Contacta con soporte para más información.');
             }
+
+            $message = 'Tu cuenta ha sido desactivada por un administrador. Contacta con soporte para más información.';
+
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $message], 403);
+            }
+
+            return redirect('/login')->with('error', $message);
         }
 
         return $next($request);

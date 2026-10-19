@@ -1,6 +1,6 @@
 # ✅ Lista de Tareas Pendientes - Turiscovery
 
-**Última actualización:** 2026-02-09
+**Última actualización:** 2026-10-19 (migración a React + Three.js)
 
 ---
 
@@ -8,17 +8,17 @@
 
 ### Seguridad
 - [ ] Implementar CSRF tokens en todos los formularios web
-- [ ] Configurar CORS para producción (`config/cors.php`)
-- [ ] Agregar rate limiting en endpoints públicos
-- [ ] Implementar validación de tipos MIME en uploads
+- [x] Configurar CORS para producción (`config/cors.php`)
+- [x] Agregar rate limiting en endpoints públicos
+- [x] Implementar validación de tipos MIME en uploads
 - [ ] Sanitización de HTML en contenido de usuario (XSS)
 - [ ] Configurar HTTPS/SSL en producción
-- [ ] Cambiar todas las contraseñas por defecto
+- [x] Cambiar todas las contraseñas por defecto
 
 ### Testing
 - [ ] Tests unitarios de modelos (User, Locale, etc.)
 - [ ] Tests de API endpoints (GET, POST, PUT, DELETE)
-- [ ] Tests de autorización (verificar RBAC)
+- [x] Tests de autorización (verificar RBAC)
 - [ ] Tests de geolocalización (PostGIS)
 - [ ] Tests de validación de formularios
 
@@ -35,74 +35,74 @@
   - [ ] `Evento::with('user')`
   - [ ] Revisar queries N+1 con `debugbar`
 - [ ] Implementar cache de consultas frecuentes (Redis)
-- [ ] Comprimir imágenes automáticamente al subir
+- [x] Comprimir imágenes automáticamente al subir
 
 ---
 
 ## 🟡 IMPORTANTE - Frontend Público
 
 ### Páginas de Detalle
-- [ ] `/candelaria/danzas/{id}` - Detalle de danza
-  - [ ] Mostrar historia completa
-  - [ ] Características detalladas
-  - [ ] Video embebido si existe
-  - [ ] Botón compartir en redes sociales
+- [x] `/candelaria/danzas/{id}` - Detalle de danza
+  - [x] Mostrar historia completa
+  - [x] Características detalladas
+  - [x] Video embebido si existe
+  - [x] Botón compartir en redes sociales
 
-- [ ] `/eventos/{id}` - Detalle de evento
-  - [ ] Mostrar mapa de ubicación
-  - [ ] Contador de días restantes
-  - [ ] Botón "Agregar a calendario"
+- [x] `/eventos/{id}` - Detalle de evento
+  - [x] Mostrar mapa de ubicación
+  - [x] Contador de días restantes
+  - [x] Botón "Agregar a calendario"
+  - [x] Reviews y ratings
+
+- [x] `/experiencias/{id}` - Detalle de experiencia
+  - [x] Galería de imágenes
+  - [x] Itinerario completo
+  - [x] Botón "Reservar"
   - [ ] Reviews y ratings
 
-- [ ] `/experiencias/{id}` - Detalle de experiencia
-  - [ ] Galería de imágenes
-  - [ ] Itinerario completo
-  - [ ] Botón "Reservar"
-  - [ ] Reviews y ratings
+- [x] `/promociones/{id}` - Detalle de promoción
+  - [x] Términos y condiciones
+  - [x] Vigencia visible
+  - [x] Información del local
+  - [x] Botón "Usar promoción"
 
-- [ ] `/promociones/{id}` - Detalle de promoción
-  - [ ] Términos y condiciones
-  - [ ] Vigencia visible
-  - [ ] Información del local
-  - [ ] Botón "Usar promoción"
-
-- [ ] `/locales/{id}` - Perfil de local/socio
-  - [ ] Información completa
-  - [ ] Ubicación en mapa
-  - [ ] Eventos, experiencias, promociones del local
+- [x] `/locales/{id}` - Perfil de local/socio
+  - [x] Información completa
+  - [x] Ubicación en mapa
+  - [x] Eventos, experiencias, promociones del local
   - [ ] Reviews y ratings
   - [ ] Formulario de contacto
 
 ### Sistema de Búsqueda
-- [ ] Página `/search` con filtros avanzados:
-  - [ ] Por tipo de contenido (locales, eventos, experiencias, promociones)
-  - [ ] Por categoría
-  - [ ] Por rango de precio
+- [x] Página `/search` con filtros avanzados:
+  - [x] Por tipo de contenido (locales, eventos, experiencias, promociones)
+  - [x] Por categoría
+  - [x] Por rango de precio
   - [ ] Por ubicación (mapa + radio)
   - [ ] Por fecha (eventos)
-  - [ ] Por dificultad (experiencias)
+  - [x] Por dificultad (experiencias)
 
 ### Mapa Interactivo
-- [ ] Página `/mapa` con Leaflet
-  - [ ] Mostrar todos los locales como marcadores
-  - [ ] Filtros por categoría
-  - [ ] Popup con información básica
-  - [ ] Click para ver detalle
+- [x] Página `/mapa` con Leaflet
+  - [x] Mostrar todos los locales como marcadores
+  - [x] Filtros por categoría
+  - [x] Popup con información básica
+  - [x] Click para ver detalle
 
 ### Sistema Social
-- [ ] Formulario de reviews
-  - [ ] Rating con estrellas
-  - [ ] Título y comentario
+- [x] Formulario de reviews
+  - [x] Rating con estrellas
+  - [x] Título y comentario
   - [ ] Validación de contenido ofensivo
 
-- [ ] Botón de favoritos en todas las páginas de detalle
-- [ ] Página `/mis-favoritos` para usuarios
+- [x] Botón de favoritos en todas las páginas de detalle
+- [x] Página `/mis-favoritos` para usuarios
 
 ### Otros
-- [ ] Página `/sobre-nosotros`
-- [ ] Página `/contacto`
-- [ ] Página `/terminos-y-condiciones`
-- [ ] Página `/politica-de-privacidad`
+- [x] Página `/sobre-nosotros`
+- [x] Página `/contacto`
+- [x] Página `/terminos-y-condiciones`
+- [x] Página `/politica-de-privacidad`
 
 ---
 
@@ -152,10 +152,10 @@
 ## 🔵 FUNCIONALIDADES NUEVAS
 
 ### Sistema de Reservas
-- [ ] Modelo `Booking` (reserva)
-- [ ] Estado: pendiente, confirmada, cancelada
-- [ ] Relación con experiencias
-- [ ] Panel de gestión de reservas para socios
+- [x] Modelo `Booking` (reserva)
+- [x] Estado: pendiente, confirmada, cancelada
+- [x] Relación con experiencias
+- [x] Panel de gestión de reservas para socios
 - [ ] Notificaciones por email
 
 ### Sistema de Mensajería
@@ -178,7 +178,7 @@
 - [ ] Usar `laravel-translatable`
 
 ### Integración Redes Sociales
-- [ ] Botones de compartir (Facebook, Twitter, WhatsApp)
+- [ ] Botones de compartir (Facebook, Twitter, WhatsApp) — hoy hay un botón "Compartir" genérico (menú del sistema o copiar enlace)
 - [ ] Meta tags Open Graph
 - [ ] Twitter Cards
 - [ ] Login con Facebook
@@ -257,7 +257,7 @@
 
 ### Mejoras de Diseño
 - [ ] Implementar modo oscuro
-- [ ] Skeleton loaders en lugar de spinners
+- [x] Skeleton loaders en lugar de spinners
 - [ ] Transiciones más fluidas
 - [ ] Animaciones de scroll (AOS.js)
 - [ ] Infinite scroll en listados

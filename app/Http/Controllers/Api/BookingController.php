@@ -61,7 +61,7 @@ class BookingController extends Controller
         }
 
         // Calcular precio total
-        $totalPrice = $experiencia->price * $validated['participants'];
+        $totalPrice = ($experiencia->price_pen ?? 0) * $validated['participants'];
 
         // Crear la reserva
         $booking = Booking::create([

@@ -54,6 +54,9 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    // URL pública del frontend React (la primera si FRONTEND_URL trae varias)
+    'frontend_url' => trim(explode(',', env('FRONTEND_URL', 'http://localhost:5173'))[0]),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

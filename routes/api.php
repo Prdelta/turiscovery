@@ -1,6 +1,8 @@
 <?php
 
-use App\Http\Controllers\Auth\{GoogleAuthController, LoginController, RegisterController, SessionController};
+use App\Http\Controllers\Auth\{LoginController, RegisterController, SessionController};
+use App\Http\Controllers\Admin\ResourceSearchController;
+use App\Http\Controllers\Api\Admin\{CandelariaContentController, UserController as AdminUserController};
 use App\Http\Controllers\Api\{
     BookingController,
     CandelariaController,
@@ -11,9 +13,13 @@ use App\Http\Controllers\Api\{
     ExperienciaController,
     FavoriteController,
     LocaleController,
+    MyContentController,
+    PartnerBookingController,
+    ProfileController,
     PromocionController,
     ReviewController,
     StatsController,
+    UploadController,
     UserCouponController
 };
 use Illuminate\Http\Request;
@@ -28,16 +34,14 @@ use Illuminate\Support\Facades\Route;
 // ========== Public Routes (No Authentication Required) ==========
 
 // Authentication Routes (Legacy - Token Based)
-Route::post('/register', [RegisterController::class, 'register']);
+Route::post('/register', [RegisterController::class, 'register'])->middleware('throttle:register');
 Route::post('/login', [LoginController::class, 'login']);
 
 // Session-Based Authentication (Secure - httpOnly Cookies)
 Route::post('/session/login', [SessionController::class, 'login']);
 Route::get('/session/check', [SessionController::class, 'check']);
 
-// Google OAuth Routes
-Route::get('/auth/google', [GoogleAuthController::class, 'redirectToGoogle']);
-Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
+// Google OAuth: definido en routes/web.php (necesita sesión web)
 
 // Public Read-Only Routes for 4 Pillars (with parameter validation + API cache)
 Route::middleware(['validate.params', 'api.cache'])->group(function () {
@@ -65,9 +69,13 @@ Route::middleware(['validate.params', 'api.cache'])->group(function () {
     Route::get('/candelaria-danzas/{id}', [CandelariaDanzaController::class, 'show']);
 });
 
+// Reseñas públicas de un contenido y asistentes a un evento
+Route::get('/reviews', [ReviewController::class, 'index']);
+Route::get('/event-attendances/count/{eventoId}', [EventAttendeeController::class, 'count'])->whereNumber('eventoId');
+
 // ========== Protected Routes (Sanctum Authentication Required) ==========
 
-Route::middleware(['auth:sanctum', 'validate.params'])->group(function () {
+Route::middleware(['auth:sanctum', 'user.active', 'validate.params'])->group(function () {
 
     // User Info & Logout (Legacy - Token Based)
     Route::post('/logout', [LoginController::class, 'logout']);
@@ -77,6 +85,10 @@ Route::middleware(['auth:sanctum', 'validate.params'])->group(function () {
     Route::post('/session/logout', [SessionController::class, 'logout']);
     Route::get('/session/me', [SessionController::class, 'me']);
 
+    // Perfil del usuario
+    Route::get('/profile', [ProfileController::class, 'show']);
+    Route::put('/profile', [ProfileController::class, 'update']);
+
     // ========== Stats & Dashboard (Optimized) ==========
     Route::get('/stats', [StatsController::class, 'index']);
     Route::get('/recent-content', [StatsController::class, 'recentContent']);
@@ -84,6 +96,15 @@ Route::middleware(['auth:sanctum', 'validate.params'])->group(function () {
     // ========== Socio Routes (Partners can manage their own content) ==========
 
     Route::middleware('role:socio,admin')->group(function () {
+
+        // Contenido propio (incluye inactivos) y subida de imágenes
+        Route::get('/my/{type}', [MyContentController::class, 'index'])
+            ->whereIn('type', ['locales', 'eventos', 'experiencias', 'promociones', 'candelaria']);
+        Route::post('/uploads', [UploadController::class, 'store']);
+
+        // Reservas recibidas en las experiencias del socio
+        Route::get('/partner/bookings', [PartnerBookingController::class, 'index']);
+        Route::put('/partner/bookings/{id}', [PartnerBookingController::class, 'updateStatus']);
 
         // Locales (Partner Venues) - Full CRUD for own locales
         Route::post('/locales', [LocaleController::class, 'store']);
@@ -116,7 +137,6 @@ Route::middleware(['auth:sanctum', 'validate.params'])->group(function () {
     // All authenticated users can create reviews and favorites
 
     // Reviews
-    Route::get('/reviews', [ReviewController::class, 'index']); // Get reviews for item
     Route::post('/reviews', [ReviewController::class, 'store']);
     Route::put('/reviews/{id}', [ReviewController::class, 'update']);
     Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
@@ -141,7 +161,6 @@ Route::middleware(['auth:sanctum', 'validate.params'])->group(function () {
     Route::put('/event-attendances/{id}', [EventAttendeeController::class, 'update']);
     Route::delete('/event-attendances/{eventoId}', [EventAttendeeController::class, 'destroy']);
     Route::get('/event-attendances/check/{eventoId}', [EventAttendeeController::class, 'check']);
-    Route::get('/event-attendances/count/{eventoId}', [EventAttendeeController::class, 'count']);
 
     // User Coupons (Cupones de promociones)
     Route::get('/user-coupons', [UserCouponController::class, 'index']);
@@ -152,6 +171,19 @@ Route::middleware(['auth:sanctum', 'validate.params'])->group(function () {
     // ========== Admin Routes (Full Control) ==========
 
     Route::middleware('role:admin')->group(function () {
+        // Gestión de usuarios y socios
+        Route::get('/admin/supervision', [AdminUserController::class, 'supervision']);
+        Route::post('/admin/users/{user}/toggle-status', [AdminUserController::class, 'toggleStatus']);
+        Route::apiResource('admin/users', AdminUserController::class);
+
+        // Listados completos de Candelaria (incluye inactivos)
+        Route::get('/admin/candelaria-gallery', [CandelariaContentController::class, 'gallery']);
+        Route::get('/admin/candelaria-danzas', [CandelariaContentController::class, 'danzas']);
+
+        // Búsqueda de recursos (Wikipedia / Wikimedia Commons)
+        Route::get('/admin/resources/search-images', [ResourceSearchController::class, 'searchImages']);
+        Route::get('/admin/resources/search-wikipedia', [ResourceSearchController::class, 'searchWikipedia']);
+
         // Candelaria Gallery Management
         Route::post('/candelaria-gallery', [CandelariaGalleryController::class, 'store']);
         Route::put('/candelaria-gallery/{id}', [CandelariaGalleryController::class, 'update']);

@@ -26,7 +26,7 @@ class ReviewController extends Controller
             ], 422);
         }
 
-        $reviews = Review::with('user')
+        $reviews = Review::with('user:id,name,avatar')
             ->where('reviewable_type', $request->reviewable_type)
             ->where('reviewable_id', $request->reviewable_id)
             ->latest()

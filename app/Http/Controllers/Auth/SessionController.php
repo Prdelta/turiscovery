@@ -58,6 +58,13 @@ class SessionController extends Controller
         // Limpiar rate limiter si el login es exitoso
         RateLimiter::clear($key);
 
+        if (!$user->is_active) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tu cuenta ha sido desactivada por un administrador.',
+            ], 403);
+        }
+
         // Login vía sesión de Laravel (NO genera token)
         // La cookie de sesión se establece automáticamente y es httpOnly
         Auth::login($user, $request->boolean('remember'));
@@ -131,6 +138,8 @@ class SessionController extends Controller
                     'email' => $user->email,
                     'role' => $user->role,
                     'avatar' => $user->avatar,
+                    'phone' => $user->phone,
+                    'bio' => $user->bio,
                     'created_at' => $user->created_at,
                 ],
             ],
@@ -153,6 +162,7 @@ class SessionController extends Controller
                 'name' => Auth::user()->name,
                 'email' => Auth::user()->email,
                 'role' => Auth::user()->role,
+                'avatar' => Auth::user()->avatar,
             ] : null,
         ], 200);
     }

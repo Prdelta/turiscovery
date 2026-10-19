@@ -9,14 +9,6 @@ use Illuminate\Support\Facades\Http;
 class ResourceSearchController extends Controller
 {
     /**
-     * Mostrar página de búsqueda de recursos
-     */
-    public function index()
-    {
-        return view('admin.candelaria.resources.search');
-    }
-
-    /**
      * Buscar imágenes en Unsplash
      */
     public function searchImages(Request $request)
@@ -25,7 +17,7 @@ class ResourceSearchController extends Controller
             'query' => 'required|string|min:3',
         ]);
 
-        $query = $request->query;
+        $query = (string) $request->input('query');
 
         // Búsqueda en Unsplash (gratis, no requiere API key para básico)
         $unsplashResults = $this->searchUnsplash($query);
@@ -51,7 +43,7 @@ class ResourceSearchController extends Controller
             'query' => 'required|string|min:3',
         ]);
 
-        $query = $request->query;
+        $query = (string) $request->input('query');
 
         try {
             // API de Wikipedia en español
@@ -80,7 +72,7 @@ class ResourceSearchController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al buscar en Wikipedia: ' . $e->getMessage()
+                'message' => 'No se pudo consultar Wikipedia en este momento.'
             ], 500);
         }
     }

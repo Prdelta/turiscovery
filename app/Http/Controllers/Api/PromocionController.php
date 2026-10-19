@@ -16,7 +16,7 @@ class PromocionController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Promocion::with(['user', 'locale'])
+        $query = Promocion::with(['user:id,name,avatar', 'locale'])
             ->active(); // Filters: is_active AND end_date > now AND start_date <= now
 
         // Filter by discount type
@@ -53,7 +53,7 @@ class PromocionController extends Controller
      */
     public function show($id)
     {
-        $promocion = Promocion::with(['user', 'locale', 'reviews.user'])
+        $promocion = Promocion::with(['user:id,name,avatar', 'locale', 'reviews.user:id,name,avatar'])
             ->findOrFail($id);
 
         return response()->json([

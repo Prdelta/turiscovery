@@ -16,7 +16,7 @@ class ExperienciaController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Experiencia::with(['user', 'locale'])
+        $query = Experiencia::with(['user:id,name,avatar', 'locale'])
             ->active();
 
         // Filter by difficulty
@@ -38,7 +38,7 @@ class ExperienciaController extends Controller
         if ($request->has('lat') && $request->has('lng')) {
             $radius = $request->get('radius', 5000);
             $query = Experiencia::nearby($request->lat, $request->lng, $radius)
-                ->with(['user', 'locale']);
+                ->with(['user:id,name,avatar', 'locale']);
         }
 
         // Search
@@ -65,7 +65,7 @@ class ExperienciaController extends Controller
      */
     public function show($id)
     {
-        $experiencia = Experiencia::with(['user', 'locale', 'reviews.user'])
+        $experiencia = Experiencia::with(['user:id,name,avatar', 'locale', 'reviews.user:id,name,avatar'])
             ->findOrFail($id);
 
         return response()->json([

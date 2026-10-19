@@ -46,6 +46,10 @@ class RegisterController extends Controller
         // Authenticate user in web session (for browser-based registration)
         Auth::login($user);
 
+        if ($request->hasSession()) {
+            $request->session()->regenerate();
+        }
+
         // Create Sanctum token for API authentication
         $token = $user->createToken('auth_token')->plainTextToken;
 

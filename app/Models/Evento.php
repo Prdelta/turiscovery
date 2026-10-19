@@ -38,6 +38,8 @@ class Evento extends Model
     ];
 
     protected $casts = [
+        'latitude' => 'float',
+        'longitude' => 'float',
         'start_time' => 'datetime',
         'end_time' => 'datetime',
         'images' => 'array',

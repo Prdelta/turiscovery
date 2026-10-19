@@ -1,0 +1,23 @@
+[
+  {
+    "id": "chullpa",
+    "file": "chullpa-sillustani.glb",
+    "title": "Chullpa de Sillustani",
+    "description": "Torre funeraria preinca de la laguna Umayo, más ancha en la parte alta.",
+    "credit": "Modelo ilustrativo generado por Turiscovery"
+  },
+  {
+    "id": "balsa",
+    "file": "balsa-totora.glb",
+    "title": "Balsa de totora",
+    "description": "Embarcación de los Uros con proa en forma de cabeza de puma.",
+    "credit": "Modelo ilustrativo generado por Turiscovery"
+  },
+  {
+    "id": "casa-uros",
+    "file": "casa-uros.glb",
+    "title": "Casa en isla flotante",
+    "description": "Vivienda de totora sobre una isla de los Uros, con fogón y haces de juncos.",
+    "credit": "Modelo ilustrativo generado por Turiscovery"
+  }
+]

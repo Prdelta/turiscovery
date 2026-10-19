@@ -16,7 +16,7 @@ class LocaleController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Locale::with('user')->active();
+        $query = Locale::with('user:id,name,avatar')->active();
 
         // Filter by category
         if ($request->has('category')) {
@@ -26,7 +26,7 @@ class LocaleController extends Controller
         // Geolocation filter
         if ($request->has('lat') && $request->has('lng')) {
             $radius = $request->get('radius', 5000);
-            $query = Locale::nearby($request->lat, $request->lng, $radius)->with('user');
+            $query = Locale::nearby($request->lat, $request->lng, $radius)->with('user:id,name,avatar');
         }
 
         // Search
@@ -54,8 +54,13 @@ class LocaleController extends Controller
      */
     public function show($id)
     {
-        $locale = Locale::with(['user', 'reviews.user', 'promociones'])
-            ->findOrFail($id);
+        $locale = Locale::with([
+            'user:id,name,avatar',
+            'reviews.user:id,name,avatar',
+            'promociones' => fn ($q) => $q->active(),
+            'experiencias' => fn ($q) => $q->active(),
+            'eventos' => fn ($q) => $q->active(),
+        ])->findOrFail($id);
 
         return response()->json([
             'success' => true,
