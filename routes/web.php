@@ -92,7 +92,7 @@ Route::middleware(['auth'])->prefix('user')->group(function () {
 });
 
 // Admin Panel (Admin Only)
-Route::middleware(['auth'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::resource('users', \App\Http\Controllers\Admin\AdminUserController::class);
 
     // Socios Management
@@ -122,6 +122,3 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         Route::get('resources/search-wikipedia', [\App\Http\Controllers\Admin\ResourceSearchController::class, 'searchWikipedia'])->name('resources.search-wikipedia');
     });
 });
-
-// TEST ROUTES - REMOVE IN PRODUCTION
-require __DIR__ . '/test.php';

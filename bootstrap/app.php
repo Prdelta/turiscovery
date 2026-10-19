@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'socio.admin' => \App\Http\Middleware\EnsureSocioOrAdmin::class,
+            'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
             'validate.params' => \App\Http\Middleware\ValidateRouteParameters::class,
             'api.cache' => \App\Http\Middleware\ApiQueryCacheMiddleware::class,
             'user.active' => \App\Http\Middleware\EnsureUserIsActive::class,
