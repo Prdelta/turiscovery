@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOwner;
+use App\Models\Concerns\HasImages;
+use App\Models\Concerns\HasLocation;
+use App\Models\Concerns\Reviewable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\DB;
 
 class Experiencia extends Model
 {
-    use HasFactory, SoftDeletes;
+    use BelongsToOwner, HasFactory, HasImages, HasLocation, Reviewable, SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -40,22 +43,12 @@ class Experiencia extends Model
     ];
 
     protected $casts = [
-        'latitude' => 'float',
-        'longitude' => 'float',
-        'images' => 'array',
         'tags' => 'array',
         'price_pen' => 'decimal:2',
         'is_active' => 'boolean',
     ];
 
-    protected $appends = ['image_url', 'formatted_address', 'short_address', 'coordinates'];
-
     // ========== Relationships ==========
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 
     public function anfitrion()
     {
@@ -67,14 +60,9 @@ class Experiencia extends Model
         return $this->belongsTo(Locale::class);
     }
 
-    public function reviews()
+    public function bookings()
     {
-        return $this->morphMany(Review::class, 'reviewable');
-    }
-
-    public function favorites()
-    {
-        return $this->morphMany(Favorite::class, 'favoritable');
+        return $this->hasMany(Booking::class);
     }
 
     // ========== Query Scopes ==========
@@ -97,85 +85,5 @@ class Experiencia extends Model
     public function scopeByTag($query, $tag)
     {
         return $query->whereJsonContains('tags', $tag);
-    }
-
-    // ========== Geolocation Methods ==========
-
-    public static function nearby(float $latitude, float $longitude, int $radiusMeters = 5000)
-    {
-        return self::selectRaw("
-                *,
-                ST_Distance(
-                    location,
-                    ST_GeogFromText('POINT({$longitude} {$latitude})')
-                ) as distance
-            ")
-            ->whereNotNull('location')
-            ->whereRaw("
-                ST_DWithin(
-                    location,
-                    ST_GeogFromText('POINT({$longitude} {$latitude})'),
-                    ?
-                )
-            ", [$radiusMeters])
-            ->orderBy('distance');
-    }
-
-    public function setLocationFromCoordinates(float $latitude, float $longitude)
-    {
-        $this->location = DB::raw("ST_GeogFromText('POINT({$longitude} {$latitude})')");
-        return $this;
-    }
-
-    // ========== Accessors ==========
-
-    public function getAverageRatingAttribute()
-    {
-        return $this->reviews()->avg('rating') ?? 0;
-    }
-
-    public function getReviewsCountAttribute()
-    {
-        return $this->reviews()->count();
-    }
-
-    public function getImageUrlAttribute()
-    {
-        return $this->images[0] ?? null;
-    }
-
-    public function getFormattedAddressAttribute()
-    {
-        $parts = [];
-        if ($this->street && $this->street_number) {
-            $parts[] = "{$this->street} N° {$this->street_number}";
-        } elseif ($this->street) {
-            $parts[] = $this->street;
-        }
-        if ($this->district) $parts[] = $this->district;
-        if ($this->city) {
-            $cityPart = $this->city;
-            if ($this->region && $this->region !== $this->city) $cityPart .= ", {$this->region}";
-            $parts[] = $cityPart;
-        }
-        if ($this->country) $parts[] = $this->country;
-        if (empty($parts) && $this->address) return $this->address;
-        return implode(', ', $parts) ?: 'Dirección no especificada';
-    }
-
-    public function getShortAddressAttribute()
-    {
-        $parts = [];
-        if ($this->street && $this->street_number) $parts[] = "{$this->street} N° {$this->street_number}";
-        elseif ($this->street) $parts[] = $this->street;
-        if ($this->district) $parts[] = $this->district;
-        elseif ($this->city) $parts[] = $this->city;
-        if (empty($parts) && $this->address) return $this->address;
-        return implode(', ', $parts) ?: 'Sin dirección';
-    }
-
-    public function getCoordinatesAttribute()
-    {
-        return ['lat' => $this->latitude, 'lng' => $this->longitude];
     }
 }

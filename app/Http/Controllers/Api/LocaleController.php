@@ -5,8 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ValidatesPaginationTrait;
 use App\Models\Locale;
+use App\Http\Requests\Content\LocaleRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Gate;
 
 class LocaleController extends Controller
 {
@@ -71,29 +72,9 @@ class LocaleController extends Controller
     /**
      * Store a newly created Locale (Partner Dashboard)
      */
-    public function store(Request $request)
+    public function store(LocaleRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'address' => 'required|string',
-            'phone' => 'nullable|string|max:20',
-            'email' => 'nullable|email',
-            'website' => 'nullable|url',
-            'latitude' => 'required|numeric|between:-16.5,-14.5', // Puno region roughly
-            'longitude' => 'required|numeric|between:-71,-69',    // Puno region roughly
-            'category' => 'required|in:restaurant,hotel,tour_agency,craft_shop,museum,cultural_center,other',
-            'images' => 'nullable|array',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $data = $validator->validated();
+        $data = $request->validated();
         $data['user_id'] = $request->user()->id;
 
         $locale = new Locale($data);
@@ -102,7 +83,7 @@ class LocaleController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Locale created successfully',
+            'message' => 'Local publicado',
             'data' => $locale,
         ], 201);
     }
@@ -110,41 +91,15 @@ class LocaleController extends Controller
     /**
      * Update the specified Locale
      */
-    public function update(Request $request, $id)
+    public function update(LocaleRequest $request, $id)
     {
         $locale = Locale::findOrFail($id);
 
-        if ($locale->user_id !== $request->user()->id && !$request->user()->isAdmin()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized to update this locale.',
-            ], 403);
-        }
+        Gate::authorize('update', $locale);
 
-        $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|required|string|max:255',
-            'description' => 'sometimes|required|string',
-            'address' => 'sometimes|required|string',
-            'phone' => 'nullable|string|max:20',
-            'email' => 'nullable|email',
-            'website' => 'nullable|url',
-            'latitude' => 'nullable|numeric|between:-16.5,-14.5',
-            'longitude' => 'nullable|numeric|between:-71,-69',
-            'category' => 'sometimes|required|in:restaurant,hotel,tour_agency,craft_shop,museum,cultural_center,other',
-            'images' => 'nullable|array',
-            'is_active' => 'boolean',
-        ]);
+        $locale->fill($request->validated());
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $locale->fill($validator->validated());
-
-        if ($request->has('latitude') && $request->has('longitude')) {
+        if ($request->hasCoordinates()) {
             $locale->setLocationFromCoordinates($request->latitude, $request->longitude);
         }
 
@@ -152,7 +107,7 @@ class LocaleController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Locale updated successfully',
+            'message' => 'Local actualizado',
             'data' => $locale,
         ], 200);
     }
@@ -164,18 +119,13 @@ class LocaleController extends Controller
     {
         $locale = Locale::findOrFail($id);
 
-        if ($locale->user_id !== $request->user()->id && !$request->user()->isAdmin()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized to delete this locale.',
-            ], 403);
-        }
+        Gate::authorize('delete', $locale);
 
         $locale->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Locale deleted successfully',
+            'message' => 'Local eliminado',
         ], 200);
     }
 }

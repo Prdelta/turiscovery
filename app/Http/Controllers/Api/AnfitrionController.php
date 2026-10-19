@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Anfitrion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 class AnfitrionController extends Controller
@@ -60,23 +61,18 @@ class AnfitrionController extends Controller
 
     public function update(Request $request, Anfitrion $anfitrion)
     {
-        $this->authorizeOwner($request, $anfitrion);
+        Gate::authorize('update', $anfitrion);
         $anfitrion->update($this->validated($request, true));
 
         return response()->json(['success' => true, 'message' => 'Anfitrión actualizado', 'data' => $anfitrion]);
     }
 
-    public function destroy(Request $request, Anfitrion $anfitrion)
+    public function destroy(Anfitrion $anfitrion)
     {
-        $this->authorizeOwner($request, $anfitrion);
+        Gate::authorize('delete', $anfitrion);
         $anfitrion->delete();
 
         return response()->json(['success' => true, 'message' => 'Anfitrión eliminado']);
-    }
-
-    private function authorizeOwner(Request $request, Anfitrion $anfitrion): void
-    {
-        abort_unless($request->user()->isAdmin() || $anfitrion->user_id === $request->user()->id, 403, 'Este anfitrión no pertenece a tu cuenta.');
     }
 
     private function validated(Request $request, bool $partial = false): array

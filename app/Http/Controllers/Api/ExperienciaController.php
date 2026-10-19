@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ValidatesPaginationTrait;
-use App\Models\Anfitrion;
 use App\Models\Experiencia;
+use App\Http\Requests\Content\ExperienciaRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Gate;
 
 class ExperienciaController extends Controller
 {
@@ -78,42 +78,14 @@ class ExperienciaController extends Controller
     /**
      * Store a newly created Experiencia
      */
-    public function store(Request $request)
+    public function store(ExperienciaRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'content' => 'nullable|string',
-            'locale_id' => 'nullable|exists:locales,id',
-            'anfitrion_id' => 'nullable|exists:anfitriones,id',
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
-            'address' => 'nullable|string',
-            'difficulty' => 'required|in:easy,medium,hard',
-            'duration_hours' => 'nullable|integer|min:1',
-            'price_pen' => 'nullable|numeric|min:0',
-            'max_participants' => 'nullable|integer|min:1',
-            'images' => 'nullable|array',
-            'tags' => 'nullable|array',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $data = $validator->validated();
+        $data = $request->validated();
         $data['user_id'] = $request->user()->id;
-
-        if ($error = $this->foreignAnfitrion($request, $data['anfitrion_id'] ?? null)) {
-            return $error;
-        }
 
         $experiencia = new Experiencia($data);
 
-        if ($request->has('latitude') && $request->has('longitude')) {
+        if ($request->hasCoordinates()) {
             $experiencia->setLocationFromCoordinates($request->latitude, $request->longitude);
         }
 
@@ -121,7 +93,7 @@ class ExperienciaController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Experiencia created successfully',
+            'message' => 'Experiencia publicada',
             'data' => $experiencia,
         ], 201);
     }
@@ -129,49 +101,15 @@ class ExperienciaController extends Controller
     /**
      * Update the specified Experiencia
      */
-    public function update(Request $request, $id)
+    public function update(ExperienciaRequest $request, $id)
     {
         $experiencia = Experiencia::findOrFail($id);
 
-        if ($experiencia->user_id !== $request->user()->id && !$request->user()->isAdmin()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized to update this experiencia.',
-            ], 403);
-        }
+        Gate::authorize('update', $experiencia);
 
-        $validator = Validator::make($request->all(), [
-            'title' => 'sometimes|required|string|max:255',
-            'description' => 'sometimes|required|string',
-            'content' => 'nullable|string',
-            'locale_id' => 'nullable|exists:locales,id',
-            'anfitrion_id' => 'nullable|exists:anfitriones,id',
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
-            'address' => 'nullable|string',
-            'difficulty' => 'sometimes|required|in:easy,medium,hard',
-            'duration_hours' => 'nullable|integer|min:1',
-            'price_pen' => 'nullable|numeric|min:0',
-            'max_participants' => 'nullable|integer|min:1',
-            'images' => 'nullable|array',
-            'tags' => 'nullable|array',
-            'is_active' => 'boolean',
-        ]);
+        $experiencia->fill($request->validated());
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        if ($error = $this->foreignAnfitrion($request, $request->input('anfitrion_id'))) {
-            return $error;
-        }
-
-        $experiencia->fill($validator->validated());
-
-        if ($request->has('latitude') && $request->has('longitude')) {
+        if ($request->hasCoordinates()) {
             $experiencia->setLocationFromCoordinates($request->latitude, $request->longitude);
         }
 
@@ -179,7 +117,7 @@ class ExperienciaController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Experiencia updated successfully',
+            'message' => 'Experiencia actualizada',
             'data' => $experiencia,
         ], 200);
     }
@@ -191,35 +129,13 @@ class ExperienciaController extends Controller
     {
         $experiencia = Experiencia::findOrFail($id);
 
-        if ($experiencia->user_id !== $request->user()->id && !$request->user()->isAdmin()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized to delete this experiencia.',
-            ], 403);
-        }
+        Gate::authorize('delete', $experiencia);
 
         $experiencia->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Experiencia deleted successfully',
+            'message' => 'Experiencia eliminada',
         ], 200);
-    }
-
-    /**
-     * Un socio solo puede asignar anfitriones propios (los admins, cualquiera)
-     */
-    private function foreignAnfitrion(Request $request, $anfitrionId)
-    {
-        if (!$anfitrionId || $request->user()->isAdmin()) {
-            return null;
-        }
-
-        $owned = Anfitrion::whereKey($anfitrionId)->where('user_id', $request->user()->id)->exists();
-
-        return $owned ? null : response()->json([
-            'success' => false,
-            'errors' => ['anfitrion_id' => ['Ese anfitrión no pertenece a tu cuenta.']],
-        ], 422);
     }
 }

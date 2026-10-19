@@ -10,7 +10,9 @@ use App\Models\Evento;
 use App\Models\Experiencia;
 use App\Models\Locale;
 use App\Models\Promocion;
+use App\Support\MorphTypes;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
@@ -30,6 +32,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Alias estables en las columnas *_type de reseñas, favoritos y tokens (ver MorphTypes)
+        Relation::enforceMorphMap(MorphTypes::MAP);
+
         // Límite general de la API: por usuario autenticado o por IP
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(120)->by($request->user()?->id ?: $request->ip());

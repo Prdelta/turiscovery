@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\EventAttendee;
 use App\Models\Evento;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
 
 class EventAttendeeController extends Controller
@@ -80,12 +81,7 @@ class EventAttendeeController extends Controller
     {
         $attendance = EventAttendee::findOrFail($id);
 
-        if ($attendance->user_id !== Auth::id()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No tienes permiso para actualizar esta confirmación.',
-            ], 403);
-        }
+        Gate::authorize('update', $attendance);
 
         $validated = $request->validate([
             'status' => 'required|in:confirmed,maybe,cancelled',

@@ -5,8 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ValidatesPaginationTrait;
 use App\Models\Evento;
+use App\Http\Requests\Content\EventoRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Gate;
 
 class EventoController extends Controller
 {
@@ -76,37 +77,15 @@ class EventoController extends Controller
     /**
      * Store a newly created Evento
      */
-    public function store(Request $request)
+    public function store(EventoRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'content' => 'nullable|string',
-            'locale_id' => 'nullable|exists:locales,id',
-            'start_time' => 'required|date|after:now',
-            'end_time' => 'required|date|after:start_time',
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
-            'address' => 'nullable|string',
-            'ticket_price' => 'nullable|numeric|min:0',
-            'category' => 'required|in:concert,festival,nightlife,cultural,sports,exhibition,other',
-            'images' => 'nullable|array',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $data = $validator->validated();
+        $data = $request->validated();
         $data['user_id'] = $request->user()->id;
 
         $evento = new Evento($data);
 
         // Set geolocation if provided
-        if ($request->has('latitude') && $request->has('longitude')) {
+        if ($request->hasCoordinates()) {
             $evento->setLocationFromCoordinates($request->latitude, $request->longitude);
         }
 
@@ -114,7 +93,7 @@ class EventoController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Evento created successfully',
+            'message' => 'Evento publicado',
             'data' => $evento,
         ], 201);
     }
@@ -122,43 +101,15 @@ class EventoController extends Controller
     /**
      * Update the specified Evento
      */
-    public function update(Request $request, $id)
+    public function update(EventoRequest $request, $id)
     {
         $evento = Evento::findOrFail($id);
 
-        if ($evento->user_id !== $request->user()->id && !$request->user()->isAdmin()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized to update this evento.',
-            ], 403);
-        }
+        Gate::authorize('update', $evento);
 
-        $validator = Validator::make($request->all(), [
-            'title' => 'sometimes|required|string|max:255',
-            'description' => 'sometimes|required|string',
-            'content' => 'nullable|string',
-            'locale_id' => 'nullable|exists:locales,id',
-            'start_time' => 'sometimes|required|date',
-            'end_time' => 'sometimes|required|date|after:start_time',
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
-            'address' => 'nullable|string',
-            'ticket_price' => 'nullable|numeric|min:0',
-            'category' => 'sometimes|required|in:concert,festival,nightlife,cultural,sports,exhibition,other',
-            'images' => 'nullable|array',
-            'is_active' => 'boolean',
-        ]);
+        $evento->fill($request->validated());
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $evento->fill($validator->validated());
-
-        if ($request->has('latitude') && $request->has('longitude')) {
+        if ($request->hasCoordinates()) {
             $evento->setLocationFromCoordinates($request->latitude, $request->longitude);
         }
 
@@ -166,7 +117,7 @@ class EventoController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Evento updated successfully',
+            'message' => 'Evento actualizado',
             'data' => $evento,
         ], 200);
     }
@@ -178,18 +129,13 @@ class EventoController extends Controller
     {
         $evento = Evento::findOrFail($id);
 
-        if ($evento->user_id !== $request->user()->id && !$request->user()->isAdmin()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized to delete this evento.',
-            ], 403);
-        }
+        Gate::authorize('delete', $evento);
 
         $evento->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Evento deleted successfully',
+            'message' => 'Evento eliminado',
         ], 200);
     }
 }

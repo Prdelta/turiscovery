@@ -31,11 +31,9 @@ class MyContentController extends Controller
     {
         abort_unless(isset($this->models[$type]), 404);
 
-        $query = $this->models[$type]::query()->with('user:id,name,email');
-
-        if (!$request->user()->isAdmin()) {
-            $query->where('user_id', $request->user()->id);
-        }
+        $query = $this->models[$type]::query()
+            ->with('user:id,name,email')
+            ->managedBy($request->user());
 
         if ($request->filled('search')) {
             $column = $type === 'locales' ? 'name' : 'title';

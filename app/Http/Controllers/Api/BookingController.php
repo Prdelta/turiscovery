@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Experiencia;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -92,13 +93,7 @@ class BookingController extends Controller
     {
         $booking = Booking::with('experiencia')->findOrFail($id);
 
-        // Verificar que la reserva pertenece al usuario
-        if ($booking->user_id !== Auth::id()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No tienes permiso para ver esta reserva.',
-            ], 403);
-        }
+        Gate::authorize('view', $booking);
 
         return response()->json([
             'success' => true,
@@ -113,13 +108,7 @@ class BookingController extends Controller
     {
         $booking = Booking::findOrFail($id);
 
-        // Verificar que la reserva pertenece al usuario
-        if ($booking->user_id !== Auth::id()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No tienes permiso para cancelar esta reserva.',
-            ], 403);
-        }
+        Gate::authorize('cancel', $booking);
 
         if ($booking->cancel()) {
             return response()->json([

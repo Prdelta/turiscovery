@@ -5,8 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ValidatesPaginationTrait;
 use App\Models\Promocion;
+use App\Http\Requests\Content\PromocionRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Gate;
 
 class PromocionController extends Controller
 {
@@ -65,33 +66,10 @@ class PromocionController extends Controller
     /**
      * Store a newly created Promocion
      */
-    public function store(Request $request)
+    public function store(PromocionRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'locale_id' => 'required|exists:locales,id',
-            'discount_type' => 'required|in:2x1,percentage,fixed',
-            'discount_percentage' => 'nullable|integer|min:1|max:100',
-            'discount_amount' => 'nullable|numeric|min:0',
-            'original_price' => 'nullable|numeric|min:0',
-            'final_price' => 'nullable|numeric|min:0',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-            'terms_conditions' => 'nullable|string',
-            'redemption_code' => 'nullable|string|max:50',
-            'images' => 'nullable|array',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
         // Validate discount logic
-        $data = $validator->validated();
+        $data = $request->validated();
 
         if ($data['discount_type'] === 'percentage' && empty($data['discount_percentage'])) {
             return response()->json([
@@ -114,7 +92,7 @@ class PromocionController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Promocion created successfully',
+            'message' => 'Promoción publicada',
             'data' => $promocion,
         ], 201);
     }
@@ -122,46 +100,17 @@ class PromocionController extends Controller
     /**
      * Update the specified Promocion
      */
-    public function update(Request $request, $id)
+    public function update(PromocionRequest $request, $id)
     {
         $promocion = Promocion::findOrFail($id);
 
-        if ($promocion->user_id !== $request->user()->id && !$request->user()->isAdmin()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized to update this promocion.',
-            ], 403);
-        }
+        Gate::authorize('update', $promocion);
 
-        $validator = Validator::make($request->all(), [
-            'title' => 'sometimes|required|string|max:255',
-            'description' => 'sometimes|required|string',
-            'locale_id' => 'sometimes|required|exists:locales,id',
-            'discount_type' => 'sometimes|required|in:2x1,percentage,fixed',
-            'discount_percentage' => 'nullable|integer|min:1|max:100',
-            'discount_amount' => 'nullable|numeric|min:0',
-            'original_price' => 'nullable|numeric|min:0',
-            'final_price' => 'nullable|numeric|min:0',
-            'start_date' => 'sometimes|required|date',
-            'end_date' => 'sometimes|required|date|after:start_date',
-            'terms_conditions' => 'nullable|string',
-            'redemption_code' => 'nullable|string|max:50',
-            'images' => 'nullable|array',
-            'is_active' => 'boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $promocion->update($validator->validated());
+        $promocion->update($request->validated());
 
         return response()->json([
             'success' => true,
-            'message' => 'Promocion updated successfully',
+            'message' => 'Promoción actualizada',
             'data' => $promocion,
         ], 200);
     }
@@ -173,18 +122,13 @@ class PromocionController extends Controller
     {
         $promocion = Promocion::findOrFail($id);
 
-        if ($promocion->user_id !== $request->user()->id && !$request->user()->isAdmin()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized to delete this promocion.',
-            ], 403);
-        }
+        Gate::authorize('delete', $promocion);
 
         $promocion->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Promocion deleted successfully',
+            'message' => 'Promoción eliminada',
         ], 200);
     }
 }

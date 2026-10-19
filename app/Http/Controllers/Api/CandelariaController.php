@@ -5,8 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ValidatesPaginationTrait;
 use App\Models\Candelaria;
+use App\Http\Requests\Content\CandelariaRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Gate;
 
 class CandelariaController extends Controller
 {
@@ -65,35 +66,16 @@ class CandelariaController extends Controller
     /**
      * Store a newly created Candelaria item
      */
-    public function store(Request $request)
+    public function store(CandelariaRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'content' => 'nullable|string',
-            'locale_id' => 'nullable|exists:locales,id',
-            'event_date' => 'nullable|date',
-            'category' => 'required|in:dance,history,costume,music,tradition,procession,other',
-            'images' => 'nullable|array',
-            'images.*' => 'nullable|string',
-            'is_featured' => 'boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
         $candelaria = Candelaria::create(array_merge(
-            $validator->validated(),
+            $request->validated(),
             ['user_id' => $request->user()->id]
         ));
 
         return response()->json([
             'success' => true,
-            'message' => 'Candelaria content created successfully',
+            'message' => 'Publicación creada',
             'data' => $candelaria,
         ], 201);
     }
@@ -101,42 +83,18 @@ class CandelariaController extends Controller
     /**
      * Update the specified Candelaria item
      */
-    public function update(Request $request, $id)
+    public function update(CandelariaRequest $request, $id)
     {
         $candelaria = Candelaria::findOrFail($id);
 
         // Authorization: Only owner or admin can update
-        if ($candelaria->user_id !== $request->user()->id && !$request->user()->isAdmin()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized to update this content.',
-            ], 403);
-        }
+        Gate::authorize('update', $candelaria);
 
-        $validator = Validator::make($request->all(), [
-            'title' => 'sometimes|required|string|max:255',
-            'description' => 'sometimes|required|string',
-            'content' => 'nullable|string',
-            'locale_id' => 'nullable|exists:locales,id',
-            'event_date' => 'nullable|date',
-            'category' => 'sometimes|required|in:dance,history,costume,music,tradition,procession,other',
-            'images' => 'nullable|array',
-            'is_featured' => 'boolean',
-            'is_active' => 'boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $candelaria->update($validator->validated());
+        $candelaria->update($request->validated());
 
         return response()->json([
             'success' => true,
-            'message' => 'Candelaria content updated successfully',
+            'message' => 'Publicación actualizada',
             'data' => $candelaria,
         ], 200);
     }
@@ -149,18 +107,13 @@ class CandelariaController extends Controller
         $candelaria = Candelaria::findOrFail($id);
 
         // Authorization: Only owner or admin can delete
-        if ($candelaria->user_id !== $request->user()->id && !$request->user()->isAdmin()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized to delete this content.',
-            ], 403);
-        }
+        Gate::authorize('delete', $candelaria);
 
         $candelaria->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Candelaria content deleted successfully',
+            'message' => 'Publicación eliminada',
         ], 200);
     }
 }

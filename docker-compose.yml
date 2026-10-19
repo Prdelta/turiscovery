@@ -1,0 +1,27 @@
+# Servicios de desarrollo y pruebas de Turiscovery.
+#   docker compose up -d          → PostgreSQL + PostGIS en el puerto 5433
+#   DB_HOST=127.0.0.1 DB_PORT=5433 DB_DATABASE=turiscovery_test DB_USERNAME=turiscovery DB_PASSWORD=turiscovery \
+#   DB_CONNECTION=pgsql php artisan test
+# No reemplaza la base de producción: es solo para trabajar y probar en local sin tocarla.
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: turiscovery
+      POSTGRES_PASSWORD: turiscovery
+      POSTGRES_DB: turiscovery
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U turiscovery"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:

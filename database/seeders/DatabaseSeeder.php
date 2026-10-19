@@ -352,7 +352,7 @@ class DatabaseSeeder extends Seeder
         // 7. Create Reviews
         Review::create([
             'user_id' => $tourist->id,
-            'reviewable_type' => 'App\Models\Locale',
+            'reviewable_type' => 'locale',
             'reviewable_id' => $createdLocales[0]->id,
             'rating' => 5,
             'title' => '¡Excelente comida!',
@@ -361,7 +361,7 @@ class DatabaseSeeder extends Seeder
 
         Review::create([
             'user_id' => $tourist->id,
-            'reviewable_type' => 'App\Models\Experiencia',
+            'reviewable_type' => 'experiencia',
             'reviewable_id' => $createdExperiencias[0]->id,
             'rating' => 5,
             'title' => 'Experiencia inolvidable',
@@ -370,7 +370,7 @@ class DatabaseSeeder extends Seeder
 
         Review::create([
             'user_id' => $socio->id,
-            'reviewable_type' => 'App\Models\Evento',
+            'reviewable_type' => 'evento',
             'reviewable_id' => $createdEventos[0]->id,
             'rating' => 4,
             'title' => 'Muy bueno',
@@ -380,19 +380,19 @@ class DatabaseSeeder extends Seeder
         // 8. Create Favorites
         Favorite::create([
             'user_id' => $tourist->id,
-            'favoritable_type' => 'App\Models\Locale',
+            'favoritable_type' => 'locale',
             'favoritable_id' => $createdLocales[0]->id,
         ]);
 
         Favorite::create([
             'user_id' => $tourist->id,
-            'favoritable_type' => 'App\Models\Experiencia',
+            'favoritable_type' => 'experiencia',
             'favoritable_id' => $createdExperiencias[0]->id,
         ]);
 
         Favorite::create([
             'user_id' => $tourist->id,
-            'favoritable_type' => 'App\Models\Candelaria',
+            'favoritable_type' => 'candelaria',
             'favoritable_id' => $createdCandelaria[0]->id,
         ]);
 

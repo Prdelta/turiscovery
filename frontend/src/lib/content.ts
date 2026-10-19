@@ -8,7 +8,7 @@ export interface ContentMeta {
   type: ContentType
   singular: string
   plural: string
-  /** Clase del modelo en Laravel (para reseñas y favoritos) */
+  /** Alias del tipo en la API (reseñas y favoritos), ver App\Support\MorphTypes */
   modelClass: string
   /** Ruta pública del detalle */
   path: string
@@ -23,7 +23,7 @@ export const CONTENT: Record<ContentType, ContentMeta> = {
     type: 'experiencias',
     singular: 'Experiencia',
     plural: 'Experiencias',
-    modelClass: 'App\\Models\\Experiencia',
+    modelClass: 'experiencia',
     path: '/experiencias',
     color: 'bg-primary',
     motif: 'olas',
@@ -33,7 +33,7 @@ export const CONTENT: Record<ContentType, ContentMeta> = {
     type: 'eventos',
     singular: 'Evento',
     plural: 'Eventos',
-    modelClass: 'App\\Models\\Evento',
+    modelClass: 'evento',
     path: '/eventos',
     color: 'bg-lake',
     motif: 'chakana',
@@ -43,7 +43,7 @@ export const CONTENT: Record<ContentType, ContentMeta> = {
     type: 'promociones',
     singular: 'Promoción',
     plural: 'Promociones',
-    modelClass: 'App\\Models\\Promocion',
+    modelClass: 'promocion',
     path: '/promociones',
     color: 'bg-sun',
     motif: 'ojo',
@@ -53,7 +53,7 @@ export const CONTENT: Record<ContentType, ContentMeta> = {
     type: 'locales',
     singular: 'Local',
     plural: 'Locales',
-    modelClass: 'App\\Models\\Locale',
+    modelClass: 'locale',
     path: '/locales',
     color: 'bg-mint-dark',
     motif: 'llave',
@@ -63,7 +63,7 @@ export const CONTENT: Record<ContentType, ContentMeta> = {
     type: 'candelaria',
     singular: 'Publicación de Candelaria',
     plural: 'Candelaria',
-    modelClass: 'App\\Models\\Candelaria',
+    modelClass: 'candelaria',
     path: '/candelaria/publicaciones',
     color: 'bg-primary-dark',
     motif: 'estrella',
@@ -71,8 +71,10 @@ export const CONTENT: Record<ContentType, ContentMeta> = {
   },
 }
 
+/** Tipo de contenido a partir del alias de la API (acepta también el nombre de clase antiguo) */
 export function typeFromModelClass(modelClass: string): ContentType | undefined {
-  return (Object.values(CONTENT).find((m) => m.modelClass === modelClass) ?? undefined)?.type
+  const alias = modelClass.includes('\\') ? modelClass.split('\\').pop()!.toLowerCase() : modelClass
+  return Object.values(CONTENT).find((m) => m.modelClass === alias)?.type
 }
 
 export const LOCALE_CATEGORIES: Record<string, string> = {

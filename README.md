@@ -138,6 +138,35 @@ La aplicación estará disponible en:
 - `frontend/src/three/`: escena 3D del lago (`LakeScene.tsx`) y visor de modelos (`ModelViewer.tsx`).
 - Modelos 3D: copia archivos `.glb` a `frontend/public/models/` y regístralos en `manifest.json`. Los modelos de ejemplo se regeneran con `node frontend/scripts/generate-models.mjs`.
 
+### Estructura del back
+
+| Capa | Dónde | Para qué |
+|------|-------|----------|
+| Rutas | `routes/api.php` | Endpoints públicos, de usuario, de socio (`role:socio,admin`) y de admin (`role:admin`) |
+| Validación | `app/Http/Requests/Content/*Request.php` | Reglas de crear/editar cada tipo de contenido. Al editar, autorizan antes de validar |
+| Autorización | `app/Policies/*Policy.php` | Quién puede editar o eliminar cada registro. `OwnedContentPolicy`: dueño o admin |
+| Reglas propias | `app/Rules/OwnedByUser.php` | Un socio solo puede asociar sus propios locales y anfitriones |
+| Modelos | `app/Models` + `app/Models/Concerns` | Traits compartidos: `BelongsToOwner`, `HasImages`, `HasLocation` (búsqueda por cercanía con parámetros enlazados), `Reviewable` |
+| Tipos polimórficos | `app/Support/MorphTypes.php` | Alias estables (`experiencia`, `evento`…) en reseñas, favoritos y tokens. La API acepta también el nombre de clase antiguo |
+| Errores | `bootstrap/app.php` | Toda respuesta de error de la API tiene la forma `{ success: false, message, errors? }` en español |
+| Idioma | `lang/es` | Mensajes de validación en español (`APP_LOCALE=es`) |
+| Lógica de dominio | `app/Services` | Por ahora `CandelariaLive` (estado del desfile) |
+
+**Pruebas**: `docker compose up -d` levanta PostgreSQL + PostGIS en el puerto 5433 con una base `turiscovery_test`. Luego:
+
+```bash
+DB_CONNECTION=pgsql DB_HOST=127.0.0.1 DB_PORT=5433 DB_DATABASE=turiscovery_test DB_USERNAME=turiscovery DB_PASSWORD=turiscovery php artisan test
+```
+
+El workflow `.github/workflows/ci.yml` corre migraciones y pruebas del back con PostGIS, y el lint y el build del frontend, en cada push.
+
+**Hoja de ruta de la reestructuración**
+
+1. ✅ Bases: Form Requests, Policies, traits de modelos, alias polimórficos, errores y mensajes en español, Docker y CI.
+2. Datos y rendimiento: una sola fuente para las coordenadas (columnas generadas desde PostGIS), calificación promedio guardada en cada contenido, búsqueda con índices `pg_trgm`/texto completo, cupos de reserva con bloqueo, Redis para caché/sesiones/colas y PgBouncer en lugar de conexiones persistentes.
+3. Escala horizontal: archivos en S3/R2 con miniaturas generadas en cola, notificaciones (correo/WhatsApp) en cola, `/api/v1` con API Resources, CDN y monitoreo (Sentry, Pulse).
+4. Organización por dominios (catálogo, reservas, Candelaria, comunidad, identidad) y rol de organizador para la Candelaria.
+
 ### Identidad: lo que hace distinto a Turiscovery
 
 - **El lago es la interfaz**: la portada es el Titicaca en 3D con seis lugares (Puno, los Uros, Taquile, Amantaní, Sillustani y Chucuito). Al tocar uno, la cámara vuela hasta él y un panel muestra lo publicado ahí. Cada contenido se asigna a su lugar por cercanía a las coordenadas reales (`frontend/src/lib/places.ts`). La escena está en `frontend/src/three/LakeScene.tsx`.

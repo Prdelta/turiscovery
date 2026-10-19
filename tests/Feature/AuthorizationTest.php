@@ -145,13 +145,13 @@ test('las reseñas públicas no exponen el correo de los usuarios', function () 
     $locale = makeLocale(userWithRole('socio'));
     Review::create([
         'user_id' => $author->id,
-        'reviewable_type' => Locale::class,
+        'reviewable_type' => 'locale',
         'reviewable_id' => $locale->id,
         'rating' => 5,
         'comment' => 'Muy bueno',
     ]);
 
-    $response = $this->getJson('/api/reviews?reviewable_type=' . urlencode(Locale::class) . "&reviewable_id={$locale->id}");
+    $response = $this->getJson("/api/reviews?reviewable_type=locale&reviewable_id={$locale->id}");
 
     $response->assertOk();
     expect($response->getContent())->not->toContain('privado@example.com');
@@ -169,4 +169,54 @@ test('los listados públicos no hacen una consulta por cada coordenada', functio
 
     // Paginación + usuarios + caché: un número fijo, no 2 por local
     expect($queries)->toBeLessThan(8);
+});
+
+test('un socio no puede asociar su evento al local de otro socio', function () {
+    $ajeno = makeLocale(userWithRole('socio'));
+    Sanctum::actingAs(userWithRole('socio'));
+
+    $this->postJson('/api/eventos', [
+        'title' => 'Concierto',
+        'description' => 'En la plaza',
+        'category' => 'concert',
+        'start_time' => now()->addDay()->toIso8601String(),
+        'end_time' => now()->addDay()->addHours(3)->toIso8601String(),
+        'locale_id' => $ajeno->id,
+    ])->assertUnprocessable()->assertJsonValidationErrors('locale_id');
+});
+
+test('editar contenido ajeno responde 403 aunque los datos sean inválidos', function () {
+    $locale = makeLocale(userWithRole('socio'));
+    Sanctum::actingAs(userWithRole('socio'));
+
+    $this->putJson("/api/locales/{$locale->id}", ['email' => 'no-es-correo'])
+        ->assertForbidden()
+        ->assertJsonPath('success', false);
+});
+
+test('los favoritos aceptan el alias y el nombre de clase antiguo', function () {
+    $locale = makeLocale(userWithRole('socio'));
+    Sanctum::actingAs(userWithRole('tourist'));
+
+    $this->postJson('/api/favorites/toggle', ['favoritable_type' => 'locale', 'favoritable_id' => $locale->id])
+        ->assertOk()->assertJsonPath('is_favorited', true);
+
+    $this->getJson('/api/favorites/check?favoritable_type=' . urlencode(Locale::class) . "&favoritable_id={$locale->id}")
+        ->assertOk()->assertJsonPath('is_favorited', true);
+
+    $this->assertDatabaseHas('favorites', ['favoritable_type' => 'locale', 'favoritable_id' => $locale->id]);
+});
+
+test('no se puede guardar en favoritos algo que no existe', function () {
+    Sanctum::actingAs(userWithRole('tourist'));
+
+    $this->postJson('/api/favorites/toggle', ['favoritable_type' => 'evento', 'favoritable_id' => 999999])
+        ->assertNotFound();
+});
+
+test('los errores de validación vienen en español y con el formato de la API', function () {
+    $this->postJson('/api/register', [])
+        ->assertUnprocessable()
+        ->assertJsonPath('success', false)
+        ->assertJsonPath('errors.email.0', 'Correo electrónico es obligatorio.');
 });

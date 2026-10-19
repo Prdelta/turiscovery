@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Favorite;
+use App\Support\MorphTypes;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class FavoriteController extends Controller
 {
@@ -18,8 +18,8 @@ class FavoriteController extends Controller
             ->where('user_id', $request->user()->id);
 
         // Filter by type
-        if ($request->has('type')) {
-            $query->where('favoritable_type', $request->type);
+        if ($type = MorphTypes::normalize($request->input('type'))) {
+            $query->where('favoritable_type', $type);
         }
 
         $favorites = $query->latest()->paginate(15);
@@ -35,17 +35,17 @@ class FavoriteController extends Controller
      */
     public function toggle(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'favoritable_type' => 'required|string|in:App\Models\Locale,App\Models\Candelaria,App\Models\CandelariaDanza,App\Models\Experiencia,App\Models\Evento,App\Models\Promocion',
-            'favoritable_id' => 'required|integer',
-        ]);
+        $request->merge(['favoritable_type' => MorphTypes::normalize($request->input('favoritable_type'))]);
+        $request->validate([
+            'favoritable_type' => 'required|string|in:' . implode(',', MorphTypes::FAVORITABLE),
+            'favoritable_id' => 'required|integer|min:1',
+        ], ['favoritable_type.*' => 'Ese tipo de contenido no se puede guardar en favoritos.']);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
+        abort_unless(
+            MorphTypes::exists($request->favoritable_type, (int) $request->favoritable_id),
+            404,
+            'Ese contenido ya no existe.',
+        );
 
         $isFavorited = Favorite::toggle(
             $request->user()->id,
@@ -55,7 +55,7 @@ class FavoriteController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => $isFavorited ? 'Added to favorites' : 'Removed from favorites',
+            'message' => $isFavorited ? 'Guardado en favoritos' : 'Quitado de favoritos',
             'is_favorited' => $isFavorited,
         ], 200);
     }
@@ -65,17 +65,11 @@ class FavoriteController extends Controller
      */
     public function check(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'favoritable_type' => 'required|string',
-            'favoritable_id' => 'required|integer',
+        $request->merge(['favoritable_type' => MorphTypes::normalize($request->input('favoritable_type'))]);
+        $request->validate([
+            'favoritable_type' => 'required|string|in:' . implode(',', MorphTypes::FAVORITABLE),
+            'favoritable_id' => 'required|integer|min:1',
         ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
 
         $isFavorited = Favorite::isFavorited(
             $request->user()->id,
