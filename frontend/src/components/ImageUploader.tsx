@@ -70,13 +70,13 @@ export function ImageUploader({
       <span className="text-sm font-semibold">{label}</span>
       <div className="flex flex-wrap gap-3">
         {value.map((url, i) => (
-          <div key={url + i} className="group relative size-28 overflow-hidden rounded-xl border border-line bg-white">
+          <div key={url + i} className="group relative size-28 overflow-hidden rounded-[var(--radius-control)] border-2 border-ink bg-white">
             <img src={url} alt="" className="size-full object-cover" />
-            {i === 0 && multiple && <span className="absolute bottom-1 left-1 rounded-full bg-ink/80 px-2 text-xs text-white">Portada</span>}
+            {i === 0 && multiple && <span className="absolute bottom-1 left-1 rounded-[var(--radius-chip)] bg-ink px-2 text-xs font-bold text-white">Portada</span>}
             <button
               type="button"
               onClick={() => onChange(value.filter((_, j) => j !== i))}
-              className="absolute right-1 top-1 rounded-full bg-white p-1 shadow"
+              className="absolute right-1 top-1 inline-flex size-8 items-center justify-center rounded-[var(--radius-chip)] border-2 border-ink bg-white hover:bg-sky"
               aria-label="Quitar imagen"
             >
               <X className="size-3.5" />
@@ -88,7 +88,7 @@ export function ImageUploader({
             type="button"
             onClick={() => input.current?.click()}
             disabled={uploading}
-            className="flex size-28 flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-line bg-white text-sm text-ink-soft hover:border-primary hover:text-primary"
+            className="flex size-28 flex-col items-center justify-center gap-1 rounded-[var(--radius-control)] border-2 border-dashed border-ink-soft bg-white text-sm font-bold text-ink-soft hover:border-ink hover:text-ink"
           >
             {uploading ? <LoaderCircle className="size-6 animate-spin" /> : <ImagePlus className="size-6" />}
             {uploading ? 'Subiendo…' : 'Añadir'}
@@ -97,7 +97,7 @@ export function ImageUploader({
       </div>
       <input ref={input} type="file" accept={ACCEPT} multiple={multiple} hidden onChange={(e) => upload(e.target.files)} />
       <p className="text-sm text-ink-soft">JPG, PNG, WebP o GIF de hasta 5 MB. Las fotos grandes se optimizan antes de subir.</p>
-      {error && <p className="text-sm text-danger">{error}</p>}
+      {error && <p className="text-sm font-bold text-cochinilla">{error}</p>}
     </div>
   )
 }

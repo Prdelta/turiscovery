@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { CalendarDays, Compass, Heart, Star, Ticket } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
 import { useAuth } from '../../auth/AuthContext'
@@ -7,8 +6,11 @@ import { ContentCard } from '../../components/ContentCard'
 import { CouponCard } from '../../components/CouponCard'
 import { SaveForTripButton } from '../../components/OfflineTools'
 import { PageHeader } from '../../components/layout/PanelLayout'
+import { TypeTag } from '../../components/textile/Tags'
+import { StitchRow, Tocapu } from '../../components/textile/Weave'
+import { PanelCard, StatTile, TEXT_LINK } from '../../components/ui/Panel'
 import { Button, ButtonLink } from '../../components/ui/Button'
-import { Alert, Badge, EmptyState, ErrorState, Pagination, Spinner, Stars, StatusBadge } from '../../components/ui/Feedback'
+import { Alert, EmptyState, ErrorState, Pagination, Spinner, Stars, StatusBadge } from '../../components/ui/Feedback'
 import { TextArea, TextField } from '../../components/ui/Field'
 import { useToast } from '../../components/ui/Toast'
 import { api, getData, parseApiError, type Paginated } from '../../lib/api'
@@ -28,38 +30,38 @@ export function AccountHome() {
   const { user } = useAuth()
   const { data } = useQuery({ queryKey: ['profile'], queryFn: () => getData<User>('/profile') })
   const cards = [
-    { to: '/cuenta/favoritos', label: 'Favoritos', value: data?.favorites_count, icon: Heart },
-    { to: '/cuenta/reservas', label: 'Reservas', value: data?.bookings_count, icon: Compass },
-    { to: '/cuenta/eventos', label: 'Asistencias', value: data?.event_attendances_count, icon: CalendarDays },
-    { to: '/cuenta/cupones', label: 'Cupones', value: data?.coupons_count, icon: Ticket },
-    { to: '/cuenta/resenas', label: 'Reseñas', value: data?.reviews_count, icon: Star },
-  ]
+    { to: '/cuenta/favoritos', label: 'Favoritos', value: data?.favorites_count, motif: 'estrella', dye: 'cochinilla' },
+    { to: '/cuenta/reservas', label: 'Reservas', value: data?.bookings_count, motif: 'olas', dye: 'anil' },
+    { to: '/cuenta/eventos', label: 'Asistencias', value: data?.event_attendances_count, motif: 'chakana', dye: 'cochinilla' },
+    { to: '/cuenta/cupones', label: 'Cupones', value: data?.coupons_count, motif: 'ojo', dye: 'chilca' },
+    { to: '/cuenta/resenas', label: 'Reseñas', value: data?.reviews_count, motif: 'sol', dye: 'solOscuro' },
+  ] as const
   return (
     <>
       <PageHeader title={`Hola, ${user?.name.split(' ')[0]}`} description="Todo lo que guardaste y reservaste en Turiscovery." />
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-5">
         {cards.map((c) => (
-          <Link key={c.to} to={c.to} className="flex flex-col gap-3 rounded-[var(--radius-card)] bg-white p-5 transition-colors hover:bg-primary/5">
-            <c.icon className="size-5 text-primary" aria-hidden />
-            <span className="font-display text-4xl font-extrabold">{c.value ?? '–'}</span>
-            <span className="text-sm text-ink-soft">{c.label}</span>
-          </Link>
+          <StatTile key={c.to} to={c.to} value={c.value ?? '–'} label={c.label} motif={c.motif} dye={c.dye} />
         ))}
       </div>
       {(user?.role === 'socio' || user?.role === 'admin') && (
+        <div className="mt-6">
         <Alert tone="info">
           Tienes una cuenta de {user.role === 'admin' ? 'administrador' : 'socio'}. Gestiona tu contenido desde el{' '}
-          <Link to={user.role === 'admin' ? '/admin' : '/dashboard'} className="font-semibold text-primary">panel</Link>.
+          <Link to={user.role === 'admin' ? '/admin' : '/dashboard'} className={TEXT_LINK}>panel</Link>.
         </Alert>
-      )}
-      <section className="mt-10 flex flex-col gap-3 rounded-[var(--radius-card)] bg-white p-6 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-lg font-bold">¿Vas al lago o a las islas?</h2>
-          <p className="text-sm text-ink-soft">Allí casi no hay señal. Guarda tus cupones, reservas y tu plan antes de salir.</p>
         </div>
-        <SaveForTripButton variant="primary" />
+      )}
+      <section className="card mt-8 flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+        <Tocapu motif="isla" dye="lago" size={40} />
+        <div className="flex-1">
+          <h2 className="t-h3">¿Vas al lago o a las islas?</h2>
+          <p className="mt-1 text-sm text-ink-soft">Allí casi no hay señal. Guarda tus cupones, reservas y tu plan antes de salir.</p>
+        </div>
+        <SaveForTripButton variant="primary" label="Guardar para el viaje" />
       </section>
-      <div className="mt-10 flex flex-wrap gap-3">
+      <StitchRow dye="cochinilla" className="mt-8" />
+      <div className="mt-8 flex flex-wrap gap-3">
         <ButtonLink to="/experiencias">Explorar experiencias</ButtonLink>
         <ButtonLink to="/eventos" variant="secondary">Ver próximos eventos</ButtonLink>
       </div>
@@ -84,7 +86,7 @@ export function FavoritesPage() {
         <ErrorState message={parseApiError(error).message} onRetry={() => refetch()} />
       ) : items.length ? (
         <>
-          <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
             {items.map((f) => (
               <ContentCard key={f.id} item={f.favoritable as AnyContent} type={typeFromModelClass(f.favoritable_type)!} />
             ))}
@@ -92,7 +94,7 @@ export function FavoritesPage() {
           <Pagination page={data!.current_page} lastPage={data!.last_page} onChange={setPage} />
         </>
       ) : (
-        <EmptyState title="Aún no guardas nada" icon={<Heart className="size-8" />} action={<ButtonLink to="/experiencias">Explorar experiencias</ButtonLink>}>
+        <EmptyState title="Aún no guardas nada" icon={<Tocapu motif="estrella" dye="cochinilla" size={40} framed={false} />} action={<ButtonLink to="/experiencias">Explorar experiencias</ButtonLink>}>
           Toca el corazón en cualquier experiencia, evento, promoción o local para guardarlo aquí.
         </EmptyState>
       )}
@@ -130,7 +132,7 @@ export function BookingsPage() {
               <article key={b.id} className="card flex flex-col gap-2 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <StatusBadge status={b.status} />
-                  <span className="font-display text-lg font-extrabold">{Number(b.total_price) > 0 ? formatPrice(b.total_price) : ''}</span>
+                  <span className="font-display t-h3">{Number(b.total_price) > 0 ? formatPrice(b.total_price) : ''}</span>
                 </div>
                 <Link to={`/experiencias/${b.experiencia_id}`} className="t-h3 hover:text-primary-dark">{b.experiencia?.title ?? 'Experiencia'}</Link>
                 <p className="text-sm text-ink-soft first-letter:uppercase">
@@ -157,7 +159,7 @@ export function BookingsPage() {
           <Pagination page={data.current_page} lastPage={data.last_page} onChange={setPage} />
         </div>
       ) : (
-        <EmptyState title="No tienes reservas" icon={<Compass className="size-8" />} action={<ButtonLink to="/experiencias">Ver experiencias</ButtonLink>}>
+        <EmptyState title="No tienes reservas" icon={<Tocapu motif="olas" dye="anil" size={40} framed={false} />} action={<ButtonLink to="/experiencias">Ver experiencias</ButtonLink>}>
           Reserva un tour o taller desde la página de cualquier experiencia.
         </EmptyState>
       )}
@@ -179,18 +181,30 @@ export function AttendancesPage() {
       ) : data?.data.length ? (
         <div className="flex flex-col gap-3">
           {data.data.map((a) => (
-            <article key={a.id} className="flex flex-wrap items-center gap-4 rounded-[var(--radius-card)] bg-white p-5">
+            <article key={a.id} className="card flex items-stretch overflow-hidden">
+              <div className="flex w-20 shrink-0 flex-col items-center justify-center border-r-2 border-ink bg-cochinilla p-2 text-white">
+                {a.evento ? (
+                  <>
+                    <span className="t-label">{new Date(a.evento.start_time).toLocaleDateString('es-PE', { month: 'short' }).replace('.', '')}</span>
+                    <span className="font-display text-3xl font-extrabold leading-none">{new Date(a.evento.start_time).getDate()}</span>
+                  </>
+                ) : (
+                  <Tocapu motif="chakana" dye="cochinilla" size={28} />
+                )}
+              </div>
+              <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3 p-4">
               <div className="min-w-0 flex-1">
-                <Link to={`/eventos/${a.evento_id}`} className="font-bold hover:text-primary">{a.evento?.title ?? 'Evento'}</Link>
-                {a.evento && <p className="text-sm text-ink-soft">{formatDate(a.evento.start_time)}, {formatTime(a.evento.start_time)}</p>}
+                <Link to={`/eventos/${a.evento_id}`} className="t-h3 hover:text-primary-dark">{a.evento?.title ?? 'Evento'}</Link>
+                {a.evento && <p className="mt-1 text-sm text-ink-soft first-letter:uppercase">{formatDate(a.evento.start_time)}, {formatTime(a.evento.start_time)}</p>}
               </div>
               <StatusBadge status={a.status === 'confirmed' ? 'confirmed' : 'maybe'} label={a.status === 'confirmed' ? 'Voy' : 'Quizás'} />
+              </div>
             </article>
           ))}
           <Pagination page={data.current_page} lastPage={data.last_page} onChange={setPage} />
         </div>
       ) : (
-        <EmptyState title="Sin eventos confirmados" icon={<CalendarDays className="size-8" />} action={<ButtonLink to="/eventos">Ver eventos</ButtonLink>}>
+        <EmptyState title="Sin eventos confirmados" icon={<Tocapu motif="chakana" dye="cochinilla" size={40} framed={false} />} action={<ButtonLink to="/eventos">Ver eventos</ButtonLink>}>
           Confirma tu asistencia desde la página de un evento.
         </EmptyState>
       )}
@@ -240,7 +254,7 @@ export function CouponsPage() {
           </div>
         </div>
       ) : (
-        <EmptyState title="No tienes cupones" icon={<Ticket className="size-8" />} action={<ButtonLink to="/promociones">Ver promociones</ButtonLink>}>
+        <EmptyState title="No tienes cupones" icon={<Tocapu motif="ojo" dye="chilca" size={40} framed={false} />} action={<ButtonLink to="/promociones">Ver promociones</ButtonLink>}>
           Obtén un cupón desde cualquier promoción vigente.
         </EmptyState>
       )}
@@ -265,17 +279,17 @@ export function MyReviewsPage() {
             const type = typeFromModelClass(r.reviewable_type)
             const name = r.reviewable?.title ?? r.reviewable?.name ?? 'Contenido retirado'
             return (
-              <article key={r.id} className="rounded-[var(--radius-card)] bg-white p-5">
+              <article key={r.id} className="card p-5">
                 <p className="flex flex-wrap items-center gap-2 text-sm text-ink-soft">
+                  {type && <TypeTag type={type} />}
                   <Stars value={r.rating} /> {formatDate(r.created_at)}
-                  {type && <Badge>{CONTENT[type].singular}</Badge>}
                 </p>
                 {type && r.reviewable ? (
-                  <Link to={`${CONTENT[type].path}/${r.reviewable_id}`} className="mt-2 block font-bold hover:text-primary">{name}</Link>
+                  <Link to={`${CONTENT[type].path}/${r.reviewable_id}`} className="t-h3 mt-3 block hover:text-primary-dark">{name}</Link>
                 ) : (
                   <p className="mt-2 font-bold">{name}</p>
                 )}
-                {r.title && <p className="mt-1 font-semibold">{r.title}</p>}
+                {r.title && <p className="mt-2 font-bold">“{r.title}”</p>}
                 {r.comment && <p className="text-ink-soft">{r.comment}</p>}
               </article>
             )
@@ -283,7 +297,7 @@ export function MyReviewsPage() {
           <Pagination page={data.current_page} lastPage={data.last_page} onChange={setPage} />
         </div>
       ) : (
-        <EmptyState title="Aún no escribes reseñas" icon={<Star className="size-8" />}>
+        <EmptyState title="Aún no escribes reseñas" icon={<Tocapu motif="sol" dye="solOscuro" size={40} framed={false} />}>
           Después de una experiencia o evento, cuenta cómo te fue desde su página.
         </EmptyState>
       )}
@@ -349,23 +363,27 @@ function ProfileForm({ profile, onSaved }: { profile: User; onSaved: () => void 
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex max-w-2xl flex-col gap-8">
-      <fieldset className="flex flex-col gap-4 rounded-[var(--radius-card)] bg-white p-6">
-        <legend className="mb-2 text-lg font-bold">Datos personales</legend>
+    <form onSubmit={onSubmit} className="flex max-w-2xl flex-col gap-6">
+      <PanelCard title="Datos personales">
+      <fieldset className="flex flex-col gap-4">
+        <legend className="sr-only">Datos personales</legend>
         <TextField label="Nombre" value={form.name} onChange={set('name')} error={errors.name} required />
         <TextField label="Teléfono" type="tel" value={form.phone} onChange={set('phone')} error={errors.phone} />
         <TextArea label="Sobre ti" value={form.bio} onChange={set('bio')} error={errors.bio} maxLength={1000} />
       </fieldset>
-      <fieldset className="flex flex-col gap-4 rounded-[var(--radius-card)] bg-white p-6">
-        <legend className="mb-2 text-lg font-bold">Cambiar contraseña</legend>
+      </PanelCard>
+      <PanelCard title="Cambiar contraseña">
+      <fieldset className="flex flex-col gap-4">
+        <legend className="sr-only">Cambiar contraseña</legend>
         <p className="text-sm text-ink-soft">Déjalo en blanco si no quieres cambiarla.</p>
         <TextField label="Contraseña actual" type="password" autoComplete="current-password" value={form.current_password} onChange={set('current_password')} error={errors.current_password} />
         <TextField label="Nueva contraseña" type="password" autoComplete="new-password" value={form.password} onChange={set('password')} error={errors.password} hint="Mínimo 8 caracteres con mayúsculas, minúsculas, un número y un símbolo." />
         <TextField label="Repite la nueva contraseña" type="password" autoComplete="new-password" value={form.password_confirmation} onChange={set('password_confirmation')} />
       </fieldset>
+      </PanelCard>
       {errors._ && <Alert tone="error">{errors._}</Alert>}
       <div>
-        <Button type="submit" loading={save.isPending}>Guardar cambios</Button>
+        <Button type="submit" loading={save.isPending} loadingText="Guardando…">Guardar cambios</Button>
       </div>
     </form>
   )

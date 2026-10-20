@@ -58,7 +58,7 @@ export default function AlmanacAdmin() {
       ) : data?.length ? (
         <ul className="flex flex-col gap-2">
           {data.map((e) => (
-            <li key={e.id} className={`flex flex-wrap items-center gap-4 rounded-[var(--radius-card)] bg-white p-4 ${e.is_active ? '' : 'opacity-60'}`}>
+            <li key={e.id} className={`flex flex-wrap items-center gap-4 card p-4 ${e.is_active ? '' : 'border-dashed'}`}>
               <span className="w-28 shrink-0 font-semibold">{e.day} de {MONTHS[e.month - 1]}</span>
               <div className="min-w-0 flex-1">
                 <p className="font-bold">{e.title}</p>
@@ -68,8 +68,8 @@ export default function AlmanacAdmin() {
                 </p>
               </div>
               <Badge>{ALMANAC_KINDS[e.kind]}</Badge>
-              <button onClick={() => setEditing(e)} aria-label="Editar" className="inline-flex size-10 items-center justify-center rounded-full hover:bg-ink/5"><Pencil className="size-4.5" /></button>
-              <button onClick={() => confirm(`¿Eliminar “${e.title}”?`) && remove.mutate(e.id)} aria-label="Eliminar" className="inline-flex size-10 items-center justify-center rounded-full hover:bg-danger/10 hover:text-danger"><Trash2 className="size-4.5" /></button>
+              <button onClick={() => setEditing(e)} aria-label="Editar" className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] border-2 border-ink bg-white text-ink hover:bg-sky"><Pencil className="size-4.5" /></button>
+              <button onClick={() => confirm(`¿Eliminar “${e.title}”?`) && remove.mutate(e.id)} aria-label="Eliminar" className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] border-2 border-cochinilla text-cochinilla hover:bg-cochinilla hover:text-white"><Trash2 className="size-4.5" /></button>
             </li>
           ))}
         </ul>
@@ -117,7 +117,7 @@ function EntryForm({ entry, onDone }: { entry?: Entry; onDone: () => void }) {
 
   return (
     <form onSubmit={onSubmit} className="mb-8 grid gap-5 rounded-[var(--radius-card)] border-2 border-qolle/50 bg-white p-6 sm:grid-cols-2">
-      <h2 className="text-lg font-bold sm:col-span-2">{entry ? 'Editar fecha' : 'Nueva fecha'}</h2>
+      <h2 className="t-h3 sm:col-span-2">{entry ? 'Editar fecha' : 'Nueva fecha'}</h2>
       <TextField label="Nombre" value={form.title} onChange={set('title')} error={errors.title} required wrapClassName="sm:col-span-2" placeholder="Fiesta de la Virgen de la Inmaculada" />
       <SelectField label="Tipo" options={KIND_OPTIONS} value={form.kind} onChange={set('kind')} />
       <TextField label="Provincia" value={form.province} onChange={set('province')} placeholder="Chucuito" />

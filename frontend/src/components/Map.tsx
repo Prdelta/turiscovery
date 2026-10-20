@@ -104,7 +104,7 @@ export function LocationPicker({
 }) {
   const position: [number, number] | null = lat && lng ? [lat, lng] : null
   return (
-    <div className="h-72 overflow-hidden rounded-[var(--radius-card)] border border-line">
+    <div className="h-72 overflow-hidden rounded-[var(--radius-card)] border-2 border-ink">
       <MapContainer center={position ?? PUNO_CENTER} zoom={14} style={{ height: '100%' }}>
         <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} />
         <ClickToPlace onPick={onChange} />
@@ -139,7 +139,7 @@ function ClickToAdd({ onAdd }: { onAdd: (p: [number, number]) => void }) {
 export function RouteEditor({ value, onChange }: { value: [number, number][]; onChange: (route: [number, number][]) => void }) {
   return (
     <div className="flex flex-col gap-2">
-      <div className="h-80 overflow-hidden rounded-[var(--radius-card)] border border-line">
+      <div className="h-80 overflow-hidden rounded-[var(--radius-card)] border-2 border-ink">
         <MapContainer center={value[0] ?? PUNO_CENTER} zoom={15} style={{ height: '100%' }}>
           <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} />
           <ClickToAdd onAdd={(p) => onChange([...value, p])} />
@@ -150,10 +150,10 @@ export function RouteEditor({ value, onChange }: { value: [number, number][]; on
       </div>
       <div className="flex flex-wrap items-center gap-3 text-sm">
         <span className="text-ink-soft">{value.length} puntos. Haz clic en el mapa siguiendo las calles del recorrido.</span>
-        <button type="button" disabled={!value.length} onClick={() => onChange(value.slice(0, -1))} className="font-semibold text-primary disabled:opacity-40">
+        <button type="button" disabled={!value.length} onClick={() => onChange(value.slice(0, -1))} className="min-h-11 font-bold text-primary-dark underline decoration-2 underline-offset-4 disabled:text-ink-soft disabled:no-underline">
           Deshacer último punto
         </button>
-        <button type="button" disabled={!value.length} onClick={() => onChange([])} className="font-semibold text-danger disabled:opacity-40">
+        <button type="button" disabled={!value.length} onClick={() => onChange([])} className="min-h-11 font-bold text-cochinilla underline decoration-2 underline-offset-4 disabled:text-ink-soft disabled:no-underline">
           Borrar recorrido
         </button>
       </div>

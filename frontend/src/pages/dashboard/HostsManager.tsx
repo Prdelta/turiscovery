@@ -43,20 +43,20 @@ export default function HostsManager() {
       ) : data?.length ? (
         <ul className="flex flex-col gap-3">
           {data.map((h) => (
-            <li key={h.id} className={clsx('flex flex-wrap items-center gap-4 rounded-[var(--radius-card)] bg-white p-4', !h.is_active && 'opacity-60')}>
-              {h.photo_url ? <img src={h.photo_url} alt="" className="size-14 rounded-xl object-cover" /> : <Avatar name={h.name} />}
+            <li key={h.id} className={clsx('flex flex-wrap items-center gap-4 card p-4', !h.is_active && 'border-dashed')}>
+              {h.photo_url ? <img src={h.photo_url} alt="" className="size-14 rounded-[var(--radius-control)] border-2 border-ink object-cover" /> : <Avatar name={h.name} />}
               <div className="min-w-0 flex-1">
                 <p className="font-bold">{h.name}</p>
                 <p className="text-sm text-ink-soft">
                   {[h.role_title, h.community].filter(Boolean).join(' · ') || 'Sin descripción'} · {h.experiencias_count ?? 0} experiencias
                 </p>
               </div>
-              {h.audio_url ? <Badge className="border-2 border-ink bg-qolle/25 text-ink">Con saludo</Badge> : <Badge>Sin saludo</Badge>}
-              <button onClick={() => setEditing(h)} aria-label="Editar" className="inline-flex size-10 items-center justify-center rounded-full hover:bg-ink/5"><Pencil className="size-4.5" /></button>
+              {h.audio_url ? <Badge className="border-2 border-ink bg-qolle text-ink">Con saludo</Badge> : <Badge>Sin saludo</Badge>}
+              <button onClick={() => setEditing(h)} aria-label="Editar" className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] border-2 border-ink bg-white text-ink hover:bg-sky"><Pencil className="size-4.5" /></button>
               <button
                 onClick={() => confirm(`¿Eliminar a ${h.name}? Sus experiencias quedarán sin anfitrión.`) && remove.mutate(h.id)}
                 aria-label="Eliminar"
-                className="inline-flex size-10 items-center justify-center rounded-full hover:bg-danger/10 hover:text-danger"
+                className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] border-2 border-cochinilla text-cochinilla hover:bg-cochinilla hover:text-white"
               >
                 <Trash2 className="size-4.5" />
               </button>
@@ -116,7 +116,7 @@ function HostForm({ host, onDone }: { host?: Anfitrion; onDone: () => void }) {
     <>
       <PageHeader title={host ? `Editar: ${host.name}` : 'Nuevo anfitrión'} />
       <form onSubmit={onSubmit} className="flex max-w-3xl flex-col gap-6">
-        <div className="grid gap-5 rounded-[var(--radius-card)] bg-white p-6 sm:grid-cols-2">
+        <div className="grid gap-5 card p-6 sm:grid-cols-2">
           <TextField label="Nombre" value={form.name} onChange={set('name')} error={errors.name} required placeholder="Juana Coila" />
           <TextField label="Qué hace" value={form.role_title} onChange={set('role_title')} placeholder="Tejedora, guía, pescador…" />
           <TextField label="Comunidad o isla" value={form.community} onChange={set('community')} placeholder="Uros Titino" wrapClassName="sm:col-span-2" />
@@ -136,7 +136,7 @@ function HostForm({ host, onDone }: { host?: Anfitrion; onDone: () => void }) {
           <TextArea label="Su historia" value={form.story} onChange={set('story')} error={errors.story} maxLength={3000} wrapClassName="sm:col-span-2" hint="Cuéntala con sus palabras: de dónde es, qué hace, qué le gusta compartir." />
         </div>
 
-        <div className="grid gap-5 rounded-[var(--radius-card)] bg-white p-6 sm:grid-cols-2">
+        <div className="grid gap-5 card p-6 sm:grid-cols-2">
           <TextField label="Saludo en su idioma" value={form.greeting} onChange={set('greeting')} error={errors.greeting} placeholder="Kamisaraki" />
           <TextField label="Traducción" value={form.greeting_translation} onChange={set('greeting_translation')} placeholder="¿Cómo estás?" />
           <div className="sm:col-span-2">
@@ -144,7 +144,7 @@ function HostForm({ host, onDone }: { host?: Anfitrion; onDone: () => void }) {
           </div>
         </div>
 
-        <div className="rounded-[var(--radius-card)] bg-white p-6">
+        <div className="card p-6">
           <ImageUploader value={photo} onChange={setPhoto} folder="anfitriones" multiple={false} label="Retrato" />
         </div>
 

@@ -39,7 +39,7 @@ export default function SearchPage() {
 
   return (
     <div className="container-page py-12 sm:py-16">
-      <h1 className="text-4xl font-extrabold sm:text-5xl">Buscar en Turiscovery</h1>
+      <h1 className="t-h1">Buscar en Turiscovery</h1>
       <div role="search" className="mt-8 flex flex-col gap-4">
         <div className="relative max-w-2xl">
           <label htmlFor="search-q" className="sr-only">Qué buscas</label>
@@ -50,7 +50,7 @@ export default function SearchPage() {
             value={q}
             onChange={(e) => set('q', e.target.value)}
             placeholder="Ejemplo: Uros, kayak, diablada, pizzería"
-            className="field-input h-14 rounded-full pl-12 text-lg"
+            className="field-input h-14 pl-12 text-lg"
           />
         </div>
         <div role="group" aria-label="Tipo de contenido" className="flex flex-wrap gap-2">
@@ -76,11 +76,11 @@ export default function SearchPage() {
               return (
                 <section key={type} aria-labelledby={`r-${type}`}>
                   <div className="mb-5 flex items-baseline justify-between gap-4">
-                    <h2 id={`r-${type}`} className="text-2xl font-extrabold">
+                    <h2 id={`r-${type}`} className="t-h2">
                       {CONTENT[type].plural} <span className="text-base font-medium text-ink-soft">({data.total})</span>
                     </h2>
                     {!only && data.total > data.data.length && (
-                      <Link to={`/buscar?q=${encodeURIComponent(debounced)}&tipo=${type}`} className="text-sm font-semibold text-primary">
+                      <Link to={`/buscar?q=${encodeURIComponent(debounced)}&tipo=${type}`} className="text-sm font-bold text-primary-dark underline decoration-2 underline-offset-4">
                         Ver los {data.total}
                       </Link>
                     )}
@@ -103,7 +103,7 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
     <button
       onClick={onClick}
       aria-pressed={active}
-      className={clsx('rounded-full border px-4 py-2 text-sm font-semibold transition-colors', active ? 'border-primary bg-primary text-white' : 'border-line bg-white hover:border-ink/40')}
+      className={clsx('inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-full border-2 border-ink px-4 text-sm font-bold transition-colors', active ? 'bg-ink text-white' : 'bg-white text-ink hover:bg-sky')}
     >
       {children}
     </button>

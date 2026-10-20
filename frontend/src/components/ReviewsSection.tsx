@@ -31,7 +31,7 @@ export function ReviewsSection({ type, id }: { type: ContentType; id: number }) 
     <section aria-labelledby="resenas" className="mt-16">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 id="resenas" className="text-2xl font-extrabold">Reseñas</h2>
+          <h2 id="resenas" className="t-h2">Reseñas</h2>
           {reviews.length > 0 && (
             <p className="mt-1 flex items-center gap-2 text-ink-soft">
               <Stars value={average} /> {average.toFixed(1)} · {data?.total ?? reviews.length} opinión{reviews.length === 1 ? '' : 'es'}
@@ -53,14 +53,14 @@ export function ReviewsSection({ type, id }: { type: ContentType; id: number }) 
           ))}
         </div>
 
-        <div className="rounded-[var(--radius-card)] bg-white p-5">
+        <div className="card p-5">
           {user ? (
             <ReviewForm modelClass={modelClass} id={id} existing={mine} queryKey={key} />
           ) : (
             <div className="flex flex-col gap-3">
-              <h3 className="text-lg font-bold">¿Ya lo visitaste?</h3>
+              <h3 className="t-h3">¿Ya lo visitaste?</h3>
               <p className="text-ink-soft">Inicia sesión para dejar tu reseña y ayudar a otros viajeros.</p>
-              <Link to={`/login?next=${encodeURIComponent(location.pathname)}`} className="font-semibold text-primary">
+              <Link to={`/login?next=${encodeURIComponent(location.pathname)}`} className="font-bold text-primary-dark underline decoration-2 underline-offset-4">
                 Iniciar sesión para opinar
               </Link>
             </div>
@@ -84,7 +84,7 @@ function ReviewItem({ review, canDelete, queryKey }: { review: Review; canDelete
   })
 
   return (
-    <article className="rounded-[var(--radius-card)] bg-white p-5">
+    <article className="card p-5">
       <header className="flex items-start gap-3">
         <Avatar name={review.user?.name ?? 'Viajero'} src={review.user?.avatar} />
         <div className="flex-1">
@@ -96,7 +96,7 @@ function ReviewItem({ review, canDelete, queryKey }: { review: Review; canDelete
         {canDelete && (
           <button
             onClick={() => confirm('¿Eliminar esta reseña?') && remove.mutate()}
-            className="rounded-full p-2 text-ink-soft hover:bg-danger/10 hover:text-danger"
+            className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] border-2 border-cochinilla text-cochinilla hover:bg-cochinilla hover:text-white"
             aria-label="Eliminar reseña"
           >
             <Trash2 className="size-4" />
@@ -141,7 +141,7 @@ function ReviewForm({ modelClass, id, existing, queryKey }: { modelClass: string
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4">
-      <h3 className="text-lg font-bold">{existing ? 'Tu reseña' : 'Escribe una reseña'}</h3>
+      <h3 className="t-h3">{existing ? 'Tu reseña' : 'Escribe una reseña'}</h3>
       <StarInput value={rating} onChange={setRating} />
       <TextField label="Título" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={255} placeholder="Resume tu experiencia" />
       <TextArea label="Comentario" value={comment} onChange={(e) => setComment(e.target.value)} maxLength={1000} placeholder="¿Qué te gustó? ¿Qué mejorarías?" />

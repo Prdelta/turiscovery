@@ -171,7 +171,7 @@ export function PanelLayout({ section }: { section: SectionKey }) {
       <div className="container-page py-8 lg:py-12">
         <div className="mb-6 flex items-center gap-3">
           {user && <Avatar name={user.name} src={user.avatar} />}
-          <h1 className="t-h1">Mi cuenta</h1>
+          <p className="t-h2">Mi cuenta</p>
         </div>
         <ChipTabs items={SECTIONS.cuenta.items} counts={counts} className="mb-8" />
         <Outlet />

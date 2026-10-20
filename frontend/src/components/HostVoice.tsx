@@ -74,13 +74,13 @@ export function HostCard({ host, compact = false }: { host: Anfitrion; compact?:
       <WovenBand motif="persona" dye="qolle" height={14} />
       <div className={clsx('flex gap-4 p-5', compact ? 'items-center' : 'flex-col sm:flex-row')}>
         {host.photo_url ? (
-          <img src={host.photo_url} alt={host.name} className={clsx('shrink-0 rounded-2xl object-cover', compact ? 'size-16' : 'size-28')} />
+          <img src={host.photo_url} alt={host.name} className={clsx('shrink-0 rounded-[var(--radius-control)] border-2 border-white object-cover', compact ? 'size-16' : 'size-28')} />
         ) : (
           <Avatar name={host.name} size="lg" />
         )}
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-mint">Te recibe</p>
-          <Link to={`/anfitriones/${host.id}`} className="font-display text-2xl font-extrabold text-white hover:underline">
+          <Link to={`/anfitriones/${host.id}`} className="font-display t-h2 text-white hover:underline">
             {host.name}
           </Link>
           <p className="text-sm text-white/75">
@@ -116,13 +116,13 @@ export function HostPortrait({ host }: { host: Anfitrion }) {
           </div>
         )}
         {host.audio_url && (
-          <span className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-semibold text-ink">
+          <span className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-[var(--radius-chip)] border-2 border-ink bg-white px-2.5 py-1 text-xs font-bold text-ink">
             <Play className="size-3.5" /> Escucha su saludo
           </span>
         )}
       </div>
       <WovenBand motif="persona" dye="qolle" height={12} />
-      <h3 className="mt-3 text-xl font-bold group-hover:text-primary">{host.name}</h3>
+      <h3 className="mt-3 t-h3 group-hover:text-primary">{host.name}</h3>
       <p className="text-sm text-ink-soft">{[host.role_title, host.community].filter(Boolean).join(' · ')}</p>
       {host.languages?.length ? (
         <p className="mt-1 flex flex-wrap gap-1">
@@ -199,9 +199,9 @@ export function VoiceRecorder({ value, onChange }: { value: string | null; onCha
     <div className="flex flex-col gap-3">
       <span className="text-sm font-semibold">Saludo grabado</span>
       {value && !recording ? (
-        <div className="flex items-center gap-3 rounded-2xl border border-line p-3">
+        <div className="flex items-center gap-3 rounded-[var(--radius-control)] border-2 border-ink bg-white p-3">
           <div className="flex-1"><VoicePlayer src={value} label="el saludo" /></div>
-          <button type="button" onClick={() => onChange(null)} aria-label="Quitar audio" className="rounded-full p-2 hover:bg-danger/10 hover:text-danger">
+          <button type="button" onClick={() => onChange(null)} aria-label="Quitar audio" className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] border-2 border-cochinilla text-cochinilla hover:bg-cochinilla hover:text-white">
             <Trash2 className="size-4" />
           </button>
         </div>
@@ -213,8 +213,8 @@ export function VoiceRecorder({ value, onChange }: { value: string | null; onCha
             onClick={() => (recording ? recorder.current?.stop() : start())}
             disabled={uploading}
             className={clsx(
-              'inline-flex h-11 items-center gap-2 rounded-full px-5 font-semibold text-white',
-              recording ? 'bg-danger' : 'bg-cochinilla hover:bg-cochinilla/85',
+              'inline-flex min-h-13 items-center gap-2 rounded-[var(--radius-control)] border-2 px-5 font-bold text-white',
+              recording ? 'border-ink bg-ink' : 'border-cochinilla bg-cochinilla hover:border-[#8f1c2f] hover:bg-[#8f1c2f]',
             )}
           >
             {recording ? <Square className="size-4" /> : <Mic className="size-4" />}
@@ -225,7 +225,7 @@ export function VoiceRecorder({ value, onChange }: { value: string | null; onCha
           type="button"
           onClick={() => fileInput.current?.click()}
           disabled={uploading || recording}
-          className="inline-flex h-11 items-center gap-2 rounded-full border border-line bg-white px-5 font-semibold hover:border-ink/40"
+          className="inline-flex min-h-13 items-center gap-2 rounded-[var(--radius-control)] border-2 border-ink bg-white px-5 font-bold hover:bg-sky"
         >
           <Upload className="size-4" /> {uploading ? 'Subiendo…' : 'Subir audio'}
         </button>
@@ -242,7 +242,7 @@ export function VoiceRecorder({ value, onChange }: { value: string | null; onCha
         />
       </div>
       <p className="text-sm text-ink-soft">Un saludo corto en su idioma, de hasta un minuto. Pide permiso a la persona antes de grabarla.</p>
-      {error && <p className="text-sm text-danger">{error}</p>}
+      {error && <p className="text-sm font-bold text-cochinilla">{error}</p>}
     </div>
   )
 }

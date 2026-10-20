@@ -29,9 +29,9 @@ import { useContentList, useDocumentTitle } from '../lib/hooks'
 import type { Evento, Experiencia } from '../lib/types'
 
 const LEVEL_STYLE: Record<DayLevel, string> = {
-  descanso: 'bg-info text-ink',
-  suave: 'bg-sun/30 text-ink',
-  libre: 'bg-mint/50 text-ink',
+  descanso: 'border-2 border-ink bg-sky text-ink',
+  suave: 'border-2 border-sun-dark bg-sun/20 text-[#6b4f00]',
+  libre: 'border-2 border-mint-dark bg-mint/20 text-[#1f6b2f]',
 }
 
 const dayFmt = new Intl.DateTimeFormat('es-PE', { weekday: 'long', day: 'numeric', month: 'long' })
@@ -91,10 +91,10 @@ export default function PlannerPage() {
     <div className="container-page py-12 sm:py-16">
       <header className="grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:items-end">
         <div>
-          <p className="mb-3 inline-flex items-center gap-2 font-semibold text-primary">
+          <p className="mb-3 inline-flex items-center gap-2 font-bold text-primary-dark underline decoration-2 underline-offset-4">
             <Mountain className="size-5" aria-hidden /> Puno está a 3 812 m de altura
           </p>
-          <h1 className="text-4xl font-extrabold sm:text-5xl">Planifica tu viaje según la altura</h1>
+          <h1 className="t-h1">Planifica tu viaje según la altura</h1>
           <p className="prose-measure mt-4 text-lg text-ink-soft">
             Elige qué quieres hacer y te sugerimos en qué día hacerlo para que tu cuerpo se adapte: lo suave al llegar, las islas lejanas y
             caminatas cuando ya estés aclimatado.
@@ -105,7 +105,7 @@ export default function PlannerPage() {
         </p>
       </header>
 
-      <section aria-label="Datos del viaje" className="mt-10 grid gap-5 rounded-[var(--radius-card)] bg-white p-6 md:grid-cols-[180px_160px_1fr]">
+      <section aria-label="Datos del viaje" className="mt-10 grid gap-5 card p-6 md:grid-cols-[180px_160px_1fr]">
         <div className="flex flex-col gap-1.5">
           <label htmlFor="llegada" className="text-sm font-semibold">Llego a Puno el</label>
           <input id="llegada" type="date" className="field-input" value={plan.arrival} onChange={(e) => e.target.value && update({ arrival: e.target.value })} />
@@ -123,8 +123,8 @@ export default function PlannerPage() {
               <label
                 key={o}
                 className={clsx(
-                  'flex cursor-pointer items-start gap-2 rounded-xl border p-3 text-sm',
-                  plan.origin === o ? 'border-primary bg-primary/5' : 'border-line hover:border-ink/40',
+                  'flex cursor-pointer items-start gap-2 rounded-[var(--radius-control)] border-2 p-3 text-sm',
+                  plan.origin === o ? 'border-ink bg-sky' : 'border-line bg-white hover:border-ink',
                 )}
               >
                 <input type="radio" name="origen" className="mt-1 accent-primary" checked={plan.origin === o} onChange={() => update({ origin: o })} />
@@ -139,13 +139,13 @@ export default function PlannerPage() {
         {/* ---------- Plan día a día ---------- */}
         <section aria-labelledby="mi-plan">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-            <h2 id="mi-plan" className="text-2xl font-extrabold">Tu plan</h2>
+            <h2 id="mi-plan" className="t-h2">Tu plan</h2>
             <div className="flex flex-wrap gap-2 print:hidden">
               <a
                 href={`https://wa.me/?text=${encodeURIComponent(shareText)}`}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex h-9 items-center gap-1.5 rounded-full bg-mint-dark px-3.5 text-sm font-semibold text-white hover:bg-mint-dark/85"
+                className="inline-flex min-h-11 items-center gap-1.5 rounded-[var(--radius-control)] border-2 border-ink bg-mint px-4 text-sm font-bold text-ink hover:bg-white"
               >
                 <Share2 className="size-4" /> WhatsApp
               </a>
@@ -170,10 +170,10 @@ export default function PlannerPage() {
             {days.map((day) => {
               const level = LEVELS[day.level]
               return (
-                <li key={day.index} className="rounded-[var(--radius-card)] bg-white p-5">
+                <li key={day.index} className="card p-5">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <h3 className="text-xl font-bold first-letter:uppercase">
+                      <h3 className="t-h3 first-letter:uppercase">
                         Día {day.index + 1} · {dayFmt.format(day.date)}
                       </h3>
                       <p className="mt-1 max-w-xl text-sm text-ink-soft">{level.summary}</p>
@@ -184,7 +184,7 @@ export default function PlannerPage() {
                   <div className="mt-4" aria-label={`${day.hours} de ${level.maxHours} horas recomendadas`}>
                     <div className="h-2 overflow-hidden rounded-full bg-line">
                       <div
-                        className={clsx('h-full rounded-full', day.hours > level.maxHours ? 'bg-danger' : 'bg-primary')}
+                        className={clsx('h-full rounded-full', day.hours > level.maxHours ? 'bg-cochinilla' : 'bg-primary')}
                         style={{ width: `${Math.min(100, (day.hours / level.maxHours) * 100)}%` }}
                       />
                     </div>
@@ -192,13 +192,13 @@ export default function PlannerPage() {
                   </div>
 
                   {(day.events.length > 0 || day.experiences.length > 0) ? (
-                    <ul className="mt-4 flex flex-col divide-y divide-line">
+                    <ul className="mt-4 flex flex-col divide-y-2 divide-line">
                       {day.events.map((e) => (
                         <li key={`e-${e.id}`} className="flex items-center gap-3 py-2.5">
                           <CalendarDays className="size-4.5 shrink-0 text-lake" aria-hidden />
-                          <Link to={`/eventos/${e.id}`} className="flex-1 font-semibold hover:text-primary">{e.title}</Link>
+                          <Link to={`/eventos/${e.id}`} className="flex-1 font-bold hover:text-primary-dark hover:underline">{e.title}</Link>
                           <span className="text-sm text-ink-soft">{formatTime(e.start_time)}</span>
-                          <button onClick={() => toggleEvent(e.id)} aria-label={`Quitar ${e.title}`} className="rounded-full p-1.5 hover:bg-danger/10 hover:text-danger print:hidden">
+                          <button onClick={() => toggleEvent(e.id)} aria-label={`Quitar ${e.title}`} className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] border-2 border-cochinilla text-cochinilla hover:bg-cochinilla hover:text-white print:hidden">
                             <Trash2 className="size-4" />
                           </button>
                         </li>
@@ -206,7 +206,7 @@ export default function PlannerPage() {
                       {day.experiences.map((e) => (
                         <li key={`x-${e.id}`} className="flex flex-wrap items-center gap-3 py-2.5">
                           <Clock className="size-4.5 shrink-0 text-primary" aria-hidden />
-                          <Link to={`/experiencias/${e.id}?fecha=${toDateInput(day.date.toISOString())}`} className="min-w-0 flex-1 font-semibold hover:text-primary">
+                          <Link to={`/experiencias/${e.id}?fecha=${toDateInput(day.date.toISOString())}`} className="min-w-0 flex-1 font-bold hover:text-primary-dark hover:underline">
                             {e.title}
                           </Link>
                           <span className="text-sm text-ink-soft">{experienceHours(e)} h · {DIFFICULTY[e.difficulty]}</span>
@@ -215,7 +215,7 @@ export default function PlannerPage() {
                             id={`mover-${e.id}`}
                             value={day.index}
                             onChange={(ev) => moveExperience(e.id, Number(ev.target.value))}
-                            className="rounded-lg border border-line bg-white px-2 py-1 text-sm print:hidden"
+                            className="min-h-11 rounded-[var(--radius-chip)] border-2 border-ink bg-white px-2 text-sm print:hidden"
                           >
                             {days.map((d) => (
                               <option key={d.index} value={d.index}>
@@ -223,7 +223,7 @@ export default function PlannerPage() {
                               </option>
                             ))}
                           </select>
-                          <button onClick={() => removeExperience(e.id)} aria-label={`Quitar ${e.title}`} className="rounded-full p-1.5 hover:bg-danger/10 hover:text-danger print:hidden">
+                          <button onClick={() => removeExperience(e.id)} aria-label={`Quitar ${e.title}`} className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] border-2 border-cochinilla text-cochinilla hover:bg-cochinilla hover:text-white print:hidden">
                             <Trash2 className="size-4" />
                           </button>
                         </li>
@@ -242,7 +242,7 @@ export default function PlannerPage() {
                   )}
 
                   <details className="mt-4 text-sm">
-                    <summary className="cursor-pointer font-semibold text-primary">Consejos para este día</summary>
+                    <summary className="cursor-pointer font-bold text-primary-dark underline decoration-2 underline-offset-4">Consejos para este día</summary>
                     <ul className="mt-2 list-disc pl-5 text-ink-soft">
                       {level.tips.map((t) => <li key={t}>{t}</li>)}
                     </ul>
@@ -256,17 +256,17 @@ export default function PlannerPage() {
         {/* ---------- Catálogo ---------- */}
         <aside className="flex flex-col gap-8 print:hidden" aria-label="Qué puedes agregar">
           <section aria-labelledby="cat-eventos">
-            <h2 id="cat-eventos" className="mb-3 text-xl font-extrabold">Eventos en tus fechas</h2>
+            <h2 id="cat-eventos" className="mb-3 t-h3">Eventos en tus fechas</h2>
             {eventsQ.isLoading ? (
               <Spinner />
             ) : eventsQ.isError ? (
-              <p className="text-sm text-danger">No se pudieron cargar los eventos. Revisa tu conexión.</p>
+              <p className="text-sm font-bold text-cochinilla">No se pudieron cargar los eventos. Revisa tu conexión.</p>
             ) : stayEvents.length ? (
               <ul className="flex flex-col gap-2">
                 {stayEvents.map((e) => {
                   const added = plan.events.includes(e.id)
                   return (
-                    <li key={e.id} className="flex items-center gap-3 rounded-2xl bg-white p-3">
+                    <li key={e.id} className="flex items-center gap-3 card p-3">
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-semibold">{e.title}</p>
                         <p className="text-xs text-ink-soft first-letter:uppercase">{dayFmt.format(new Date(e.start_time))}, {formatTime(e.start_time)}</p>
@@ -284,12 +284,12 @@ export default function PlannerPage() {
           </section>
 
           <section aria-labelledby="cat-exp">
-            <h2 id="cat-exp" className="mb-1 text-xl font-extrabold">Experiencias</h2>
+            <h2 id="cat-exp" className="mb-1 t-h3">Experiencias</h2>
             <p className="mb-3 text-sm text-ink-soft">Al agregarlas, las ponemos en el primer día en que tu cuerpo estará listo.</p>
             {experiencesQ.isLoading ? (
               <Spinner />
             ) : experiencesQ.isError ? (
-              <p className="text-sm text-danger">No se pudieron cargar las experiencias. Revisa tu conexión.</p>
+              <p className="text-sm font-bold text-cochinilla">No se pudieron cargar las experiencias. Revisa tu conexión.</p>
             ) : experiences.length ? (
               <ul className="flex flex-col gap-2">
                 {experiences.map((e) => {
@@ -297,7 +297,7 @@ export default function PlannerPage() {
                   const added = day !== undefined
                   const earliest = Array.from({ length: plan.days }, (_, i) => i).find((i) => fitsLevel(e.difficulty, levelForDay(i, plan.origin)))
                   return (
-                    <li key={e.id} className="flex items-center gap-3 rounded-2xl bg-white p-3">
+                    <li key={e.id} className="flex items-center gap-3 card p-3">
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-semibold">{e.title}</p>
                         <p className="text-xs text-ink-soft">
@@ -307,7 +307,7 @@ export default function PlannerPage() {
                       </div>
                       {added ? (
                         <span className="flex items-center gap-2">
-                          <span className="text-xs font-semibold text-primary">Día {day + 1}</span>
+                          <span className="text-xs font-bold text-primary-dark underline decoration-2 underline-offset-4">Día {day + 1}</span>
                           <Button size="sm" variant="secondary" onClick={() => removeExperience(e.id)}>Quitar</Button>
                         </span>
                       ) : (

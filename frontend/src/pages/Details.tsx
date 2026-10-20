@@ -39,9 +39,9 @@ function DetailState({ isLoading, error, refetch }: { isLoading: boolean; error:
     <div className="container-page py-20">
       {status === 404 ? (
         <div className="text-center">
-          <h1 className="text-3xl font-bold">No encontramos esta publicación</h1>
+          <h1 className="t-h2">No encontramos esta publicación</h1>
           <p className="mt-2 text-ink-soft">Puede que el socio la haya retirado.</p>
-          <Link to="/" className="mt-6 inline-block font-semibold text-primary">Volver al inicio</Link>
+          <Link to="/" className="mt-6 inline-block font-bold text-primary-dark underline decoration-2 underline-offset-4">Volver al inicio</Link>
         </div>
       ) : (
         <ErrorState message={parseApiError(error).message} onRetry={refetch} />
@@ -229,7 +229,7 @@ function LocaleLink({ locale }: { locale?: Locale | null }) {
   return (
     <p className="flex items-center gap-2">
       <MapPin className="size-4.5" aria-hidden /> Ofrecido por{' '}
-      <Link to={`/locales/${locale.id}`} className="font-semibold text-primary">{locale.name}</Link>
+      <Link to={`/locales/${locale.id}`} className="font-bold text-primary-dark underline decoration-2 underline-offset-4">{locale.name}</Link>
     </p>
   )
 }
@@ -281,7 +281,7 @@ export function ExperienciaDetail() {
       aside={
         <AsideCard>
           <div>
-            <p className="font-display text-4xl font-extrabold">{price ?? 'Precio a consultar'}</p>
+            <p className="font-display t-h1">{price ?? 'Precio a consultar'}</p>
             {price && price !== 'Gratis' && <p className="text-sm text-ink-soft">por persona</p>}
           </div>
           <ButtonLink to={bookHref} size="lg" fullWidth>Reservar</ButtonLink>
@@ -294,7 +294,7 @@ export function ExperienciaDetail() {
       bottomBar={
         <>
           <p>
-            <span className="block font-display text-2xl font-extrabold leading-none">{price ?? 'A consultar'}</span>
+            <span className="block font-display t-h2 leading-none">{price ?? 'A consultar'}</span>
             {price && price !== 'Gratis' && <span className="text-sm text-ink-soft">por persona</span>}
           </p>
           <ButtonLink to={bookHref} size="lg">Reservar</ButtonLink>
@@ -329,8 +329,8 @@ export function EventoDetail() {
       type="eventos"
       kicker={
         <>
-          <Badge className="bg-lake text-white">{EVENT_CATEGORIES[e.category] ?? e.category}</Badge>
-          {days >= 0 && <Badge className="bg-mint text-ink">{relativeDays(e.start_time)}</Badge>}
+          <Badge>{EVENT_CATEGORIES[e.category] ?? e.category}</Badge>
+          {days >= 0 && <Badge className="border-2 border-mint-dark bg-mint/20 text-[#1f6b2f]">{relativeDays(e.start_time)}</Badge>}
         </>
       }
       meta={
@@ -392,7 +392,7 @@ function AttendanceCard({ evento }: { evento: Evento }) {
   return (
     <AsideCard>
       <div>
-        <p className="font-display text-3xl font-extrabold text-lake">{price ?? 'Entrada libre'}</p>
+        <p className="font-display text-4xl font-extrabold">{price ?? "Entrada libre"}</p>
         {count.data && (
           <p className="mt-1 text-sm text-ink-soft">
             {count.data.confirmed} confirmados{count.data.maybe ? ` · ${count.data.maybe} interesados` : ''}
@@ -423,7 +423,7 @@ function AttendanceCard({ evento }: { evento: Evento }) {
         href={googleCalendarUrl(evento.title, evento.start_time, evento.end_time, evento.description, evento.formatted_address || evento.address)}
         target="_blank"
         rel="noreferrer"
-        className="inline-flex items-center gap-2 font-semibold text-primary"
+        className="inline-flex items-center gap-2 font-bold text-primary-dark underline decoration-2 underline-offset-4"
       >
         <CalendarPlus className="size-4.5" /> Añadir a Google Calendar
       </a>
@@ -444,7 +444,7 @@ export function PromocionDetail() {
       item={p}
       type="promociones"
       showMap={false}
-      kicker={<Badge className="bg-sun text-ink">{discount}</Badge>}
+      kicker={<Badge className="border-2 border-ink bg-chilca text-white">{discount}</Badge>}
       meta={
         <>
           <p className="flex items-center gap-2"><CalendarDays className="size-4.5" aria-hidden /> Válida del {formatDate(p.start_date)} al {formatDate(p.end_date)}</p>
@@ -455,7 +455,7 @@ export function PromocionDetail() {
     >
       {p.terms_conditions && (
         <section className="mt-10">
-          <h2 className="mb-3 text-2xl font-extrabold">Términos y condiciones</h2>
+          <h2 className="mb-3 t-h2">Términos y condiciones</h2>
           <p className="prose-measure whitespace-pre-line text-ink-soft">{p.terms_conditions}</p>
         </section>
       )}
@@ -480,7 +480,7 @@ function CouponCard({ promo, discount }: { promo: Promocion; discount: string })
 
   return (
     <AsideCard>
-      <p className="font-display text-3xl font-extrabold">{discount}</p>
+      <p className="font-display text-4xl font-extrabold text-chilca">{discount}</p>
       {promo.original_price && promo.final_price && (
         <p className="text-ink-soft">
           <s>{formatPrice(promo.original_price)}</s> <strong className="text-lg text-ink">{formatPrice(promo.final_price)}</strong>
@@ -488,9 +488,9 @@ function CouponCard({ promo, discount }: { promo: Promocion; discount: string })
       )}
       <p className="text-sm text-ink-soft">Quedan {Math.max(0, daysUntil(promo.end_date))} días para usarla.</p>
       {coupon ? (
-        <div className="rounded-2xl border-2 border-dashed border-sun bg-sun/10 p-4 text-center">
+        <div className="rounded-[var(--radius-control)] border-2 border-dashed border-chilca bg-lana p-4 text-center">
           <p className="text-sm text-ink-soft">Tu código</p>
-          <p className="font-display text-2xl font-extrabold tracking-wider">{coupon.coupon_code}</p>
+          <p className="font-mono text-3xl font-bold tracking-[0.15em] break-all">{coupon.coupon_code}</p>
           <p className="mt-1 text-xs text-ink-soft">Muéstralo al pagar en el local.</p>
         </div>
       ) : user ? (
@@ -520,10 +520,10 @@ export function LocaleDetail() {
     <DetailShell
       item={l}
       type="locales"
-      kicker={<Badge className="bg-mint-dark text-white">{LOCALE_CATEGORIES[l.category] ?? l.category}</Badge>}
+      kicker={<Badge>{LOCALE_CATEGORIES[l.category] ?? l.category}</Badge>}
       aside={
         <AsideCard>
-          <h2 className="text-xl font-bold">Contacto</h2>
+          <h2 className="t-h3">Contacto</h2>
           <ul className="flex flex-col gap-3">
             {l.phone && <li><a href={`tel:${l.phone}`} className="flex items-center gap-2 hover:text-primary"><Phone className="size-4.5" /> {l.phone}</a></li>}
             {l.email && <li><a href={`mailto:${l.email}`} className="flex items-center gap-2 break-all hover:text-primary"><Mail className="size-4.5 shrink-0" /> {l.email}</a></li>}
@@ -537,7 +537,7 @@ export function LocaleDetail() {
       {related.map(([type, items]) =>
         items?.length ? (
           <section key={type} className="mt-12">
-            <h2 className="mb-5 text-2xl font-extrabold">{CONTENT[type].plural} de este local</h2>
+            <h2 className="mb-5 t-h2">{CONTENT[type].plural} de este local</h2>
             <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2">
               {items.map((it) => <ContentCard key={it.id} item={it} type={type} />)}
             </div>
@@ -558,7 +558,7 @@ export function CandelariaPostDetail() {
       item={data}
       type="candelaria"
       showMap={false}
-      kicker={<Badge className="bg-primary text-white">{CANDELARIA_CATEGORIES[data.category] ?? data.category}</Badge>}
+      kicker={<Badge>{CANDELARIA_CATEGORIES[data.category] ?? data.category}</Badge>}
       meta={data.event_date ? <p className="flex items-center gap-2"><CalendarDays className="size-4.5" aria-hidden /> {formatDate(data.event_date)}</p> : undefined}
     >
       {data.content && <div className="prose-measure mt-6 whitespace-pre-line text-ink-soft">{data.content}</div>}

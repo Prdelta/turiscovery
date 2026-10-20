@@ -28,7 +28,7 @@ const KIND_WEAVE: Record<AlmanacKind, { motif: Motif; dye: Dye }> = {
 const LAKE_TEXT = {
   calmo: { label: 'Lago calmo', cls: 'bg-mint text-ink' },
   moderado: { label: 'Algo de oleaje', cls: 'bg-sun text-ink' },
-  ventoso: { label: 'Lago picado', cls: 'bg-danger text-white' },
+  ventoso: { label: 'Lago picado', cls: 'bg-cochinilla text-white' },
 }
 
 export function MoonGlyph({ phase, size = 44 }: { phase: number; size?: number }) {
@@ -51,7 +51,7 @@ export function AlmanacRow({ item, dark = false }: { item: AlmanacItem; dark?: b
   const weave = KIND_WEAVE[item.kind] ?? KIND_WEAVE.fiesta
   return (
     <li>
-      <Link to={itemHref(item)} className={clsx('flex items-start gap-3 rounded-xl p-2 transition-colors', dark ? 'hover:bg-white/10' : 'hover:bg-ink/5')}>
+      <Link to={itemHref(item)} className={clsx('flex items-start gap-3 rounded-[var(--radius-control)] p-2 transition-colors', dark ? 'hover:bg-white/10' : 'hover:bg-ink/5')}>
         <Tocapu motif={weave.motif} dye={weave.dye} size={26} className="mt-0.5" />
         <div className="min-w-0 flex-1">
           <p className="font-semibold leading-snug">{item.title}</p>
@@ -81,7 +81,7 @@ export function TodayPanel({ dark = false, className }: { dark?: boolean; classN
   return (
     <section
       aria-label="Hoy en Puno"
-      className={clsx('flex flex-col gap-4 rounded-[var(--radius-card)] p-5', dark ? 'bg-lake-deep/90 text-white backdrop-blur' : 'bg-white', className)}
+      className={clsx('flex flex-col gap-4 rounded-[var(--radius-card)] p-5', dark ? 'border-2 border-ink bg-ink text-white' : 'card', className)}
     >
       <div className="flex items-start justify-between gap-3">
         <div>
@@ -93,9 +93,9 @@ export function TodayPanel({ dark = false, className }: { dark?: boolean; classN
       </div>
 
       {lake.data ? (
-        <div className={clsx('flex flex-col gap-2 rounded-xl p-3', dark ? 'bg-white/10' : 'bg-sky')}>
+        <div className={clsx('flex flex-col gap-2 rounded-[var(--radius-control)] p-3', dark ? 'bg-[#2c2a55]' : 'bg-sky')}>
           <div className="flex flex-wrap items-center gap-2">
-            <span className={clsx('rounded-full px-2.5 py-0.5 text-xs font-bold', LAKE_TEXT[lake.data.status].cls)}>{LAKE_TEXT[lake.data.status].label}</span>
+            <span className={clsx('rounded-[var(--radius-chip)] border-2 border-ink px-2.5 py-0.5 text-xs font-bold', LAKE_TEXT[lake.data.status].cls)}>{LAKE_TEXT[lake.data.status].label}</span>
             <span className="inline-flex items-center gap-1 text-sm"><Wind className="size-4" aria-hidden /> {lake.data.windNow} km/h</span>
             <span className="inline-flex items-center gap-1 text-sm"><Thermometer className="size-4" aria-hidden /> {lake.data.temperature} °C</span>
           </div>
@@ -112,13 +112,13 @@ export function TodayPanel({ dark = false, className }: { dark?: boolean; classN
       ) : lake.isError ? (
         <p className={clsx('text-sm', dark ? 'text-white/70' : 'text-ink-soft')}>El estado del lago no está disponible ahora.</p>
       ) : (
-        <div className={clsx('h-20 animate-pulse rounded-xl', dark ? 'bg-white/10' : 'bg-line/70')} />
+        <div className={clsx('h-20 animate-pulse rounded-[var(--radius-control)]', dark ? 'bg-white/10' : 'bg-line/70')} />
       )}
 
       <div>
         <p className={clsx('mb-1 text-sm font-semibold', dark ? 'text-white' : 'text-ink')}>Pasa hoy</p>
         {almanac.isLoading ? (
-          <div className={clsx('h-12 animate-pulse rounded-xl', dark ? 'bg-white/10' : 'bg-line/70')} />
+          <div className={clsx('h-12 animate-pulse rounded-[var(--radius-control)]', dark ? 'bg-white/10' : 'bg-line/70')} />
         ) : todayItems.length ? (
           <ul className="-mx-2 flex flex-col">
             {todayItems.slice(0, 4).map((i) => <AlmanacRow key={`${i.source}-${i.id}-${i.starts_at}`} item={i} dark={dark} />)}

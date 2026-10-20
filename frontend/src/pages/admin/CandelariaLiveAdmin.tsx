@@ -5,7 +5,7 @@ import { lazy, Suspense, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router'
 import { PageHeader } from '../../components/layout/PanelLayout'
 import { Button, ButtonLink } from '../../components/ui/Button'
-import { Alert, Badge, EmptyState, Spinner } from '../../components/ui/Feedback'
+import { Alert, Badge, EmptyState, Spinner, StatusBadge } from '../../components/ui/Feedback'
 import { Checkbox, SelectField, TextArea, TextField } from '../../components/ui/Field'
 import { useToast } from '../../components/ui/Toast'
 import { api, getData, parseApiError } from '../../lib/api'
@@ -18,10 +18,10 @@ const LocationPicker = lazy(() => import('../../components/Map').then((m) => ({ 
 const RouteEditor = lazy(() => import('../../components/Map').then((m) => ({ default: m.RouteEditor })))
 
 const STATUS: Record<Performance['status'], { label: string; cls: string }> = {
-  pending: { label: 'Por pasar', cls: 'bg-ink/8 text-ink' },
-  performing: { label: 'Pasando', cls: 'bg-danger text-white' },
-  done: { label: 'Pasó', cls: 'bg-mint/40 text-ink' },
-  skipped: { label: 'No se presentó', cls: 'bg-sun/30 text-ink' },
+  pending: { label: 'Por pasar', cls: 'border-2 border-ink bg-white text-ink' },
+  performing: { label: 'Pasando', cls: 'border-2 border-cochinilla bg-cochinilla text-white' },
+  done: { label: 'Pasó', cls: 'border-2 border-mint-dark bg-mint/20 text-[#1f6b2f]' },
+  skipped: { label: 'No se presentó', cls: 'border-2 border-dashed border-sun-dark bg-transparent text-[#6b4f00]' },
 }
 
 /* ---------- Programa ---------- */
@@ -55,7 +55,7 @@ export function ProgramAdmin() {
       ) : data?.length ? (
         <ul className="flex flex-col gap-3">
           {data.map((item) => (
-            <li key={item.id} className={clsx('flex flex-wrap items-center gap-4 rounded-[var(--radius-card)] bg-white p-4', !item.is_active && 'opacity-60')}>
+            <li key={item.id} className={clsx('flex flex-wrap items-center gap-4 card p-4', !item.is_active && 'border-dashed')}>
               <div className="min-w-0 flex-1">
                 <p className="font-bold">{item.title}</p>
                 <p className="text-sm text-ink-soft">
@@ -63,13 +63,13 @@ export function ProgramAdmin() {
                   {item.location_name ? ` · ${item.location_name}` : ''} · {item.performances_count ?? 0} conjuntos
                 </p>
               </div>
-              {!item.is_active && <Badge>Oculta</Badge>}
+              {!item.is_active && <StatusBadge status="hidden" label="Oculta" />}
               <ButtonLink to={`/admin/candelaria-vivo/${item.id}`} size="sm" icon={<Radio className="size-4" />}>Controlar desfile</ButtonLink>
-              <button onClick={() => setEditing(item)} aria-label="Editar jornada" className="inline-flex size-10 items-center justify-center rounded-full hover:bg-ink/5"><Pencil className="size-4.5" /></button>
+              <button onClick={() => setEditing(item)} aria-label="Editar jornada" className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] border-2 border-ink bg-white text-ink hover:bg-sky"><Pencil className="size-4.5" /></button>
               <button
                 onClick={() => confirm(`¿Eliminar “${item.title}” y todos sus conjuntos?`) && remove.mutate(item.id)}
                 aria-label="Eliminar jornada"
-                className="inline-flex size-10 items-center justify-center rounded-full hover:bg-danger/10 hover:text-danger"
+                className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] border-2 border-cochinilla text-cochinilla hover:bg-cochinilla hover:text-white"
               >
                 <Trash2 className="size-4.5" />
               </button>
@@ -137,7 +137,7 @@ function ProgramItemForm({ item, onDone }: { item?: ProgramItem; onDone: () => v
     <>
       <PageHeader title={item ? `Editar: ${item.title}` : 'Nueva jornada'} />
       <form onSubmit={onSubmit} className="flex max-w-4xl flex-col gap-6">
-        <div className="grid gap-5 rounded-[var(--radius-card)] bg-white p-6 sm:grid-cols-2">
+        <div className="grid gap-5 card p-6 sm:grid-cols-2">
           <TextField label="Nombre" value={form.title} onChange={set('title')} error={errors.title} required wrapClassName="sm:col-span-2" placeholder="Gran Parada de Veneración" />
           <SelectField label="Tipo" options={PROGRAM_TYPES} value={form.type} onChange={set('type')} required />
           <TextField label="Lugar" value={form.location_name} onChange={set('location_name')} error={errors.location_name} placeholder="Estadio Enrique Torres Belón" />
@@ -146,19 +146,19 @@ function ProgramItemForm({ item, onDone }: { item?: ProgramItem; onDone: () => v
           <TextArea label="Descripción" value={form.description} onChange={set('description')} wrapClassName="sm:col-span-2" className="min-h-20" />
           <Checkbox label="Visible en el programa público" checked={form.is_active} onChange={(e) => setForm((f) => ({ ...f, is_active: e.target.checked }))} />
         </div>
-        <div className="flex flex-col gap-3 rounded-[var(--radius-card)] bg-white p-6">
-          <h2 className="text-lg font-bold">Punto de encuentro</h2>
+        <div className="flex flex-col gap-3 card p-6">
+          <h2 className="t-h3">Punto de encuentro</h2>
           <p className="text-sm text-ink-soft">Opcional. Haz clic en el mapa para marcar el lugar principal.</p>
           <Suspense fallback={<div className="skeleton h-72" />}>
             <LocationPicker lat={point.lat} lng={point.lng} onChange={(lat, lng) => setPoint({ lat, lng })} />
           </Suspense>
         </div>
-        <div className="flex flex-col gap-3 rounded-[var(--radius-card)] bg-white p-6">
-          <h2 className="text-lg font-bold">Recorrido del desfile</h2>
+        <div className="flex flex-col gap-3 card p-6">
+          <h2 className="t-h3">Recorrido del desfile</h2>
           <Suspense fallback={<div className="skeleton h-80" />}>
             <RouteEditor value={route} onChange={setRoute} />
           </Suspense>
-          {errors.route && <p className="text-sm text-danger">{errors.route}</p>}
+          {errors.route && <p className="text-sm font-bold text-cochinilla">{errors.route}</p>}
         </div>
         {errors._ && <Alert tone="error">{errors._}</Alert>}
         <div className="flex gap-3">
@@ -226,10 +226,10 @@ export function LiveControl() {
         action={<ButtonLink to="/candelaria/en-vivo" target="_blank" variant="secondary" size="sm">Ver página pública</ButtonLink>}
       />
 
-      <div className="grid gap-4 rounded-[var(--radius-card)] bg-lake-deep p-6 text-white sm:grid-cols-[1fr_auto] sm:items-center">
+      <div className="grid gap-4 rounded-[var(--radius-panel)] border-2 border-ink bg-ink p-6 text-white sm:grid-cols-[1fr_auto] sm:items-center">
         <div aria-live="polite">
           <p className="text-sm font-semibold text-mint">Pasando ahora</p>
-          <p className="font-display text-3xl font-extrabold text-white">{current ? `${current.order_number}. ${current.group_name}` : 'Nadie todavía'}</p>
+          <p className="font-display t-h2 text-white">{current ? `${current.order_number}. ${current.group_name}` : 'Nadie todavía'}</p>
           <p className="mt-1 text-white/75">
             {next ? `Siguiente: ${next.order_number}. ${next.group_name}` : 'No quedan conjuntos por pasar'} · {state.done_count ?? 0} de {state.total ?? 0} ya pasaron · ~{state.minutes_per_group} min por conjunto
           </p>
@@ -249,12 +249,12 @@ export function LiveControl() {
 
       <AddPerformances itemId={item.id} onAdded={refresh} />
 
-      <h2 className="mb-3 mt-10 text-xl font-extrabold">Orden de presentación</h2>
+      <h2 className="mb-3 mt-10 t-h3">Orden de presentación</h2>
       {performances.length ? (
         <ol className="flex flex-col gap-2">
           {performances.map((p) => (
-            <li key={p.id} className={clsx('flex flex-wrap items-center gap-3 rounded-2xl bg-white p-3', p.status === 'performing' && 'ring-2 ring-danger')}>
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-sky font-display font-bold">{p.order_number}</span>
+            <li key={p.id} className={clsx('flex flex-wrap items-center gap-3 card p-3', p.status === 'performing' && 'border-cochinilla bg-cochinilla/5')}>
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-chip)] border-2 border-ink bg-lana font-display font-extrabold">{p.order_number}</span>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-semibold">{p.group_name}</p>
                 <p className="truncate text-sm text-ink-soft">
@@ -264,7 +264,7 @@ export function LiveControl() {
                 </p>
               </div>
               <Badge className={STATUS[p.status].cls}>{STATUS[p.status].label}</Badge>
-              <div className="flex gap-1">
+              <div className="flex gap-2">
                 {p.status !== 'performing' && (
                   <IconBtn label="Marcar como pasando" onClick={() => setStatus.mutate({ pid: p.id, status: 'performing' })}><Play className="size-4" /></IconBtn>
                 )}
@@ -288,7 +288,7 @@ export function LiveControl() {
 
 function IconBtn({ label, onClick, children, danger }: { label: string; onClick: () => void; children: React.ReactNode; danger?: boolean }) {
   return (
-    <button onClick={onClick} aria-label={label} title={label} className={clsx('inline-flex size-9 items-center justify-center rounded-full', danger ? 'hover:bg-danger/10 hover:text-danger' : 'hover:bg-ink/5')}>
+    <button onClick={onClick} aria-label={label} title={label} className={clsx('inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] border-2', danger ? 'border-cochinilla text-cochinilla hover:bg-cochinilla hover:text-white' : 'border-ink bg-white text-ink hover:bg-sky')}>
       {children}
     </button>
   )
@@ -332,7 +332,7 @@ function AddPerformances({ itemId, onAdded }: { itemId: number; onAdded: () => v
   }
 
   return (
-    <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-3 rounded-[var(--radius-card)] bg-white p-6">
+    <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-3 card p-6">
       <TextArea
         label="Agregar conjuntos al final del orden"
         hint="Uno por línea. Para enlazar la danza, agrégala después de una barra: Conjunto Folklórico Juventud Obrera | Diablada"

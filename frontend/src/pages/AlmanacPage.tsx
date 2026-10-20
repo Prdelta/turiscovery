@@ -32,7 +32,7 @@ export default function AlmanacPage() {
       <header className="mb-10">
         <div className="flex items-center gap-4">
           <Tocapu motif="sol" dye="qolle" size={48} />
-          <h1 className="text-4xl font-extrabold sm:text-5xl">Almanaque de Puno</h1>
+          <h1 className="t-h1">Almanaque de Puno</h1>
         </div>
         <p className="prose-measure mt-4 text-lg text-ink-soft">
           Qué pasa cada día: fiestas, rituales andinos, eventos y la Candelaria, con la luna y la época del año. En el altiplano el calendario
@@ -49,7 +49,7 @@ export default function AlmanacPage() {
                 key={r.days}
                 onClick={() => setDays(r.days)}
                 aria-pressed={days === r.days}
-                className={clsx('rounded-full border px-4 py-2 text-sm font-semibold', days === r.days ? 'border-qolle bg-qolle text-ink' : 'border-line bg-white')}
+                className={clsx('inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-full border-2 border-ink px-4 text-sm font-bold transition-colors', days === r.days ? 'bg-ink text-white' : 'bg-white text-ink hover:bg-sky')}
               >
                 {r.label}
               </button>

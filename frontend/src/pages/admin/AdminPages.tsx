@@ -8,7 +8,9 @@ import { ImageUploader } from '../../components/ImageUploader'
 import { PageHeader } from '../../components/layout/PanelLayout'
 import { Avatar } from '../../components/layout/SiteLayout'
 import { Button, ButtonLink } from '../../components/ui/Button'
-import { Alert, Badge, EmptyState, ErrorState, Pagination, Spinner } from '../../components/ui/Feedback'
+import type { Dye, Motif } from '../../components/textile/Weave'
+import { Alert, Badge, EmptyState, ErrorState, Pagination, Spinner, StatusBadge } from '../../components/ui/Feedback'
+import { ChipGroup, PanelCard, StatTile } from '../../components/ui/Panel'
 import { Checkbox, SelectField, TextArea, TextField } from '../../components/ui/Field'
 import { useToast } from '../../components/ui/Toast'
 import { api, getData, parseApiError, type Paginated } from '../../lib/api'
@@ -17,6 +19,23 @@ import { useDebounced, useDocumentTitle } from '../../lib/hooks'
 import type { Danza, GalleryPhoto, Role, User } from '../../lib/types'
 
 const ROLES: Record<Role, string> = { tourist: 'Viajero', socio: 'Socio', admin: 'Administrador' }
+
+/** Pestaña de rol: tinta para administradores, q'olle (solo relleno) para socios */
+function RoleBadge({ role }: { role: Role }) {
+  const cls = role === 'admin' ? 'border-2 border-ink bg-ink text-white' : role === 'socio' ? 'border-2 border-ink bg-qolle text-ink' : undefined
+  return <Badge className={cls}>{ROLES[role]}</Badge>
+}
+
+const TILE_WEAVE: Record<string, [Motif, Dye]> = {
+  Usuarios: ['persona', 'lago'],
+  Viajeros: ['isla', 'lago'],
+  'Socios activos': ['llave', 'qolle'],
+  'Socios nuevos este mes': ['sol', 'solOscuro'],
+  Locales: ['llave', 'tierra'],
+  Experiencias: ['olas', 'anil'],
+  Eventos: ['chakana', 'cochinilla'],
+  Promociones: ['ojo', 'chilca'],
+}
 
 /* ---------- Supervisión ---------- */
 
@@ -47,25 +66,20 @@ export function AdminHome() {
       <PageHeader title="Supervisión" description="Estado general de usuarios, socios y contenido." action={<ButtonLink to="/admin/usuarios/nuevo" icon={<Plus className="size-4.5" />}>Crear socio</ButtonLink>} />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {tiles.map(([label, value, note]) => (
-          <div key={label} className="rounded-[var(--radius-card)] bg-white p-5">
-            <p className="font-display text-4xl font-extrabold">{value}</p>
-            <p className="text-sm text-ink-soft">{label}</p>
-            {note && <p className="mt-1 text-xs text-ink-soft">{note}</p>}
-          </div>
+          <StatTile key={label} value={value} label={label} note={note} motif={TILE_WEAVE[label]?.[0] ?? 'chakana'} dye={TILE_WEAVE[label]?.[1] ?? 'morado'} />
         ))}
       </div>
       <div className="mt-10 grid gap-6 xl:grid-cols-2">
-        <section className="rounded-[var(--radius-card)] bg-white p-6">
-          <h2 className="mb-4 text-xl font-bold">Socios con más contenido</h2>
+        <PanelCard title="Socios con más contenido">
           {data.socios_mas_activos.length ? (
             <table className="w-full text-left text-sm">
-              <thead className="text-ink-soft">
-                <tr><th className="pb-2 font-medium">Socio</th><th className="pb-2 text-right font-medium">Loc.</th><th className="pb-2 text-right font-medium">Exp.</th><th className="pb-2 text-right font-medium">Evt.</th><th className="pb-2 text-right font-medium">Prom.</th></tr>
+              <thead className="t-label text-ink-soft">
+                <tr><th className="pb-2">Socio</th><th className="pb-2 text-right">Loc.</th><th className="pb-2 text-right">Exp.</th><th className="pb-2 text-right">Evt.</th><th className="pb-2 text-right">Prom.</th></tr>
               </thead>
-              <tbody className="divide-y divide-line">
+              <tbody className="divide-y-2 divide-line">
                 {data.socios_mas_activos.map((u) => (
                   <tr key={u.id}>
-                    <td className="py-2.5"><Link to={`/admin/usuarios/${u.id}`} className="font-semibold hover:text-primary">{u.name}</Link></td>
+                    <td className="py-2.5"><Link to={`/admin/usuarios/${u.id}`} className="font-bold hover:text-primary-dark hover:underline">{u.name}</Link></td>
                     <td className="text-right">{u.locales_count}</td>
                     <td className="text-right">{u.experiencias_count}</td>
                     <td className="text-right">{u.eventos_count}</td>
@@ -77,14 +91,13 @@ export function AdminHome() {
           ) : (
             <p className="text-ink-soft">Aún no hay socios.</p>
           )}
-        </section>
-        <section className="rounded-[var(--radius-card)] bg-white p-6">
-          <h2 className="mb-4 text-xl font-bold">Socios desactivados</h2>
+        </PanelCard>
+        <PanelCard title="Socios desactivados">
           {data.socios_inactivos.length ? (
-            <ul className="divide-y divide-line">
+            <ul className="divide-y-2 divide-line">
               {data.socios_inactivos.map((u) => (
                 <li key={u.id} className="py-2.5 text-sm">
-                  <Link to={`/admin/usuarios/${u.id}`} className="font-semibold hover:text-primary">{u.name}</Link>
+                  <Link to={`/admin/usuarios/${u.id}`} className="font-bold hover:text-primary-dark hover:underline">{u.name}</Link>
                   <span className="text-ink-soft"> · desde el {formatDate(u.deactivated_at)}{u.deactivated_by ? ` por ${u.deactivated_by.name}` : ''}</span>
                 </li>
               ))}
@@ -92,7 +105,7 @@ export function AdminHome() {
           ) : (
             <p className="text-ink-soft">Todos los socios están activos.</p>
           )}
-        </section>
+        </PanelCard>
       </div>
     </>
   )
@@ -133,21 +146,24 @@ export function UsersPage() {
   return (
     <>
       <PageHeader title="Usuarios y socios" action={<ButtonLink to="/admin/usuarios/nuevo" icon={<Plus className="size-4.5" />}>Crear usuario</ButtonLink>} />
-      <div className="mb-6 flex flex-wrap gap-3" role="search">
-        <div className="relative min-w-60 flex-1">
+      <div className="mb-6 flex flex-col gap-3" role="search">
+        <div className="relative max-w-md">
           <label htmlFor="u-search" className="sr-only">Buscar por nombre o correo</label>
-          <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4.5 -translate-y-1/2 text-ink-soft" aria-hidden />
-          <input id="u-search" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1) }} placeholder="Nombre o correo" className="field-input pl-10" />
+          <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-ink-soft" aria-hidden />
+          <input id="u-search" type="search" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1) }} placeholder="Nombre o correo" className="field-input pl-12" />
         </div>
-        <select aria-label="Rol" value={role} onChange={(e) => { setRole(e.target.value); setPage(1) }} className="field-input w-auto">
-          <option value="">Todos los roles</option>
-          {Object.entries(ROLES).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-        </select>
-        <select aria-label="Estado" value={status} onChange={(e) => { setStatus(e.target.value); setPage(1) }} className="field-input w-auto">
-          <option value="">Cualquier estado</option>
-          <option value="active">Activos</option>
-          <option value="inactive">Desactivados</option>
-        </select>
+        <ChipGroup
+          label="Rol"
+          value={role}
+          onChange={(v) => { setRole(v); setPage(1) }}
+          options={[['', 'Todos'], ...(Object.entries(ROLES) as [string, string][])]}
+        />
+        <ChipGroup
+          label="Estado"
+          value={status}
+          onChange={(v) => { setStatus(v); setPage(1) }}
+          options={[['', 'Cualquier estado'], ['active', 'Activos'], ['inactive', 'Desactivados']]}
+        />
       </div>
       {isLoading ? (
         <Spinner />
@@ -157,21 +173,21 @@ export function UsersPage() {
         <>
           <ul className="flex flex-col gap-2">
             {data.data.map((u) => (
-              <li key={u.id} className={clsx('flex flex-wrap items-center gap-4 rounded-[var(--radius-card)] bg-white p-4', !u.is_active && 'opacity-70')}>
+              <li key={u.id} className={clsx('flex flex-wrap items-center gap-4 card p-4', !u.is_active && 'border-dashed')}>
                 <Avatar name={u.name} src={u.avatar} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-bold">{u.name}{u.id === me?.id && <span className="font-normal text-ink-soft"> (tú)</span>}</p>
                   <p className="truncate text-sm text-ink-soft">{u.email} · desde {formatDate(u.created_at)}</p>
                 </div>
-                <Badge className={u.role === 'admin' ? 'bg-primary text-white' : u.role === 'socio' ? 'bg-mint/50 text-ink' : undefined}>{ROLES[u.role]}</Badge>
-                {!u.is_active && <Badge className="bg-danger/10 text-danger">Desactivado</Badge>}
+                <RoleBadge role={u.role} />
+                {!u.is_active && <StatusBadge status="inactive" label="Desactivado" />}
                 {u.id !== me?.id && (
-                  <div className="flex gap-1">
-                    <button onClick={() => toggle.mutate(u.id)} aria-label={u.is_active ? 'Desactivar cuenta' : 'Activar cuenta'} title={u.is_active ? 'Desactivar cuenta' : 'Activar cuenta'} className="inline-flex size-10 items-center justify-center rounded-full hover:bg-ink/5">
+                  <div className="flex gap-2">
+                    <button onClick={() => toggle.mutate(u.id)} aria-label={u.is_active ? 'Desactivar cuenta' : 'Activar cuenta'} title={u.is_active ? 'Desactivar cuenta' : 'Activar cuenta'} className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] border-2 border-ink bg-white text-ink hover:bg-sky">
                       <Power className="size-4.5" />
                     </button>
-                    <Link to={`/admin/usuarios/${u.id}`} aria-label="Editar" className="inline-flex size-10 items-center justify-center rounded-full hover:bg-ink/5"><Pencil className="size-4.5" /></Link>
-                    <button onClick={() => confirm(`¿Eliminar la cuenta de ${u.name}? Se borrará su contenido asociado.`) && remove.mutate(u.id)} aria-label="Eliminar" className="inline-flex size-10 items-center justify-center rounded-full hover:bg-danger/10 hover:text-danger">
+                    <Link to={`/admin/usuarios/${u.id}`} aria-label="Editar" className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] border-2 border-ink bg-white text-ink hover:bg-sky"><Pencil className="size-4.5" /></Link>
+                    <button onClick={() => confirm(`¿Eliminar la cuenta de ${u.name}? Se borrará su contenido asociado.`) && remove.mutate(u.id)} aria-label="Eliminar" className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] border-2 border-cochinilla text-cochinilla hover:bg-cochinilla hover:text-white">
                       <Trash2 className="size-4.5" />
                     </button>
                   </div>
@@ -237,7 +253,7 @@ function UserForm({ user }: { user?: User }) {
         title={user ? `Editar: ${user.name}` : 'Crear usuario'}
         description={user ? `Contenido: ${user.locales_count ?? 0} locales, ${user.experiencias_count ?? 0} experiencias, ${user.eventos_count ?? 0} eventos, ${user.promociones_count ?? 0} promociones.` : 'Los socios se crean aquí; los viajeros se registran solos.'}
       />
-      <form onSubmit={onSubmit} className="flex max-w-2xl flex-col gap-5 rounded-[var(--radius-card)] bg-white p-6">
+      <form onSubmit={onSubmit} className="flex max-w-2xl flex-col gap-5 card p-6">
         <TextField label="Nombre" value={form.name} onChange={set('name')} error={errors.name} required />
         <TextField label="Correo" type="email" value={form.email} onChange={set('email')} error={errors.email} required />
         <SelectField label="Rol" options={ROLES} value={form.role} onChange={set('role')} error={errors.role} required />
@@ -288,16 +304,16 @@ export function DanzasAdmin() {
       {isLoading ? <Spinner /> : data?.length ? (
         <ul className="flex flex-col gap-2">
           {data.map((d) => (
-            <li key={d.id} className={clsx('flex flex-wrap items-center gap-4 rounded-[var(--radius-card)] bg-white p-4', !d.is_active && 'opacity-70')}>
-              <img src={d.image_url || '/images/puno_dancers.webp'} alt="" className="size-14 rounded-xl object-cover" />
+            <li key={d.id} className={clsx('flex flex-wrap items-center gap-4 card p-4', !d.is_active && 'border-dashed')}>
+              <img src={d.image_url || '/images/puno_dancers.webp'} alt="" className="size-14 rounded-[var(--radius-control)] border-2 border-ink object-cover" />
               <div className="min-w-0 flex-1">
                 <p className="font-bold">{d.name}</p>
                 <p className="text-sm text-ink-soft">{d.type === 'autoctona' ? 'Autóctona' : 'Mestiza'}{d.region ? ` · ${d.region}` : ''} · orden {d.order ?? 0}</p>
               </div>
-              {d.is_featured && <Badge className="bg-sun text-ink">Destacada</Badge>}
-              {!d.is_active && <Badge>Oculta</Badge>}
-              <button onClick={() => setEditing(d)} aria-label="Editar" className="inline-flex size-10 items-center justify-center rounded-full hover:bg-ink/5"><Pencil className="size-4.5" /></button>
-              <button onClick={() => confirm(`¿Eliminar “${d.name}”?`) && remove.mutate(d.id)} aria-label="Eliminar" className="inline-flex size-10 items-center justify-center rounded-full hover:bg-danger/10 hover:text-danger"><Trash2 className="size-4.5" /></button>
+              {d.is_featured && <Badge className="border-2 border-sun-dark bg-sun text-ink">Destacada</Badge>}
+              {!d.is_active && <StatusBadge status="hidden" label="Oculta" />}
+              <button onClick={() => setEditing(d)} aria-label="Editar" className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] border-2 border-ink bg-white text-ink hover:bg-sky"><Pencil className="size-4.5" /></button>
+              <button onClick={() => confirm(`¿Eliminar “${d.name}”?`) && remove.mutate(d.id)} aria-label="Eliminar" className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] border-2 border-cochinilla text-cochinilla hover:bg-cochinilla hover:text-white"><Trash2 className="size-4.5" /></button>
             </li>
           ))}
         </ul>
@@ -333,7 +349,7 @@ function DanzaForm({ danza, onDone }: { danza?: Danza; onDone: () => void }) {
   return (
     <>
       <PageHeader title={danza ? `Editar: ${danza.name}` : 'Nueva danza'} />
-      <form onSubmit={(e) => { e.preventDefault(); setErrors({}); save.mutate() }} className="grid max-w-3xl gap-5 rounded-[var(--radius-card)] bg-white p-6 sm:grid-cols-2">
+      <form onSubmit={(e) => { e.preventDefault(); setErrors({}); save.mutate() }} className="grid max-w-3xl gap-5 card p-6 sm:grid-cols-2">
         <TextField label="Nombre" value={form.name} onChange={set('name')} error={errors.name} required />
         <SelectField label="Tipo" options={{ autoctona: 'Autóctona', mestiza: 'Mestiza' }} value={form.type} onChange={set('type')} required />
         <TextField label="Región o comunidad" value={form.region} onChange={set('region')} error={errors.region} />
@@ -379,15 +395,15 @@ export function GalleryAdmin() {
       {isLoading ? <Spinner /> : data?.length ? (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
           {data.map((p) => (
-            <figure key={p.id} className={clsx('overflow-hidden rounded-[var(--radius-card)] bg-white', !p.is_active && 'opacity-60')}>
+            <figure key={p.id} className={clsx('overflow-hidden card', !p.is_active && 'border-dashed')}>
               <img src={p.image_url} alt={p.title} className="aspect-[4/3] w-full object-cover" />
               <figcaption className="flex items-start gap-2 p-3">
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-semibold">{p.title}</p>
                   <p className="text-sm text-ink-soft">{p.year}{!p.is_active && ' · oculta'}</p>
                 </div>
-                <button onClick={() => setEditing(p)} aria-label="Editar" className="rounded-full p-1.5 hover:bg-ink/5"><Pencil className="size-4" /></button>
-                <button onClick={() => confirm('¿Eliminar esta foto?') && remove.mutate(p.id)} aria-label="Eliminar" className="rounded-full p-1.5 hover:bg-danger/10 hover:text-danger"><Trash2 className="size-4" /></button>
+                <button onClick={() => setEditing(p)} aria-label="Editar" className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] border-2 border-ink bg-white text-ink hover:bg-sky"><Pencil className="size-4" /></button>
+                <button onClick={() => confirm('¿Eliminar esta foto?') && remove.mutate(p.id)} aria-label="Eliminar" className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] border-2 border-cochinilla text-cochinilla hover:bg-cochinilla hover:text-white"><Trash2 className="size-4" /></button>
               </figcaption>
             </figure>
           ))}
@@ -425,7 +441,7 @@ function PhotoForm({ photo, onDone }: { photo?: GalleryPhoto; onDone: () => void
       }}
       className="mb-8 grid gap-5 rounded-[var(--radius-card)] border-2 border-primary/30 bg-white p-6 sm:grid-cols-2"
     >
-      <h2 className="text-lg font-bold sm:col-span-2">{photo ? 'Editar foto' : 'Nueva foto'}</h2>
+      <h2 className="t-h3 sm:col-span-2">{photo ? 'Editar foto' : 'Nueva foto'}</h2>
       <div className="sm:col-span-2">
         <ImageUploader value={form.image_url ? [form.image_url] : []} onChange={(u) => setForm((f) => ({ ...f, image_url: u[0] ?? '' }))} folder="candelaria/gallery" multiple={false} label="Imagen" />
       </div>
@@ -475,33 +491,31 @@ export function ResourceSearchPage() {
       </form>
       {submitted && (
         <div className="grid gap-6 xl:grid-cols-2">
-          <section className="rounded-[var(--radius-card)] bg-white p-6">
-            <h2 className="mb-3 text-xl font-bold">Wikipedia</h2>
+          <PanelCard title="Wikipedia">
             {wiki.isLoading ? <div className="skeleton h-32" /> : wiki.data ? (
               <div className="flex gap-4">
-                {wiki.data.thumbnail && <img src={wiki.data.thumbnail} alt="" className="size-24 rounded-xl object-cover" />}
+                {wiki.data.thumbnail && <img src={wiki.data.thumbnail} alt="" className="size-24 rounded-[var(--radius-control)] border-2 border-ink object-cover" />}
                 <div>
                   <p className="font-bold">{wiki.data.title}</p>
                   {wiki.data.description && <p className="text-sm text-ink-soft">{wiki.data.description}</p>}
                   <p className="mt-2 text-sm">{wiki.data.extract}</p>
-                  {wiki.data.url && <a href={wiki.data.url} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-primary">Abrir artículo <ExternalLink className="size-3.5" /></a>}
+                  {wiki.data.url && <a href={wiki.data.url} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-1 text-sm font-bold text-primary-dark underline decoration-2 underline-offset-4">Abrir artículo <ExternalLink className="size-3.5" /></a>}
                 </div>
               </div>
             ) : <p className="text-ink-soft">No hay un artículo con ese título exacto. Prueba con el nombre completo.</p>}
-          </section>
-          <section className="rounded-[var(--radius-card)] bg-white p-6">
-            <h2 className="mb-3 text-xl font-bold">Wikimedia Commons</h2>
+          </PanelCard>
+          <PanelCard title="Wikimedia Commons">
             {images.isLoading ? <div className="skeleton h-32" /> : images.data?.wikimedia.length ? (
-              <ul className="flex flex-col divide-y divide-line">
+              <ul className="flex flex-col divide-y-2 divide-line">
                 {images.data.wikimedia.map((r) => (
                   <li key={r.page_url} className="py-2.5">
-                    <a href={r.page_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-semibold text-primary">{r.title.replace(/^File:|^Archivo:/, '')} <ExternalLink className="size-3.5" /></a>
+                    <a href={r.page_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-bold text-primary-dark underline decoration-2 underline-offset-4">{r.title.replace(/^File:|^Archivo:/, '')} <ExternalLink className="size-3.5" /></a>
                     {r.snippet && <p className="line-clamp-2 text-sm text-ink-soft">{r.snippet}</p>}
                   </li>
                 ))}
               </ul>
             ) : <p className="text-ink-soft">Sin archivos para esa búsqueda.</p>}
-          </section>
+          </PanelCard>
         </div>
       )}
     </>

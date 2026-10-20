@@ -140,7 +140,19 @@ export function Badge({ children, className }: { children: ReactNode; className?
   )
 }
 
-export type StatusKey = 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'available' | 'used' | 'expired' | 'maybe'
+export type StatusKey =
+  | 'pending'
+  | 'confirmed'
+  | 'cancelled'
+  | 'completed'
+  | 'available'
+  | 'used'
+  | 'expired'
+  | 'maybe'
+  | 'published'
+  | 'hidden'
+  | 'active'
+  | 'inactive'
 
 const STATUS: Record<StatusKey, { label: string; cls: string }> = {
   pending: { label: 'Pendiente', cls: 'border-2 border-sun-dark bg-sun/20 text-[#6b4f00]' },
@@ -151,6 +163,10 @@ const STATUS: Record<StatusKey, { label: string; cls: string }> = {
   used: { label: 'Usado', cls: 'border-2 border-line bg-line text-ink' },
   expired: { label: 'Vencido', cls: 'border-2 border-dashed border-cochinilla bg-transparent text-cochinilla' },
   maybe: { label: 'Quizás', cls: 'border-2 border-sun-dark bg-sun/20 text-[#6b4f00]' },
+  published: { label: 'Publicado', cls: 'border-2 border-mint-dark bg-mint/20 text-[#1f6b2f]' },
+  hidden: { label: 'Oculto', cls: 'border-2 border-dashed border-ink-soft bg-transparent text-ink-soft' },
+  active: { label: 'Activa', cls: 'border-2 border-mint-dark bg-mint/20 text-[#1f6b2f]' },
+  inactive: { label: 'Desactivada', cls: 'border-2 border-cochinilla bg-cochinilla/10 text-cochinilla' },
 }
 
 /** Estado de reservas, cupones y asistencias, con texto (no solo color) */

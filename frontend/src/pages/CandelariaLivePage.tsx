@@ -91,7 +91,7 @@ export default function CandelariaLivePage() {
 
       <div className="container-page py-12">
         {banner && (
-          <div className="sticky top-20 z-[900] mb-6 rounded-xl bg-white shadow-md">
+          <div className="card sticky top-20 z-[900] mb-6">
             <Alert tone="info">
               <span className="flex items-center gap-2 font-semibold"><Bell className="size-4 shrink-0" aria-hidden /> {banner}</span>
             </Alert>
@@ -110,7 +110,7 @@ export default function CandelariaLivePage() {
         <FollowPanel followed={followed} toggle={toggle} />
 
         <section aria-labelledby="programa" className="mt-16">
-          <h2 id="programa" className="mb-6 text-3xl font-extrabold">Programa {program.data?.year ?? ''}</h2>
+          <h2 id="programa" className="mb-6 t-h2">Programa {program.data?.year ?? ''}</h2>
           {program.isLoading ? (
             <Spinner />
           ) : program.data?.items.length ? (
@@ -137,15 +137,15 @@ function LiveBoard({ state, followed }: { state: LiveState; followed: number[] }
     <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
       <div className="flex flex-col gap-6">
         <div>
-          <p className="text-sm font-semibold text-primary">{PROGRAM_TYPES[item.type]} · {item.location_name ?? 'Puno'}</p>
-          <h2 className="text-3xl font-extrabold">{item.title}</h2>
+          <p className="text-sm font-bold text-primary-dark underline decoration-2 underline-offset-4">{PROGRAM_TYPES[item.type]} · {item.location_name ?? 'Puno'}</p>
+          <h2 className="t-h2">{item.title}</h2>
         </div>
 
         <div className="rounded-[var(--radius-card)] bg-primary p-6 text-white" aria-live="polite">
           <p className="text-sm font-semibold text-mint">Pasando ahora</p>
           {current ? (
             <>
-              <p className="mt-2 font-display text-4xl font-extrabold text-white">{current.group_name}</p>
+              <p className="mt-2 font-display t-h1 text-white">{current.group_name}</p>
               {current.danza && <p className="mt-1 text-lg text-white/85">{current.danza.name} · {current.danza.type === 'autoctona' ? 'autóctona' : 'mestiza'}</p>}
               <p className="mt-3 text-sm text-white/75">Conjunto N.º {current.order_number}{current.started_at ? ` · desde las ${formatTime(current.started_at)}` : ''}</p>
             </>
@@ -171,7 +171,7 @@ function LiveBoard({ state, followed }: { state: LiveState; followed: number[] }
       </div>
 
       <section aria-labelledby="proximos-conjuntos">
-        <h3 id="proximos-conjuntos" className="mb-4 text-xl font-extrabold">Próximos conjuntos</h3>
+        <h3 id="proximos-conjuntos" className="mb-4 t-h3">Próximos conjuntos</h3>
         {upcoming.length ? (
           <ol className="flex flex-col gap-2">
             {upcoming.map((p) => <UpcomingRow key={p.id} p={p} followed={!!p.candelaria_danza_id && followed.includes(p.candelaria_danza_id)} />)}
@@ -188,8 +188,8 @@ function LiveBoard({ state, followed }: { state: LiveState; followed: number[] }
 function UpcomingRow({ p, followed }: { p: Performance; followed: boolean }) {
   const mins = minutesUntil(p.eta)
   return (
-    <li className={clsx('flex items-center gap-3 rounded-2xl p-3', followed ? 'border-2 border-sun bg-sun/10' : 'bg-white')}>
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-sky font-display font-bold">{p.order_number}</span>
+    <li className={clsx('flex items-center gap-3 rounded-[var(--radius-card)] border-2 p-3', followed ? 'border-sun-dark bg-sun/15' : 'border-ink bg-white')}>
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-chip)] border-2 border-ink bg-lana font-display font-extrabold">{p.order_number}</span>
       <div className="min-w-0 flex-1">
         <p className="truncate font-semibold">{p.group_name}</p>
         {p.danza && <p className="truncate text-sm text-ink-soft">{p.danza.name}</p>}
@@ -205,8 +205,8 @@ function UpcomingRow({ p, followed }: { p: Performance; followed: boolean }) {
 function NotLive({ state }: { state?: LiveState }) {
   const next = state?.next_item
   return (
-    <div className="rounded-[var(--radius-card)] bg-white p-8">
-      <h2 className="text-2xl font-extrabold">Ahora no hay ninguna jornada en curso</h2>
+    <div className="card p-8">
+      <h2 className="t-h2">Ahora no hay ninguna jornada en curso</h2>
       {next ? (
         <p className="mt-2 text-lg text-ink-soft first-letter:uppercase">
           La próxima es <strong className="text-ink">{next.title}</strong>, el {dayFmt.format(new Date(next.starts_at))} a las {formatTime(next.starts_at)}
@@ -224,7 +224,7 @@ function ProgramRow({ item, liveId }: { item: ProgramItem; liveId?: number }) {
   const isLive = liveId === item.id
   const past = new Date(item.ends_at) < new Date()
   return (
-    <li className={clsx('flex flex-wrap items-center gap-4 rounded-2xl bg-white p-4', past && !isLive && 'opacity-60')}>
+    <li className={clsx('flex flex-wrap items-center gap-4 card p-4', past && !isLive && 'opacity-60')}>
       <div className="w-36 shrink-0">
         <p className="font-semibold first-letter:uppercase">{dayFmt.format(new Date(item.starts_at))}</p>
         <p className="text-sm text-ink-soft">{formatTime(item.starts_at)} – {formatTime(item.ends_at)}</p>
@@ -237,7 +237,7 @@ function ProgramRow({ item, liveId }: { item: ProgramItem; liveId?: number }) {
           {item.performances_count ? <span>{item.performances_count} conjuntos</span> : null}
         </p>
       </div>
-      {isLive ? <Badge className="bg-danger text-white">En vivo</Badge> : past ? <Badge>Terminó</Badge> : null}
+      {isLive ? <Badge className="border-2 border-cochinilla bg-cochinilla text-white">En vivo</Badge> : past ? <Badge>Terminó</Badge> : null}
     </li>
   )
 }
@@ -249,10 +249,10 @@ function FollowPanel({ followed, toggle }: { followed: number[]; toggle: (id: nu
   const [permission, setPermission] = useState(() => (typeof Notification === 'undefined' ? 'unsupported' : Notification.permission))
 
   return (
-    <section aria-labelledby="mis-danzas" className="mt-16 rounded-[var(--radius-card)] bg-white p-6">
+    <section aria-labelledby="mis-danzas" className="mt-16 card p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h2 id="mis-danzas" className="text-2xl font-extrabold">Tus danzas</h2>
+          <h2 id="mis-danzas" className="t-h2">Tus danzas</h2>
           <p className="mt-1 max-w-xl text-ink-soft">Marca las que quieres ver. Cuando una esté a tres conjuntos o menos, te avisamos en esta página.</p>
         </div>
         {permission === 'default' && (
@@ -260,7 +260,7 @@ function FollowPanel({ followed, toggle }: { followed: number[]; toggle: (id: nu
             Activar avisos del navegador
           </Button>
         )}
-        {permission === 'granted' && <Badge className="bg-mint/40 text-ink"><Bell className="size-3.5" /> Avisos activados</Badge>}
+        {permission === 'granted' && <Badge className="border-2 border-mint-dark bg-mint/20 text-[#1f6b2f]"><Bell className="size-3.5" /> Avisos activados</Badge>}
         {permission === 'denied' && <Badge><BellOff className="size-3.5" /> Avisos bloqueados en el navegador</Badge>}
       </div>
       <div className="mt-5 flex flex-wrap gap-2">
@@ -271,7 +271,7 @@ function FollowPanel({ followed, toggle }: { followed: number[]; toggle: (id: nu
               key={d.id}
               onClick={() => toggle(d.id)}
               aria-pressed={on}
-              className={clsx('rounded-full border px-4 py-2 text-sm font-semibold transition-colors', on ? 'border-sun bg-sun text-ink' : 'border-line hover:border-ink/40')}
+              className={clsx('inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-full border-2 border-ink px-4 text-sm font-bold transition-colors', on ? 'bg-sun text-ink' : 'bg-white text-ink hover:bg-sky')}
             >
               {d.name}
             </button>

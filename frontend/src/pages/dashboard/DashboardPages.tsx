@@ -7,7 +7,10 @@ import { useAuth } from '../../auth/AuthContext'
 import { ImageUploader } from '../../components/ImageUploader'
 import { PageHeader } from '../../components/layout/PanelLayout'
 import { Button, ButtonLink } from '../../components/ui/Button'
-import { Alert, Badge, EmptyState, ErrorState, Pagination, Spinner } from '../../components/ui/Feedback'
+import { TypeTag } from '../../components/textile/Tags'
+import { StitchRow, Tocapu } from '../../components/textile/Weave'
+import { Alert, CardGridSkeleton, EmptyState, ErrorState, Pagination, Spinner, StatusBadge } from '../../components/ui/Feedback'
+import { ChipGroup, IconAction, PanelCard, StatTile, TEXT_LINK } from '../../components/ui/Panel'
 import { Checkbox, SelectField, TextArea, TextField } from '../../components/ui/Field'
 import { useToast } from '../../components/ui/Toast'
 import { api, getData, parseApiError, type Paginated } from '../../lib/api'
@@ -44,64 +47,77 @@ export function DashboardHome() {
       />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {(['locales', 'experiencias', 'eventos', 'promociones'] as const).map((t) => (
-          <Link key={t} to={`/dashboard/${t}`} className="flex flex-col gap-1 rounded-[var(--radius-card)] bg-white p-5 hover:bg-primary/5">
-            <span className="font-display text-4xl font-extrabold">{stats.data?.[t] ?? '–'}</span>
-            <span className="text-sm text-ink-soft">{CONTENT[t].plural}</span>
-          </Link>
+          <StatTile key={t} to={`/dashboard/${t}`} value={stats.data?.[t] ?? '–'} label={CONTENT[t].plural} motif={CONTENT[t].motif} dye={CONTENT[t].dye} />
         ))}
       </div>
 
-      <section className="mt-10 grid gap-6 xl:grid-cols-2">
-        <div className="rounded-[var(--radius-card)] bg-white p-6">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-xl font-bold">Reservas por confirmar</h2>
-            <Link to="/dashboard/reservas" className="text-sm font-semibold text-primary">Ver todas</Link>
-          </div>
+      <section className="mt-8 grid gap-6 xl:grid-cols-2">
+        <PanelCard
+          title={
+            <span className="flex items-center gap-2">
+              Reservas por confirmar
+              {bookings.data?.total ? <span className="rounded-full bg-sun px-2 text-sm font-extrabold">{bookings.data.total}</span> : null}
+            </span>
+          }
+          action={<Link to="/dashboard/reservas" className={TEXT_LINK}>Ver todas</Link>}
+          bodyClassName="py-2"
+        >
           {bookings.isLoading ? (
-            <div className="skeleton h-24" />
+            <div className="skeleton my-3 h-24" />
           ) : bookings.data?.data.length ? (
-            <ul className="flex flex-col divide-y divide-line">
+            <ul className="flex flex-col divide-y-2 divide-line">
               {bookings.data.data.slice(0, 5).map((b) => (
-                <li key={b.id} className="py-3">
-                  <p className="font-semibold">{b.experiencia?.title}</p>
-                  <p className="text-sm text-ink-soft">{b.user?.name} · {formatDate(b.booking_date)} · {b.participants} pers.</p>
+                <li key={b.id} className="flex items-center gap-3 py-3">
+                  <Tocapu motif="olas" dye="anil" size={24} />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-bold">{b.experiencia?.title}</p>
+                    <p className="text-sm text-ink-soft">{b.user?.name} · {formatDate(b.booking_date)} · {b.participants} pers.</p>
+                  </div>
+                  <StatusBadge status="pending" />
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-ink-soft">No tienes reservas pendientes.</p>
+            <p className="py-3 text-ink-soft">No tienes reservas pendientes. Te avisamos aquí cuando llegue una.</p>
           )}
-        </div>
-        <div className="rounded-[var(--radius-card)] bg-white p-6">
-          <h2 className="mb-4 text-xl font-bold">Publicado recientemente</h2>
+        </PanelCard>
+        <PanelCard title="Publicado recientemente" bodyClassName="py-2">
           {recent.isLoading ? (
-            <div className="skeleton h-24" />
+            <div className="skeleton my-3 h-24" />
           ) : recent.data?.length ? (
-            <ul className="flex flex-col divide-y divide-line">
+            <ul className="flex flex-col divide-y-2 divide-line">
               {recent.data.slice(0, 6).map((item) => (
                 <li key={`${item.contentType}-${item.id}`} className="flex items-center gap-3 py-3">
-                  <img src={imageOf(item, item.contentType)} alt="" className="size-12 rounded-lg object-cover" />
+                  <img src={imageOf(item, item.contentType)} alt="" className="size-12 rounded-[var(--radius-chip)] border-2 border-ink object-cover" />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold">{titleOf(item as never)}</p>
+                    <p className="truncate font-bold">{titleOf(item as never)}</p>
                     <p className="text-sm text-ink-soft">{CONTENT[item.contentType]?.singular} · {formatDate(item.created_at)}</p>
                   </div>
-                  <Link to={`/dashboard/${item.contentType}/${item.id}`} className="text-sm font-semibold text-primary">Editar</Link>
+                  <IconAction label="Editar" to={`/dashboard/${item.contentType}/${item.id}`}>
+                    <Pencil className="size-4.5" />
+                  </IconAction>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-ink-soft">Aún no publicas nada. Empieza registrando tu local.</p>
+            <p className="py-3 text-ink-soft">Aún no publicas nada. Empieza registrando tu local.</p>
           )}
-        </div>
+        </PanelCard>
       </section>
 
-      <div className="mt-10 flex flex-wrap gap-3">
-        {MANAGED.map((t) => (
-          <ButtonLink key={t} to={`/dashboard/${t}/nuevo`} variant="secondary" size="sm" icon={<Plus className="size-4" />}>
-            {CONTENT[t].singular}
-          </ButtonLink>
-        ))}
-      </div>
+      <StitchRow dye="anil" className="mt-10" />
+      <section aria-labelledby="crear" className="mt-8">
+        <h2 id="crear" className="t-h3 mb-4">Publicar algo nuevo</h2>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {MANAGED.map((t) => (
+            <Link key={t} to={`/dashboard/${t}/nuevo`} className="card flex min-h-14 items-center gap-3 p-3 font-bold transition-colors hover:bg-sky">
+              <Tocapu motif={CONTENT[t].motif} dye={CONTENT[t].dye} size={28} />
+              <span className="flex-1">{CONTENT[t].singular}</span>
+              <Plus className="size-4.5 text-ink-soft" aria-hidden />
+            </Link>
+          ))}
+        </div>
+      </section>
     </>
   )
 }
@@ -159,19 +175,23 @@ export function ContentManager() {
       />
       <div className="relative mb-6 max-w-md">
         <label htmlFor="mine-search" className="sr-only">Buscar</label>
-        <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4.5 -translate-y-1/2 text-ink-soft" aria-hidden />
-        <input id="mine-search" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1) }} placeholder="Buscar por título" className="field-input pl-10" />
+        <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-ink-soft" aria-hidden />
+        <input id="mine-search" type="search" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1) }} placeholder="Buscar por título" className="field-input pl-12" />
       </div>
       {list.isLoading ? (
-        <Spinner />
+        <CardGridSkeleton count={3} />
       ) : list.isError ? (
         <ErrorState message={parseApiError(list.error).message} onRetry={() => list.refetch()} />
       ) : list.data?.data.length ? (
         <>
           <ul className="flex flex-col gap-3">
             {list.data.data.map((item) => (
-              <li key={item.id} className={clsx('flex flex-wrap items-center gap-4 rounded-[var(--radius-card)] bg-white p-4', !item.is_active && 'opacity-70')}>
-                <img src={imageOf(item, type)} alt="" className="size-16 rounded-xl object-cover" />
+              <li key={item.id} className={clsx('card flex flex-wrap items-center gap-4 p-3 pr-4', !item.is_active && 'border-dashed')}>
+                <img
+                  src={imageOf(item, type)}
+                  alt=""
+                  className={clsx('size-16 rounded-[var(--radius-control)] border-2 border-ink object-cover', !item.is_active && 'grayscale')}
+                />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-bold">{titleOf(item as never)}</p>
                   <p className="text-sm text-ink-soft">
@@ -179,17 +199,17 @@ export function ContentManager() {
                     {user?.role === 'admin' && item.user ? ` · ${item.user.name}` : ''}
                   </p>
                 </div>
-                <Badge className={item.is_active ? 'bg-mint/40 text-ink' : 'bg-ink/10 text-ink-soft'}>{item.is_active ? 'Publicado' : 'Oculto'}</Badge>
-                <div className="flex gap-1">
-                  <IconBtn label={item.is_active ? 'Ocultar del sitio' : 'Publicar'} onClick={() => toggle.mutate(item)}>
+                <StatusBadge status={item.is_active ? 'published' : 'hidden'} />
+                <div className="flex gap-2">
+                  <IconAction label={item.is_active ? 'Ocultar del sitio' : 'Publicar'} onClick={() => toggle.mutate(item)} disabled={toggle.isPending && toggle.variables?.id === item.id}>
                     {item.is_active ? <EyeOff className="size-4.5" /> : <Eye className="size-4.5" />}
-                  </IconBtn>
-                  <Link to={`/dashboard/${type}/${item.id}`} aria-label="Editar" className="inline-flex size-10 items-center justify-center rounded-full hover:bg-ink/5">
+                  </IconAction>
+                  <IconAction label="Editar" to={`/dashboard/${type}/${item.id}`}>
                     <Pencil className="size-4.5" />
-                  </Link>
-                  <IconBtn label="Eliminar" danger onClick={() => confirm(`¿Eliminar “${titleOf(item as never)}”? No se puede deshacer.`) && remove.mutate(item.id)}>
+                  </IconAction>
+                  <IconAction label="Eliminar" danger onClick={() => confirm(`¿Eliminar “${titleOf(item as never)}”? No se puede deshacer.`) && remove.mutate(item.id)}>
                     <Trash2 className="size-4.5" />
-                  </IconBtn>
+                  </IconAction>
                 </div>
               </li>
             ))}
@@ -197,19 +217,14 @@ export function ContentManager() {
           <Pagination page={list.data.current_page} lastPage={list.data.last_page} onChange={setPage} />
         </>
       ) : (
-        <EmptyState title={`No tienes ${meta.plural.toLowerCase()}`} action={<ButtonLink to={`/dashboard/${type}/nuevo`}>Crear {meta.singular.toLowerCase()}</ButtonLink>}>
+        <EmptyState
+          title={`No tienes ${meta.plural.toLowerCase()}`}
+          icon={<Tocapu motif={meta.motif} dye={meta.dye} size={40} framed={false} />}
+          action={<ButtonLink to={`/dashboard/${type}/nuevo`}>Crear {meta.singular.toLowerCase()}</ButtonLink>}>
           {type === 'promociones' ? 'Las promociones se asocian a un local: regístralo primero si aún no lo tienes.' : 'Lo que publiques aparecerá en el sitio público.'}
         </EmptyState>
       )}
     </>
-  )
-}
-
-function IconBtn({ label, onClick, children, danger }: { label: string; onClick: () => void; children: React.ReactNode; danger?: boolean }) {
-  return (
-    <button onClick={onClick} aria-label={label} title={label} className={clsx('inline-flex size-10 items-center justify-center rounded-full', danger ? 'hover:bg-danger/10 hover:text-danger' : 'hover:bg-ink/5')}>
-      {children}
-    </button>
   )
 }
 
@@ -352,10 +367,13 @@ function ContentForm({ type, item }: { type: ContentType; item?: AnyContent }) {
 
   return (
     <>
+      <div className="mb-3">
+        <TypeTag type={type} />
+      </div>
       <PageHeader title={item ? `Editar: ${titleOf(item as never)}` : `Nuevo: ${meta.singular.toLowerCase()}`} />
-      <form onSubmit={onSubmit} className="flex max-w-4xl flex-col gap-8" noValidate>
+      <form onSubmit={onSubmit} className="flex max-w-4xl flex-col gap-6" noValidate>
         {formError && <Alert tone="error">{formError}</Alert>}
-        <div className="grid gap-5 rounded-[var(--radius-card)] bg-white p-6 sm:grid-cols-2">
+        <PanelCard title="Información" bodyClassName="grid gap-5 sm:grid-cols-2">
           {config.fields.map((f) =>
             f.when && !f.when(values) ? null : (
               <FieldInput
@@ -369,13 +387,17 @@ function ContentForm({ type, item }: { type: ContentType; item?: AnyContent }) {
               />
             ),
           )}
-        </div>
+        </PanelCard>
 
         {config.location && (
-          <div className="flex flex-col gap-3 rounded-[var(--radius-card)] bg-white p-6">
-            <h2 className="text-lg font-bold">
-              Ubicación en el mapa{config.location === 'required' && <span className="text-danger"> *</span>}
-            </h2>
+          <PanelCard
+            title={
+              <>
+                Ubicación en el mapa{config.location === 'required' && <span className="text-cochinilla"> *</span>}
+              </>
+            }
+            bodyClassName="flex flex-col gap-3"
+          >
             <p className="text-sm text-ink-soft">Haz clic en el mapa para marcar el punto. Puedes arrastrar el marcador para ajustarlo.</p>
             <Suspense fallback={<div className="skeleton h-72" />}>
               <LocationPicker
@@ -387,19 +409,20 @@ function ContentForm({ type, item }: { type: ContentType; item?: AnyContent }) {
             {values.latitude ? (
               <p className="text-sm text-ink-soft">Coordenadas: {String(values.latitude)}, {String(values.longitude)}</p>
             ) : null}
-            {(errors.latitude || errors.longitude) && <p className="text-sm text-danger">{errors.latitude || errors.longitude}</p>}
-          </div>
+            {(errors.latitude || errors.longitude) && <p className="text-sm font-bold text-cochinilla">{errors.latitude || errors.longitude}</p>}
+          </PanelCard>
         )}
 
-        <div className="rounded-[var(--radius-card)] bg-white p-6">
-          <ImageUploader value={(values.images as string[]) ?? []} onChange={(urls) => set('images', urls)} folder={config.uploadFolder} label="Fotos (la primera es la portada)" />
-        </div>
+        <PanelCard title="Fotos">
+          <ImageUploader value={(values.images as string[]) ?? []} onChange={(urls) => set('images', urls)} folder={config.uploadFolder} label="La primera es la portada" />
+        </PanelCard>
 
-        <div className="flex flex-wrap gap-3">
-          <Button type="submit" loading={save.isPending}>{item ? 'Guardar cambios' : 'Publicar'}</Button>
+        {/* Acciones fijas al pie: siempre a mano en formularios largos (sobre la barra inferior en móvil) */}
+        <div className="sticky bottom-20 z-10 flex flex-wrap items-center gap-3 rounded-[var(--radius-panel)] border-2 border-ink bg-white p-3 lg:bottom-4">
+          <Button type="submit" loading={save.isPending} loadingText="Guardando…">{item ? 'Guardar cambios' : 'Publicar'}</Button>
           <ButtonLink to={`/dashboard/${type}`} variant="secondary">Cancelar</ButtonLink>
           {item && (
-            <Link to={`${meta.path}/${item.id}`} target="_blank" className="inline-flex h-11 items-center px-3 font-semibold text-primary">
+            <Link to={`${meta.path}/${item.id}`} target="_blank" className={clsx(TEXT_LINK, 'ml-auto px-2')}>
               Ver en el sitio
             </Link>
           )}
@@ -476,8 +499,6 @@ function FieldInput({
 
 /* ---------- Reservas recibidas ---------- */
 
-const STATUS_LABEL: Record<Booking['status'], string> = { pending: 'Pendiente', confirmed: 'Confirmada', cancelled: 'Cancelada', completed: 'Completada' }
-
 export function PartnerBookingsPage() {
   useDocumentTitle('Reservas recibidas')
   const qc = useQueryClient()
@@ -496,52 +517,62 @@ export function PartnerBookingsPage() {
     },
     onError: (e) => notify(parseApiError(e).message, 'error'),
   })
+  const busy = (id: number, s: string) => update.isPending && update.variables?.id === id && update.variables.status === s
 
   return (
     <>
       <PageHeader title="Reservas recibidas" description="Confirma o rechaza las reservas de tus experiencias. El viajero ve el estado en su cuenta." />
-      <div role="group" aria-label="Estado" className="mb-6 flex flex-wrap gap-2">
-        {[['pending', 'Pendientes'], ['confirmed', 'Confirmadas'], ['completed', 'Completadas'], ['cancelled', 'Canceladas'], ['', 'Todas']].map(([v, l]) => (
-          <button
-            key={v}
-            onClick={() => { setStatus(v); setPage(1) }}
-            aria-pressed={status === v}
-            className={clsx('rounded-full border px-4 py-1.5 text-sm font-semibold', status === v ? 'border-primary bg-primary text-white' : 'border-line bg-white')}
-          >
-            {l}
-          </button>
-        ))}
-      </div>
+      <ChipGroup
+        label="Estado"
+        className="mb-6"
+        value={status}
+        onChange={(v) => { setStatus(v); setPage(1) }}
+        options={[['pending', 'Pendientes'], ['confirmed', 'Confirmadas'], ['completed', 'Completadas'], ['cancelled', 'Canceladas'], ['', 'Todas']]}
+      />
       {isLoading ? (
-        <Spinner />
+        <CardGridSkeleton count={3} />
       ) : data?.data.length ? (
         <>
           <ul className="flex flex-col gap-3">
             {data.data.map((b) => (
-              <li key={b.id} className="flex flex-wrap items-center gap-4 rounded-[var(--radius-card)] bg-white p-5">
+              <li key={b.id} className="card flex flex-wrap items-center gap-4 p-5">
                 <div className="min-w-0 flex-1">
-                  <p className="font-bold">{b.experiencia?.title}</p>
+                  <div className="mb-1 flex flex-wrap items-center gap-2">
+                    <StatusBadge status={b.status} />
+                    <p className="font-bold">{b.experiencia?.title}</p>
+                  </div>
                   <p className="text-sm text-ink-soft">
                     {formatDate(b.booking_date)} · {b.participants} persona{b.participants > 1 ? 's' : ''}
                     {Number(b.total_price) > 0 && ` · ${formatPrice(b.total_price)}`}
                   </p>
                   <p className="text-sm">
                     {b.user?.name}
-                    {(b.contact_phone || b.user?.phone) && <> · <a href={`tel:${b.contact_phone || b.user?.phone}`} className="text-primary">{b.contact_phone || b.user?.phone}</a></>}
-                    {(b.contact_email || b.user?.email) && <> · <a href={`mailto:${b.contact_email || b.user?.email}`} className="text-primary">{b.contact_email || b.user?.email}</a></>}
+                    {(b.contact_phone || b.user?.phone) && <> · <a href={`tel:${b.contact_phone || b.user?.phone}`} className={TEXT_LINK}>{b.contact_phone || b.user?.phone}</a></>}
+                    {(b.contact_email || b.user?.email) && <> · <a href={`mailto:${b.contact_email || b.user?.email}`} className={TEXT_LINK}>{b.contact_email || b.user?.email}</a></>}
                   </p>
                   {b.notes && <p className="mt-1 text-sm text-ink-soft">“{b.notes}”</p>}
                 </div>
-                <Badge>{STATUS_LABEL[b.status]}</Badge>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {b.status === 'pending' && (
                     <>
-                      <Button size="sm" onClick={() => update.mutate({ id: b.id, status: 'confirmed' })}>Confirmar</Button>
-                      <Button size="sm" variant="secondary" onClick={() => confirm('¿Rechazar esta reserva?') && update.mutate({ id: b.id, status: 'cancelled' })}>Rechazar</Button>
+                      <Button size="sm" loading={busy(b.id, 'confirmed')} loadingText="Confirmando…" onClick={() => update.mutate({ id: b.id, status: 'confirmed' })}>
+                        Confirmar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        loading={busy(b.id, 'cancelled')}
+                        loadingText="Rechazando…"
+                        onClick={() => confirm('¿Rechazar esta reserva?') && update.mutate({ id: b.id, status: 'cancelled' })}
+                      >
+                        Rechazar
+                      </Button>
                     </>
                   )}
                   {b.status === 'confirmed' && (
-                    <Button size="sm" variant="secondary" onClick={() => update.mutate({ id: b.id, status: 'completed' })}>Marcar completada</Button>
+                    <Button size="sm" variant="secondary" loading={busy(b.id, 'completed')} loadingText="Guardando…" onClick={() => update.mutate({ id: b.id, status: 'completed' })}>
+                      Marcar completada
+                    </Button>
                   )}
                 </div>
               </li>
@@ -550,7 +581,9 @@ export function PartnerBookingsPage() {
           <Pagination page={data.current_page} lastPage={data.last_page} onChange={setPage} />
         </>
       ) : (
-        <EmptyState title="No hay reservas en este estado" />
+        <EmptyState title="No hay reservas en este estado" icon={<Tocapu motif="olas" dye="anil" size={40} framed={false} />}>
+          Cuando un viajero reserve una de tus experiencias, aparecerá aquí para que la confirmes.
+        </EmptyState>
       )}
     </>
   )

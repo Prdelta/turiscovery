@@ -46,10 +46,10 @@ export default function MapPage() {
 
   return (
     <div className="container-page py-12 sm:py-16">
-      <h1 className="text-4xl font-extrabold sm:text-5xl">Mapa de Puno</h1>
+      <h1 className="t-h1">Mapa de Puno</h1>
       <p className="prose-measure mt-3 text-lg text-ink-soft">Locales, experiencias y eventos con ubicación. Toca un marcador para ver el detalle.</p>
       <div className="mt-8 grid gap-6 lg:grid-cols-[260px_1fr]">
-        <fieldset className="flex flex-col gap-4 self-start rounded-[var(--radius-card)] bg-white p-5">
+        <fieldset className="flex flex-col gap-4 self-start card p-5">
           <legend className="sr-only">Capas del mapa</legend>
           {(Object.keys(LAYERS) as Layer[]).map((layer) => (
             <div key={layer} className="flex items-center gap-2.5">

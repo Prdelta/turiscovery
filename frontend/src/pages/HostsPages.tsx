@@ -24,7 +24,7 @@ export default function HostsPage() {
       <header className="mb-10">
         <div className="flex items-center gap-4">
           <Tocapu motif="persona" dye="qolle" size={48} />
-          <h1 className="text-4xl font-extrabold sm:text-5xl">Quién te recibe</h1>
+          <h1 className="t-h1">Quién te recibe</h1>
         </div>
         <p className="prose-measure mt-4 text-lg text-ink-soft">
           Familias de las islas flotantes, tejedores de Taquile, guías de Sillustani. Escucha cómo te saludan en su idioma antes de conocerlos.
@@ -39,8 +39,8 @@ export default function HostsPage() {
             onClick={() => setLanguage(l)}
             aria-pressed={language === l}
             className={clsx(
-              'rounded-full border px-4 py-2 text-sm font-semibold',
-              language === l ? 'border-ink bg-ink text-white' : 'border-ink bg-white hover:bg-sky',
+              'inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-full border-2 border-ink px-4 text-sm font-bold transition-colors',
+              language === l ? 'bg-ink text-white' : 'bg-white text-ink hover:bg-sky',
             )}
           >
             {l ? `Habla ${LANGUAGE_LABEL[l].toLowerCase()}` : 'Todos'}
@@ -95,7 +95,7 @@ export function HostDetail() {
           <HostCard host={host} />
           {host.story && (
             <section>
-              <h2 className="mb-3 text-2xl font-extrabold">Su historia</h2>
+              <h2 className="mb-3 t-h2">Su historia</h2>
               <p className="prose-measure whitespace-pre-line text-lg leading-relaxed">{host.story}</p>
             </section>
           )}
@@ -103,7 +103,7 @@ export function HostDetail() {
       </div>
       {host.experiencias?.length ? (
         <section className="mt-16">
-          <h2 className="mb-6 text-3xl font-extrabold">Viaja con {host.name.split(' ')[0]}</h2>
+          <h2 className="mb-6 t-h2">Viaja con {host.name.split(' ')[0]}</h2>
           <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
             {host.experiencias.map((e) => <ContentCard key={e.id} item={e} type="experiencias" />)}
           </div>

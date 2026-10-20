@@ -24,7 +24,7 @@ export default function Puno3DPage() {
   if (!canRender) {
     return (
       <div className="container-page py-20">
-        <h1 className="text-4xl font-extrabold">Puno en 3D</h1>
+        <h1 className="t-h1">Puno en 3D</h1>
         <p className="mt-4 text-ink-soft">Tu navegador no permite gráficos 3D (WebGL). Prueba con una versión reciente de Chrome, Edge, Firefox o Safari.</p>
       </div>
     )
@@ -70,7 +70,7 @@ function ModelsSection() {
 
   return (
     <section aria-labelledby="modelos" className="container-page py-20">
-      <h2 id="modelos" className="text-3xl font-extrabold sm:text-4xl">Modelos de Puno</h2>
+      <h2 id="modelos" className="t-h2">Modelos de Puno</h2>
       <p className="prose-measure mt-2 text-ink-soft">
         Piezas y lugares en tres dimensiones. Gíralos con el ratón o con el dedo.
       </p>
@@ -86,8 +86,8 @@ function ModelsSection() {
               }}
               aria-pressed={!localFile && activeId === m.id}
               className={clsx(
-                'rounded-2xl border p-4 text-left transition-colors',
-                !localFile && activeId === m.id ? 'border-primary bg-primary/5' : 'border-line bg-white hover:border-ink/40',
+                'rounded-[var(--radius-card)] border-2 p-4 text-left transition-colors',
+                !localFile && activeId === m.id ? 'border-ink bg-sky' : 'border-line bg-white hover:border-ink',
               )}
             >
               <p className="font-bold">{m.title}</p>
@@ -96,7 +96,7 @@ function ModelsSection() {
           ))}
           <button
             onClick={() => input.current?.click()}
-            className="flex items-center gap-3 rounded-2xl border-2 border-dashed border-line p-4 text-left text-sm hover:border-primary"
+            className="flex items-center gap-3 rounded-[var(--radius-card)] border-2 border-dashed border-ink-soft bg-white p-4 text-left text-sm hover:border-ink"
           >
             <FileUp className="size-5 shrink-0 text-primary" aria-hidden />
             <span>
@@ -117,7 +117,7 @@ function ModelsSection() {
           />
         </div>
         <div className="flex flex-col gap-3">
-          <div className="h-[520px] overflow-hidden rounded-[var(--radius-card)] border border-line">
+          <div className="h-[520px] overflow-hidden rounded-[var(--radius-card)] border-2 border-ink">
             {url ? (
               <Suspense fallback={<Spinner label="Cargando visor…" />}>
                 <ModelViewer url={url} />

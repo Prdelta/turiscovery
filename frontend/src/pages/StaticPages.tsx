@@ -7,7 +7,7 @@ function TextPage({ title, children }: { title: string; children: ReactNode }) {
   useDocumentTitle(title)
   return (
     <div className="container-page py-14 sm:py-20">
-      <h1 className="text-4xl font-extrabold sm:text-5xl">{title}</h1>
+      <h1 className="t-h1">{title}</h1>
       <div className="prose-measure mt-8 flex flex-col gap-5 text-lg leading-relaxed text-ink-soft [&_h2]:mt-6 [&_h2]:text-2xl [&_h2]:font-extrabold [&_h2]:text-ink">
         {children}
       </div>
@@ -30,7 +30,7 @@ export function AboutPage() {
       <p>Crea una cuenta gratis para guardar favoritos, reservar experiencias, confirmar asistencia a eventos y obtener cupones.</p>
       <h2>Para negocios</h2>
       <p>
-        Si tienes un negocio turístico en Puno, <Link to="/contacto" className="font-semibold text-primary">escríbenos</Link> y te
+        Si tienes un negocio turístico en Puno, <Link to="/contacto" className="font-bold text-primary-dark underline decoration-2 underline-offset-4">escríbenos</Link> y te
         creamos una cuenta de socio.
       </p>
     </TextPage>
@@ -43,7 +43,7 @@ export function ContactPage() {
       <p>¿Quieres publicar tu negocio, reportar un error o hacer una consulta? Escríbenos y te respondemos en un plazo de dos días hábiles.</p>
       <p>
         Correo:{' '}
-        <a href="mailto:contacto@turiscovery.com" className="font-semibold text-primary">contacto@turiscovery.com</a>
+        <a href="mailto:contacto@turiscovery.com" className="font-bold text-primary-dark underline decoration-2 underline-offset-4">contacto@turiscovery.com</a>
       </p>
       <p>Puno, Perú.</p>
       <div>
@@ -89,7 +89,7 @@ export function PrivacyPage() {
       <h2>Tus derechos</h2>
       <p>
         Puedes pedir acceso, corrección o eliminación de tus datos escribiendo a{' '}
-        <a href="mailto:contacto@turiscovery.com" className="font-semibold text-primary">contacto@turiscovery.com</a>.
+        <a href="mailto:contacto@turiscovery.com" className="font-bold text-primary-dark underline decoration-2 underline-offset-4">contacto@turiscovery.com</a>.
       </p>
     </TextPage>
   )
