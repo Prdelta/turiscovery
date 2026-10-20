@@ -1,5 +1,15 @@
 export type Role = 'tourist' | 'socio' | 'admin'
 
+export type Interest = 'experiencias' | 'eventos' | 'promociones' | 'locales' | 'candelaria'
+export type TravelPace = 'suave' | 'moderado' | 'intenso'
+
+/** Preferencias del usuario (el backend completa los valores por defecto) */
+export interface UserPreferences {
+  notifications: { bookings: boolean; promotions: boolean }
+  interests: Interest[]
+  pace: TravelPace | null
+}
+
 export interface User {
   id: number
   name: string
@@ -11,7 +21,8 @@ export interface User {
   is_active?: boolean
   created_at?: string
   deactivated_at?: string | null
-  preferences?: Record<string, unknown> | null
+  email_verified_at?: string | null
+  preferences?: UserPreferences | null
   favorites_count?: number
   reviews_count?: number
   bookings_count?: number

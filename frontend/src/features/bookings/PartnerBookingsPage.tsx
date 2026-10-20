@@ -27,6 +27,8 @@ export function PartnerBookingsPage() {
         onError: (e) => notify(parseApiError(e).message, 'error'),
       }),
   }
+  // Fecha local en formato YYYY-MM-DD, comparable con booking_date
+  const todayKey = new Date().toLocaleDateString('en-CA')
   const busy = (id: number, s: string) => update.isPending && update.variables?.id === id && update.variables.status === s
 
   return (
@@ -79,9 +81,21 @@ export function PartnerBookingsPage() {
                       </Button>
                     </>
                   )}
-                  {b.status === 'confirmed' && (
+                  {/* Una confirmada se completa desde el día de la salida; antes solo se puede cancelar */}
+                  {b.status === 'confirmed' && b.booking_date.slice(0, 10) <= todayKey && (
                     <Button size="sm" variant="secondary" loading={busy(b.id, 'completed')} loadingText="Guardando…" onClick={() => update.mutate({ id: b.id, status: 'completed' })}>
                       Marcar completada
+                    </Button>
+                  )}
+                  {b.status === 'confirmed' && b.booking_date.slice(0, 10) > todayKey && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      loading={busy(b.id, 'cancelled')}
+                      loadingText="Cancelando…"
+                      onClick={() => confirm('¿Cancelar esta reserva confirmada? Le avisaremos al viajero.') && update.mutate({ id: b.id, status: 'cancelled' })}
+                    >
+                      Cancelar
                     </Button>
                   )}
                 </div>

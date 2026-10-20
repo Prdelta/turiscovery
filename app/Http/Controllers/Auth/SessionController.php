@@ -82,6 +82,8 @@ class SessionController extends Controller
                     'email' => $user->email,
                     'role' => $user->role,
                     'avatar' => $user->avatar,
+                    'email_verified_at' => $user->email_verified_at,
+                    'preferences' => $user->resolvedPreferences(),
                 ],
                 // NO se devuelve token - la cookie de sesión se establece automáticamente
                 // y es httpOnly (no accesible desde JavaScript)
@@ -138,6 +140,8 @@ class SessionController extends Controller
                     'email' => $user->email,
                     'role' => $user->role,
                     'avatar' => $user->avatar,
+                    'email_verified_at' => $user->email_verified_at,
+                    'preferences' => $user->resolvedPreferences(),
                     'phone' => $user->phone,
                     'bio' => $user->bio,
                     'created_at' => $user->created_at,
@@ -163,6 +167,8 @@ class SessionController extends Controller
                 'email' => Auth::user()->email,
                 'role' => Auth::user()->role,
                 'avatar' => Auth::user()->avatar,
+                'email_verified_at' => Auth::user()->email_verified_at,
+                'preferences' => Auth::user()->resolvedPreferences(),
             ] : null,
         ], 200);
     }

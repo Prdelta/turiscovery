@@ -49,7 +49,8 @@ export interface NewBooking {
 
 export function useCreateBooking() {
   const invalidate = useInvalidateBookings()
-  return useMutation({ mutationFn: (body: NewBooking) => api.post('/bookings', body), onSuccess: invalidate })
+  // onSettled: si falla por cupos (422), también se refrescan los días para mostrar lo que queda
+  return useMutation({ mutationFn: (body: NewBooking) => api.post('/bookings', body), onSettled: invalidate })
 }
 
 export function useCancelBooking() {

@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Experiencia;
+use App\Services\BookingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class BookingController extends Controller
 {
@@ -29,55 +29,20 @@ class BookingController extends Controller
     }
 
     /**
-     * Crear una nueva reserva
+     * Crear una nueva reserva (sin sobreventa: ver BookingService::create)
      */
-    public function store(Request $request)
+    public function store(Request $request, BookingService $bookings)
     {
         $validated = $request->validate([
             'experiencia_id' => 'required|exists:experiencias,id',
             'booking_date' => 'required|date|after:today',
-            'participants' => 'required|integer|min:1',
+            'participants' => 'required|integer|min:1|max:50',
             'notes' => 'nullable|string|max:500',
             'contact_phone' => 'nullable|string|max:20',
             'contact_email' => 'nullable|email',
         ]);
 
-        $experiencia = Experiencia::findOrFail($validated['experiencia_id']);
-
-        // Verificar disponibilidad
-        if ($experiencia->max_participants) {
-            $bookedParticipants = Booking::where('experiencia_id', $experiencia->id)
-                ->where('booking_date', $validated['booking_date'])
-                ->whereIn('status', ['pending', 'confirmed'])
-                ->sum('participants');
-
-            $availableSlots = $experiencia->max_participants - $bookedParticipants;
-
-            if ($validated['participants'] > $availableSlots) {
-                return response()->json([
-                    'success' => false,
-                    'message' => "Solo hay {$availableSlots} cupos disponibles para esa fecha.",
-                ], 422);
-            }
-        }
-
-        // Calcular precio total
-        $totalPrice = ($experiencia->price_pen ?? 0) * $validated['participants'];
-
-        // Crear la reserva
-        $booking = Booking::create([
-            'user_id' => Auth::id(),
-            'experiencia_id' => $validated['experiencia_id'],
-            'booking_date' => $validated['booking_date'],
-            'participants' => $validated['participants'],
-            'total_price' => $totalPrice,
-            'notes' => $validated['notes'] ?? null,
-            'contact_phone' => $validated['contact_phone'] ?? Auth::user()->phone,
-            'contact_email' => $validated['contact_email'] ?? Auth::user()->email,
-            'status' => 'pending',
-        ]);
-
-        $booking->load('experiencia');
+        $booking = $bookings->create($request->user(), $validated);
 
         return response()->json([
             'success' => true,
@@ -102,15 +67,15 @@ class BookingController extends Controller
     }
 
     /**
-     * Cancelar una reserva
+     * Cancelar una reserva (la hace el viajero)
      */
-    public function cancel($id)
+    public function cancel($id, BookingService $bookings)
     {
         $booking = Booking::findOrFail($id);
 
         Gate::authorize('cancel', $booking);
 
-        if ($booking->cancel()) {
+        if ($bookings->cancelByTourist($booking)) {
             return response()->json([
                 'success' => true,
                 'message' => 'Reserva cancelada exitosamente.',
@@ -127,7 +92,7 @@ class BookingController extends Controller
     /**
      * Verificar disponibilidad para una experiencia en una fecha
      */
-    public function checkAvailability(Request $request)
+    public function checkAvailability(Request $request, BookingService $bookings)
     {
         $validated = $request->validate([
             'experiencia_id' => 'required|exists:experiencias,id',
@@ -145,12 +110,7 @@ class BookingController extends Controller
             ]);
         }
 
-        $bookedParticipants = Booking::where('experiencia_id', $experiencia->id)
-            ->where('booking_date', $validated['booking_date'])
-            ->whereIn('status', ['pending', 'confirmed'])
-            ->sum('participants');
-
-        $availableSlots = $experiencia->max_participants - $bookedParticipants;
+        $availableSlots = $bookings->availableSeats($experiencia, $validated['booking_date']);
         $isAvailable = $validated['participants'] <= $availableSlots;
 
         return response()->json([

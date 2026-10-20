@@ -3,13 +3,20 @@ import { Link, Navigate, useNavigate, useSearchParams } from 'react-router'
 import { homeForRole, useAuth } from '@/shared/auth/AuthContext'
 import { Brand } from '@/shared/ui/Identity'
 import { MotifStrip, StitchRow, WovenBand } from '@/shared/textile/Weave'
-import { Button } from '@/shared/ui/Button'
+import { Button, ButtonLink } from '@/shared/ui/Button'
 import { Alert } from '@/shared/ui/Feedback'
 import { Checkbox, TextField } from '@/shared/ui/Field'
-import { parseApiError } from '@/shared/api/client'
+import { api, parseApiError } from '@/shared/api/client'
+import { useToast } from '@/shared/ui/Toast'
 import { useDocumentTitle } from '@/shared/lib/hooks'
 
 const API_URL = import.meta.env.VITE_API_URL ?? ''
+
+/** Errores con los que el backend devuelve al login desde el flujo de Google */
+const GOOGLE_ERRORS: Record<string, string> = {
+  google: 'No se pudo completar el acceso con Google. Inténtalo otra vez.',
+  google_config: 'El acceso con Google todavía no está disponible. Entra con tu correo y contraseña.',
+}
 
 /** Solo se permite volver a rutas internas tras iniciar sesión */
 function safeNext(next: string | null) {
@@ -76,7 +83,7 @@ export function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(false)
-  const [error, setError] = useState<string | null>(params.get('error') === 'google' ? 'No se pudo completar el acceso con Google. Inténtalo otra vez.' : null)
+  const [error, setError] = useState<string | null>(GOOGLE_ERRORS[params.get('error') ?? ''] ?? null)
   const [loading, setLoading] = useState(false)
 
   if (user) return <Navigate to={next ?? homeForRole(user.role)} replace />
@@ -102,6 +109,9 @@ export function LoginPage() {
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
         <TextField label="Correo electrónico" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         <TextField label="Contraseña" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <Link to={`/recuperar${email ? `?email=${encodeURIComponent(email)}` : ''}`} className="-mt-2 self-end text-sm font-bold text-primary-dark underline decoration-2 underline-offset-4">
+          ¿Olvidaste tu contraseña?
+        </Link>
         <Checkbox label="Mantener la sesión iniciada" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
         {error && <Alert tone="error">{error}</Alert>}
         <Button type="submit" loading={loading} loadingText="Entrando…" fullWidth>Iniciar sesión</Button>
@@ -177,6 +187,119 @@ export function RegisterPage() {
       <p className="mt-6 text-center text-ink-soft">
         ¿Ya tienes cuenta? <Link to="/login" className="font-bold text-primary-dark underline decoration-2 underline-offset-4">Inicia sesión</Link>
       </p>
+    </AuthLayout>
+  )
+}
+
+export function ForgotPasswordPage() {
+  useDocumentTitle('Recuperar contraseña')
+  const [params] = useSearchParams()
+  const [email, setEmail] = useState(params.get('email') ?? '')
+  const [sent, setSent] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  const onSubmit = async (e: FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    setLoading(true)
+    try {
+      const res = await api.post<{ message: string }>('/forgot-password', { email })
+      setSent(res.data.message)
+    } catch (err) {
+      setError(parseApiError(err).message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <AuthLayout title="Recupera tu contraseña" text="Te enviaremos un enlace a tu correo para crear una nueva.">
+      {sent ? (
+        <div className="flex flex-col gap-4">
+          <Alert tone="success">{sent}</Alert>
+          <p className="text-sm text-ink-soft">Revisa también la carpeta de spam. El enlace vence en una hora.</p>
+          <Button type="button" variant="secondary" onClick={() => setSent(null)}>Usar otro correo</Button>
+        </div>
+      ) : (
+        <form onSubmit={onSubmit} className="flex flex-col gap-4">
+          <TextField label="Correo electrónico" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          {error && <Alert tone="error">{error}</Alert>}
+          <Button type="submit" loading={loading} loadingText="Enviando…" fullWidth>Enviar enlace</Button>
+        </form>
+      )}
+      <p className="mt-6 text-center text-ink-soft">
+        ¿La recordaste? <Link to="/login" className="font-bold text-primary-dark underline decoration-2 underline-offset-4">Inicia sesión</Link>
+      </p>
+    </AuthLayout>
+  )
+}
+
+export function ResetPasswordPage() {
+  useDocumentTitle('Nueva contraseña')
+  const navigate = useNavigate()
+  const notify = useToast()
+  const [params] = useSearchParams()
+  const token = params.get('token') ?? ''
+  const email = params.get('email') ?? ''
+  const [form, setForm] = useState({ password: '', password_confirmation: '' })
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  if (!token || !email) {
+    return (
+      <AuthLayout title="Enlace incompleto" text="Abre el enlace tal como llegó a tu correo, o pide uno nuevo.">
+        <ButtonLink to="/recuperar" fullWidth>Pedir un enlace nuevo</ButtonLink>
+      </AuthLayout>
+    )
+  }
+
+  const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => setForm((f) => ({ ...f, [key]: e.target.value }))
+
+  const onSubmit = async (e: FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    setErrors({})
+    if (form.password !== form.password_confirmation) {
+      setErrors({ password_confirmation: 'Las contraseñas no coinciden.' })
+      return
+    }
+    setLoading(true)
+    try {
+      const res = await api.post<{ message: string }>('/reset-password', { token, email, ...form })
+      notify(res.data.message)
+      navigate(`/login`, { replace: true })
+    } catch (err) {
+      const parsed = parseApiError(err)
+      setErrors(parsed.fields)
+      if (!parsed.fields.password) setError(parsed.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <AuthLayout title="Crea una nueva contraseña" text={`Para la cuenta ${email}.`}>
+      <form onSubmit={onSubmit} className="flex flex-col gap-4">
+        <TextField
+          label="Nueva contraseña"
+          type="password"
+          autoComplete="new-password"
+          value={form.password}
+          onChange={set('password')}
+          error={errors.password}
+          hint="Mínimo 8 caracteres con mayúsculas, minúsculas, un número y un símbolo."
+          required
+        />
+        <TextField label="Repite la contraseña" type="password" autoComplete="new-password" value={form.password_confirmation} onChange={set('password_confirmation')} error={errors.password_confirmation} required />
+        {error && (
+          <Alert tone="error">
+            {error} <Link to="/recuperar" className="font-bold underline">Pedir otro enlace</Link>
+          </Alert>
+        )}
+        <Button type="submit" loading={loading} loadingText="Guardando…" fullWidth>Guardar contraseña</Button>
+      </form>
     </AuthLayout>
   )
 }

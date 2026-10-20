@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Traits\ValidatesPaginationTrait;
 use App\Models\Experiencia;
 use App\Http\Requests\Content\ExperienciaRequest;
+use App\Services\BookingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -147,11 +148,11 @@ class ExperienciaController extends Controller
     {
         $experiencia = Experiencia::active()->findOrFail($id);
         $days = min(max($request->integer('days', 14), 1), 60);
-        $from = now('America/Lima')->addDay()->startOfDay();
+        $from = now(BookingService::TIMEZONE)->addDay()->startOfDay();
         $to = $from->copy()->addDays($days - 1);
 
         $booked = $experiencia->bookings()
-            ->whereIn('status', ['pending', 'confirmed'])
+            ->whereIn('status', BookingService::ACTIVE)
             ->whereBetween('booking_date', [$from->toDateString(), $to->toDateString()])
             ->selectRaw('booking_date, SUM(participants) as total')
             ->groupBy('booking_date')

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Services\BookingService;
 use Illuminate\Http\Request;
 
 /**
@@ -30,13 +31,13 @@ class PartnerBookingController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $request, $id)
+    public function updateStatus(Request $request, $id, BookingService $bookings)
     {
         $validated = $request->validate([
             'status' => 'required|in:confirmed,cancelled,completed',
         ]);
 
-        $booking = Booking::with('experiencia:id,user_id')->findOrFail($id);
+        $booking = Booking::with('experiencia:id,title,user_id')->findOrFail($id);
 
         if (!$request->user()->isAdmin() && $booking->experiencia?->user_id !== $request->user()->id) {
             return response()->json([
@@ -45,7 +46,8 @@ class PartnerBookingController extends Controller
             ], 403);
         }
 
-        $booking->update(['status' => $validated['status']]);
+        // Valida la transición (p. ej., una cancelada no se reconfirma) y avisa al viajero
+        $bookings->changeStatus($booking, $validated['status']);
 
         return response()->json([
             'success' => true,

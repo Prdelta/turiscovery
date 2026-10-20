@@ -10,5 +10,7 @@ export const authFeature = defineFeature({
     { path: '/login', element: lazyPage(pages, 'LoginPage') },
     { path: '/registro', element: lazyPage(pages, 'RegisterPage') },
     { path: '/register', element: <Navigate to="/registro" replace /> },
+    { path: '/recuperar', element: lazyPage(pages, 'ForgotPasswordPage') },
+    { path: '/restablecer', element: lazyPage(pages, 'ResetPasswordPage') },
   ],
 })

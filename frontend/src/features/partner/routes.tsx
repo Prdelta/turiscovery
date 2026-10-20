@@ -1,4 +1,4 @@
-import { BarChart3 } from 'lucide-react'
+import { BarChart3, TicketCheck } from 'lucide-react'
 import { CONTENT } from '@/shared/config/content'
 import { defineFeature, type NavItem } from '@/shared/routing/feature'
 import { lazyPage } from '@/shared/routing/lazyPage'
@@ -14,6 +14,8 @@ export const partnerFeature = defineFeature({
   panels: {
     partner: [
       { index: true, element: lazyPage(() => import('./PartnerHome'), 'PartnerHome') },
+      // Antes de ':type' para que "cupones" no se tome como tipo de contenido
+      { path: 'cupones', element: lazyPage(() => import('./CouponRedeemPage'), 'CouponRedeemPage') },
       { path: ':type', element: lazyPage(() => import('./ContentManager'), 'ContentManager') },
       { path: ':type/nuevo', element: lazyPage(form, 'ContentFormPage') },
       { path: ':type/:id', element: lazyPage(form, 'ContentFormPage') },
@@ -22,6 +24,7 @@ export const partnerFeature = defineFeature({
   nav: {
     partner: [
       { path: '', label: 'Resumen', order: 0, icon: BarChart3 },
+      { path: 'cupones', label: 'Canjear cupón', order: 15, icon: TicketCheck },
       ...MANAGED.map(
         (type): NavItem => ({
           path: type,

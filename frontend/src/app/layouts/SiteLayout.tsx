@@ -2,6 +2,7 @@ import { clsx } from 'clsx'
 import { Bookmark, Home, LogOut, MapPin, Menu, Search, User as UserIcon, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, ScrollRestoration, useLocation, useNavigate } from 'react-router'
+import { NotificationBell } from '@/features/notifications/NotificationBell'
 import { homeForRole, useAuth } from '@/shared/auth/AuthContext'
 import { InstallAppButton, OfflineBanner } from '@/shared/offline/OfflineTools'
 import { SiteBand, StitchRow } from '@/shared/textile/Weave'
@@ -85,6 +86,7 @@ function Header() {
           <Link to="/buscar" aria-label="Buscar" className="hidden size-11 items-center justify-center rounded-[var(--radius-control)] hover:bg-white lg:inline-flex">
             <Search className="size-5" />
           </Link>
+          <NotificationBell />
           {user ? (
             <div className="hidden items-center gap-1 lg:flex">
               <Link to={homeForRole(user.role)} className="flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] py-1 pl-1 pr-3 text-sm font-bold hover:bg-white">

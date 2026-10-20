@@ -1,15 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState, type FormEvent } from 'react'
+import { clsx } from 'clsx'
+import { useRef, useState, type FormEvent } from 'react'
 import { useAuth } from '@/shared/auth/AuthContext'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { PanelCard } from '@/shared/ui/Panel'
 import { Button } from '@/shared/ui/Button'
-import { Alert, Spinner } from '@/shared/ui/Feedback'
-import { TextArea, TextField } from '@/shared/ui/Field'
+import { Alert, FilterChip, Spinner } from '@/shared/ui/Feedback'
+import { Checkbox, TextArea, TextField } from '@/shared/ui/Field'
+import { Avatar } from '@/shared/ui/Identity'
+import { CONTENT } from '@/shared/config/content'
 import { useToast } from '@/shared/ui/Toast'
 import { api, parseApiError } from '@/shared/api/client'
 import { useDocumentTitle } from '@/shared/lib/hooks'
-import type { User } from '@/shared/api/types'
+import type { Interest, TravelPace, User, UserPreferences } from '@/shared/api/types'
 import { accountKeys, accountQueries } from '@/features/account/api'
 
 export function ProfilePage() {
@@ -20,17 +23,19 @@ export function ProfilePage() {
   const { data: profile, isLoading } = useQuery(accountQueries.profile())
 
   if (isLoading || !profile) return <Spinner />
+  const saved = (message: string) => () => {
+    void qc.invalidateQueries({ queryKey: accountKeys.profile() })
+    void refresh()
+    notify(message)
+  }
   return (
     <>
       <PageHeader title="Perfil" description={profile.email} />
-      <ProfileForm
-        profile={profile}
-        onSaved={() => {
-          void qc.invalidateQueries({ queryKey: accountKeys.profile() })
-          void refresh()
-          notify('Perfil actualizado')
-        }}
-      />
+      <div className="flex max-w-2xl flex-col gap-6">
+        <AvatarCard profile={profile} onSaved={saved('Foto actualizada')} />
+        <ProfileForm profile={profile} onSaved={saved('Perfil actualizado')} />
+        <PreferencesCard key={JSON.stringify(profile.preferences)} profile={profile} onSaved={saved('Preferencias guardadas')} />
+      </div>
     </>
   )
 }
@@ -91,5 +96,129 @@ function ProfileForm({ profile, onSaved }: { profile: User; onSaved: () => void 
         <Button type="submit" loading={save.isPending} loadingText="Guardando…">Guardar cambios</Button>
       </div>
     </form>
+  )
+}
+
+const INTERESTS: Interest[] = ['experiencias', 'eventos', 'promociones', 'locales', 'candelaria']
+const PACES: [TravelPace, string, string][] = [
+  ['suave', 'Suave', 'Recién llegado o prefiero caminatas cortas'],
+  ['moderado', 'Moderado', 'Me aclimaté y puedo caminar un par de horas'],
+  ['intenso', 'Intenso', 'Quiero subir cerros y hacer kayak'],
+]
+
+/** Foto de perfil: subir una nueva o quitarla */
+function AvatarCard({ profile, onSaved }: { profile: User; onSaved: () => void }) {
+  const input = useRef<HTMLInputElement>(null)
+  const notify = useToast()
+  const upload = useMutation({
+    mutationFn: (file: File | null) => {
+      const body = new FormData()
+      if (file) body.append('avatar', file)
+      else body.append('remove', '1')
+      return api.post('/profile/avatar', body)
+    },
+    onSuccess: onSaved,
+    onError: (e) => notify(parseApiError(e).message, 'error'),
+  })
+
+  return (
+    <PanelCard title="Foto de perfil">
+      <div className="flex flex-wrap items-center gap-4">
+        <Avatar name={profile.name} src={profile.avatar} size="lg" />
+        <div className="flex flex-wrap gap-2">
+          <input
+            ref={input}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="sr-only"
+            aria-label="Elegir foto de perfil"
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (file) upload.mutate(file)
+              e.target.value = ''
+            }}
+          />
+          <Button type="button" size="sm" variant="secondary" loading={upload.isPending && upload.variables !== null} loadingText="Subiendo…" onClick={() => input.current?.click()}>
+            {profile.avatar ? 'Cambiar foto' : 'Subir foto'}
+          </Button>
+          {profile.avatar && (
+            <Button type="button" size="sm" variant="ghost" loading={upload.isPending && upload.variables === null} loadingText="Quitando…" onClick={() => upload.mutate(null)}>
+              Quitar
+            </Button>
+          )}
+        </div>
+        <p className="w-full text-sm text-ink-soft">JPG, PNG o WebP de hasta 3 MB. Los anfitriones la ven en tus reservas.</p>
+      </div>
+    </PanelCard>
+  )
+}
+
+/** Preferencias: qué le interesa, a qué ritmo viaja y qué correos quiere recibir */
+function PreferencesCard({ profile, onSaved }: { profile: User; onSaved: () => void }) {
+  const [prefs, setPrefs] = useState<UserPreferences>(
+    profile.preferences ?? { notifications: { bookings: true, promotions: true }, interests: [], pace: null },
+  )
+  const notify = useToast()
+  const save = useMutation({
+    mutationFn: () => api.put('/profile', { name: profile.name, phone: profile.phone ?? '', bio: profile.bio ?? '', preferences: prefs }),
+    onSuccess: onSaved,
+    onError: (e) => notify(parseApiError(e).message, 'error'),
+  })
+  const toggleInterest = (i: Interest) =>
+    setPrefs((p) => ({ ...p, interests: p.interests.includes(i) ? p.interests.filter((x) => x !== i) : [...p.interests, i] }))
+
+  return (
+    <PanelCard title="Preferencias">
+      <div className="flex flex-col gap-6">
+        <fieldset>
+          <legend className="font-bold">¿Qué te interesa?</legend>
+          <p className="text-sm text-ink-soft">Lo mostramos primero en tu inicio.</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {INTERESTS.map((i) => (
+              <FilterChip key={i} type="button" selected={prefs.interests.includes(i)} aria-pressed={prefs.interests.includes(i)} onClick={() => toggleInterest(i)}>
+                {CONTENT[i].plural}
+              </FilterChip>
+            ))}
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend className="font-bold">Tu ritmo de viaje</legend>
+          <p className="text-sm text-ink-soft">Para sugerirte experiencias según la altura y el esfuerzo.</p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-3">
+            {PACES.map(([value, label, hint]) => (
+              <label
+                key={value}
+                className={clsx(
+                  'flex cursor-pointer flex-col gap-1 rounded-[var(--radius-control)] border-2 p-3',
+                  prefs.pace === value ? 'border-primary bg-primary/10' : 'border-line hover:border-ink',
+                )}
+              >
+                <span className="flex items-center gap-2 font-bold">
+                  <input type="radio" name="pace" className="accent-primary" checked={prefs.pace === value} onChange={() => setPrefs((p) => ({ ...p, pace: value }))} />
+                  {label}
+                </span>
+                <span className="text-sm text-ink-soft">{hint}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        <fieldset className="flex flex-col">
+          <legend className="font-bold">Correos</legend>
+          <Checkbox
+            label="Avisos de mis reservas (confirmaciones, cambios y recordatorios)"
+            checked={prefs.notifications.bookings}
+            onChange={(e) => setPrefs((p) => ({ ...p, notifications: { ...p.notifications, bookings: e.target.checked } }))}
+          />
+          <Checkbox
+            label="Promociones y novedades de Puno"
+            checked={prefs.notifications.promotions}
+            onChange={(e) => setPrefs((p) => ({ ...p, notifications: { ...p.notifications, promotions: e.target.checked } }))}
+          />
+        </fieldset>
+        <div>
+          <Button type="button" loading={save.isPending} loadingText="Guardando…" onClick={() => save.mutate()}>Guardar preferencias</Button>
+        </div>
+      </div>
+    </PanelCard>
   )
 }

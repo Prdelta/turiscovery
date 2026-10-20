@@ -20,11 +20,13 @@ class Booking extends Model
         'notes',
         'contact_phone',
         'contact_email',
+        'reminded_at',
     ];
 
     protected $casts = [
         'booking_date' => 'date',
         'total_price' => 'decimal:2',
+        'reminded_at' => 'datetime',
     ];
 
     /**

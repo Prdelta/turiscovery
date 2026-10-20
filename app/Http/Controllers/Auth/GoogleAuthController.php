@@ -18,6 +18,13 @@ class GoogleAuthController extends Controller
      */
     public function redirectToGoogle()
     {
+        // Sin credenciales, Google mostraría su propia página de error: se vuelve al login con un aviso
+        if (!config('services.google.client_id') || !config('services.google.client_secret')) {
+            Log::warning('Google OAuth sin configurar: faltan GOOGLE_CLIENT_ID o GOOGLE_CLIENT_SECRET en .env');
+
+            return redirect()->away($this->frontendUrl('/login?error=google_config'));
+        }
+
         return Socialite::driver('google')->redirect();
     }
 
@@ -53,7 +60,9 @@ class GoogleAuthController extends Controller
                 // Link Google account to existing user
                 $existingUser->update([
                     'google_id' => $googleUser->id,
-                    'avatar' => $googleUser->avatar ?? $existingUser->avatar,
+                    'avatar' => $existingUser->avatar ?: $googleUser->avatar,
+                    // Google ya verificó ese correo
+                    'email_verified_at' => $existingUser->email_verified_at ?? now(),
                 ]);
 
                 Auth::login($existingUser);

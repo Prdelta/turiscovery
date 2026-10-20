@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Auth\{LoginController, RegisterController, SessionController};
+use App\Http\Controllers\Auth\{EmailVerificationController, LoginController, PasswordResetController, RegisterController, SessionController};
 use App\Http\Controllers\Admin\ResourceSearchController;
 use App\Http\Controllers\Api\Admin\{CandelariaContentController, CandelariaLiveAdminController, UserController as AdminUserController};
 use App\Http\Controllers\Api\{
@@ -17,7 +17,9 @@ use App\Http\Controllers\Api\{
     FavoriteController,
     LocaleController,
     MyContentController,
+    NotificationController,
     PartnerBookingController,
+    PartnerCouponController,
     ProfileController,
     PromocionController,
     ReviewController,
@@ -43,6 +45,16 @@ Route::post('/login', [LoginController::class, 'login']);
 // Session-Based Authentication (Secure - httpOnly Cookies)
 Route::post('/session/login', [SessionController::class, 'login']);
 Route::get('/session/check', [SessionController::class, 'check']);
+
+// Recuperar contraseña (el enlace del correo abre /restablecer en el frontend)
+Route::post('/forgot-password', [PasswordResetController::class, 'sendLink'])->middleware('throttle:password-reset');
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])->middleware('throttle:password-reset');
+
+// Enlace firmado del correo de verificación (no requiere sesión)
+Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+    ->whereNumber('id')
+    ->middleware('throttle:6,1')
+    ->name('verification.verify');
 
 // Google OAuth: definido en routes/web.php (necesita sesión web)
 
@@ -106,6 +118,10 @@ Route::middleware(['auth:sanctum', 'user.active', 'validate.params'])->group(fun
     // Perfil del usuario
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::put('/profile', [ProfileController::class, 'update']);
+    Route::post('/profile/avatar', [ProfileController::class, 'avatar']);
+
+    // Reenviar el correo de verificación
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])->middleware('throttle:3,1');
 
     // ========== Stats & Dashboard (Optimized) ==========
     Route::get('/stats', [StatsController::class, 'index']);
@@ -130,6 +146,11 @@ Route::middleware(['auth:sanctum', 'user.active', 'validate.params'])->group(fun
         // Reservas recibidas en las experiencias del socio
         Route::get('/partner/bookings', [PartnerBookingController::class, 'index']);
         Route::put('/partner/bookings/{id}', [PartnerBookingController::class, 'updateStatus']);
+
+        // Canje de cupones en el local
+        Route::get('/partner/coupons', [PartnerCouponController::class, 'index']);
+        Route::get('/partner/coupons/lookup', [PartnerCouponController::class, 'lookup']);
+        Route::post('/partner/coupons/redeem', [PartnerCouponController::class, 'redeem']);
 
         // Locales (Partner Venues) - Full CRUD for own locales
         Route::post('/locales', [LocaleController::class, 'store']);
@@ -179,6 +200,11 @@ Route::middleware(['auth:sanctum', 'user.active', 'validate.params'])->group(fun
     Route::get('/bookings/{id}', [BookingController::class, 'show']);
     Route::post('/bookings/{id}/cancel', [BookingController::class, 'cancel']);
     Route::post('/bookings/check-availability', [BookingController::class, 'checkAvailability']);
+
+    // Avisos dentro de la app (reservas nuevas, confirmaciones, recordatorios)
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead']);
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markRead']);
 
     // Event Attendances (Confirmación de asistencia a eventos)
     Route::get('/event-attendances', [EventAttendeeController::class, 'index']);
