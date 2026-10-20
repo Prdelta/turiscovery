@@ -42,7 +42,8 @@ class CleanupDatabaseConnections extends Command
 
             return self::SUCCESS;
         } catch (\Exception $e) {
-            $this->error('❌ Error al limpiar conexiones: ' . $e->getMessage());
+            $this->error('❌ Error al limpiar conexiones: '.$e->getMessage());
+
             return self::FAILURE;
         }
     }
@@ -66,6 +67,7 @@ class CleanupDatabaseConnections extends Command
 
             if (count($idleConnections) === 0) {
                 $this->info('No hay conexiones idle para limpiar');
+
                 return;
             }
 
@@ -86,7 +88,7 @@ class CleanupDatabaseConnections extends Command
                 $terminated = 0;
                 foreach ($idleConnections as $conn) {
                     try {
-                        DB::select("SELECT pg_terminate_backend(?)", [$conn->pid]);
+                        DB::select('SELECT pg_terminate_backend(?)', [$conn->pid]);
                         $terminated++;
                     } catch (\Exception $e) {
                         // Ignorar errores (la conexión ya puede estar cerrada)
@@ -96,7 +98,7 @@ class CleanupDatabaseConnections extends Command
                 $this->info("✅ {$terminated} conexiones terminadas");
             }
         } catch (\Exception $e) {
-            $this->error('Error al limpiar conexiones PostgreSQL: ' . $e->getMessage());
+            $this->error('Error al limpiar conexiones PostgreSQL: '.$e->getMessage());
         }
     }
 }

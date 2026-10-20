@@ -75,7 +75,7 @@ class UserCoupon extends Model
     public static function generateCouponCode($prefix = 'TURISCO'): string
     {
         do {
-            $code = $prefix . '-' . strtoupper(Str::random(8));
+            $code = $prefix.'-'.strtoupper(Str::random(8));
         } while (self::where('coupon_code', $code)->exists());
 
         return $code;

@@ -2,6 +2,4 @@
 
 namespace App\Policies;
 
-class ExperienciaPolicy extends OwnedContentPolicy
-{
-}
+class ExperienciaPolicy extends OwnedContentPolicy {}

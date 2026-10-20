@@ -54,7 +54,7 @@ function cuentaCupon(User $socio, User $tourist, array $attrs = []): UserCoupon
         'name' => 'Café del lago',
         'description' => 'Café',
         'address' => 'Jr. Lima 100, Puno',
-        'category' => 'cafe',
+        'category' => 'restaurant',
         'latitude' => -15.84,
         'longitude' => -70.02,
         'is_active' => true,
@@ -170,7 +170,7 @@ test('quien desactiva los correos de reservas no los recibe', function () {
         'participants' => 1,
     ])->assertCreated();
 
-    Notification::assertSentTo($socio, BookingNotification::class, fn ($n, $channels) => !in_array('mail', $channels, true));
+    Notification::assertSentTo($socio, BookingNotification::class, fn ($n, $channels) => ! in_array('mail', $channels, true));
 });
 
 test('la tarea diaria completa reservas pasadas y vence cupones', function () {

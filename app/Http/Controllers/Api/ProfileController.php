@@ -51,8 +51,8 @@ class ProfileController extends Controller
             'password' => ['nullable', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
         ]);
 
-        if (!empty($validated['password'])) {
-            if (!Hash::check($validated['current_password'] ?? '', $user->password)) {
+        if (! empty($validated['password'])) {
+            if (! Hash::check($validated['current_password'] ?? '', $user->password)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'La contraseña actual no es correcta.',
@@ -101,7 +101,7 @@ class ProfileController extends Controller
             $user->avatar = null;
         } else {
             $path = $request->file('avatar')->store('avatars', 'public');
-            $user->avatar = $request->getSchemeAndHttpHost() . '/storage/' . $path;
+            $user->avatar = $request->getSchemeAndHttpHost().'/storage/'.$path;
         }
 
         $user->save();
@@ -117,7 +117,7 @@ class ProfileController extends Controller
     private function deleteStoredAvatar(?string $url): void
     {
         if ($url && str_contains($url, '/storage/avatars/')) {
-            Storage::disk('public')->delete('avatars/' . basename(parse_url($url, PHP_URL_PATH)));
+            Storage::disk('public')->delete('avatars/'.basename(parse_url($url, PHP_URL_PATH)));
         }
     }
 

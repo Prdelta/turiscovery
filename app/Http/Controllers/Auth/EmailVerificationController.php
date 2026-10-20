@@ -20,15 +20,15 @@ class EmailVerificationController extends Controller
     {
         $user = User::find($id);
 
-        if (!$request->hasValidSignature()) {
+        if (! $request->hasValidSignature()) {
             return redirect()->away($this->frontendUrl('/cuenta?verificado=vencido'));
         }
 
-        if (!$user || !hash_equals(sha1($user->getEmailForVerification()), $hash)) {
+        if (! $user || ! hash_equals(sha1($user->getEmailForVerification()), $hash)) {
             return redirect()->away($this->frontendUrl('/cuenta?verificado=error'));
         }
 
-        if (!$user->hasVerifiedEmail() && $user->markEmailAsVerified()) {
+        if (! $user->hasVerifiedEmail() && $user->markEmailAsVerified()) {
             event(new Verified($user));
         }
 
@@ -59,6 +59,6 @@ class EmailVerificationController extends Controller
 
     private function frontendUrl(string $path): string
     {
-        return rtrim(config('app.frontend_url'), '/') . $path;
+        return rtrim(config('app.frontend_url'), '/').$path;
     }
 }

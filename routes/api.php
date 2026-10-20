@@ -1,33 +1,36 @@
 <?php
 
-use App\Http\Controllers\Auth\{EmailVerificationController, LoginController, PasswordResetController, RegisterController, SessionController};
 use App\Http\Controllers\Admin\ResourceSearchController;
-use App\Http\Controllers\Api\Admin\{CandelariaContentController, CandelariaLiveAdminController, UserController as AdminUserController};
-use App\Http\Controllers\Api\{
-    AlmanacController,
-    AnfitrionController,
-    BookingController,
-    CandelariaController,
-    CandelariaDanzaController,
-    CandelariaGalleryController,
-    CandelariaLiveController,
-    EventAttendeeController,
-    EventoController,
-    ExperienciaController,
-    FavoriteController,
-    LocaleController,
-    MyContentController,
-    NotificationController,
-    PartnerBookingController,
-    PartnerCouponController,
-    ProfileController,
-    PromocionController,
-    ReviewController,
-    StatsController,
-    UploadController,
-    UserCouponController
-};
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\Admin\CandelariaContentController;
+use App\Http\Controllers\Api\Admin\CandelariaLiveAdminController;
+use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Api\AlmanacController;
+use App\Http\Controllers\Api\AnfitrionController;
+use App\Http\Controllers\Api\BookingController;
+use App\Http\Controllers\Api\CandelariaController;
+use App\Http\Controllers\Api\CandelariaDanzaController;
+use App\Http\Controllers\Api\CandelariaGalleryController;
+use App\Http\Controllers\Api\CandelariaLiveController;
+use App\Http\Controllers\Api\EventAttendeeController;
+use App\Http\Controllers\Api\EventoController;
+use App\Http\Controllers\Api\ExperienciaController;
+use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\LocaleController;
+use App\Http\Controllers\Api\MyContentController;
+use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\PartnerBookingController;
+use App\Http\Controllers\Api\PartnerCouponController;
+use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\PromocionController;
+use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\StatsController;
+use App\Http\Controllers\Api\UploadController;
+use App\Http\Controllers\Api\UserCouponController;
+use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\SessionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -204,7 +207,7 @@ Route::middleware(['auth:sanctum', 'user.active', 'validate.params'])->group(fun
     // Avisos dentro de la app (reservas nuevas, confirmaciones, recordatorios)
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead']);
-    Route::post('/notifications/{id}/read', [NotificationController::class, 'markRead']);
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead'])->whereUuid('notification');
 
     // Event Attendances (Confirmación de asistencia a eventos)
     Route::get('/event-attendances', [EventAttendeeController::class, 'index']);

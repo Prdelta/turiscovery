@@ -27,7 +27,7 @@ class CandelariaGalleryController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'image_url' => 'required|url',
-            'year' => 'required|integer|min:1583|max:' . (date('Y') + 1),
+            'year' => 'required|integer|min:1583|max:'.(date('Y') + 1),
             'order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
         ]);
@@ -49,7 +49,7 @@ class CandelariaGalleryController extends Controller
             'title' => 'sometimes|string|max:255',
             'description' => 'nullable|string',
             'image_url' => 'sometimes|url',
-            'year' => 'sometimes|integer|min:1583|max:' . (date('Y') + 1),
+            'year' => 'sometimes|integer|min:1583|max:'.(date('Y') + 1),
             'order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
         ]);

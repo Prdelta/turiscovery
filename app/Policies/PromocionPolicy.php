@@ -2,6 +2,4 @@
 
 namespace App\Policies;
 
-class PromocionPolicy extends OwnedContentPolicy
-{
-}
+class PromocionPolicy extends OwnedContentPolicy {}

@@ -2,6 +2,4 @@
 
 namespace App\Policies;
 
-class LocalePolicy extends OwnedContentPolicy
-{
-}
+class LocalePolicy extends OwnedContentPolicy {}

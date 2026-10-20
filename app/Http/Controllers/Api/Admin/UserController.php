@@ -127,7 +127,7 @@ class UserController extends Controller
             ], 422);
         }
 
-        $active = !$user->is_active;
+        $active = ! $user->is_active;
 
         $user->update([
             'is_active' => $active,

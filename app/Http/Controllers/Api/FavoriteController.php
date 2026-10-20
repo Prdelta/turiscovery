@@ -37,7 +37,7 @@ class FavoriteController extends Controller
     {
         $request->merge(['favoritable_type' => MorphTypes::normalize($request->input('favoritable_type'))]);
         $request->validate([
-            'favoritable_type' => 'required|string|in:' . implode(',', MorphTypes::FAVORITABLE),
+            'favoritable_type' => 'required|string|in:'.implode(',', MorphTypes::FAVORITABLE),
             'favoritable_id' => 'required|integer|min:1',
         ], ['favoritable_type.*' => 'Ese tipo de contenido no se puede guardar en favoritos.']);
 
@@ -67,7 +67,7 @@ class FavoriteController extends Controller
     {
         $request->merge(['favoritable_type' => MorphTypes::normalize($request->input('favoritable_type'))]);
         $request->validate([
-            'favoritable_type' => 'required|string|in:' . implode(',', MorphTypes::FAVORITABLE),
+            'favoritable_type' => 'required|string|in:'.implode(',', MorphTypes::FAVORITABLE),
             'favoritable_id' => 'required|integer|min:1',
         ]);
 

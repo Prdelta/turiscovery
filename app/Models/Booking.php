@@ -86,8 +86,10 @@ class Booking extends Model
         if ($this->canBeCancelled()) {
             $this->status = 'cancelled';
             $this->save();
+
             return true;
         }
+
         return false;
     }
 
@@ -99,8 +101,10 @@ class Booking extends Model
         if ($this->status === 'pending') {
             $this->status = 'confirmed';
             $this->save();
+
             return true;
         }
+
         return false;
     }
 }

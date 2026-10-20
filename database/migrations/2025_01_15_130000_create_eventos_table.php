@@ -38,7 +38,7 @@ return new class extends Migration
                 'cultural',
                 'sports',
                 'exhibition',
-                'other'
+                'other',
             ])->default('other');
 
             // Media

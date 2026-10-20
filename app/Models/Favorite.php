@@ -55,6 +55,7 @@ class Favorite extends Model
 
         if ($favorite) {
             $favorite->delete();
+
             return false; // Unfavorited
         } else {
             self::create([
@@ -62,6 +63,7 @@ class Favorite extends Model
                 'favoritable_type' => $type,
                 'favoritable_id' => $id,
             ]);
+
             return true; // Favorited
         }
     }

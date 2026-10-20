@@ -34,11 +34,11 @@ class NotificationController extends Controller
         ]);
     }
 
-    public function markRead(Request $request, string $id)
+    public function markRead(Request $request, string $notification)
     {
         // Solo los avisos propios: otro id da 404
-        $notification = $request->user()->notifications()->whereKey($id)->firstOrFail();
-        $notification->markAsRead();
+        $item = $request->user()->notifications()->whereKey($notification)->firstOrFail();
+        $item->markAsRead();
 
         return response()->json(['success' => true]);
     }

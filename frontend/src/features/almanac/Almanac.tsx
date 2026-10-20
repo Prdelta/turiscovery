@@ -14,6 +14,7 @@ import {
   type AlmanacKind,
 } from '@/features/almanac/model'
 import { formatTime } from '@/shared/lib/format'
+import { useNow } from '@/shared/lib/hooks'
 import { Tocapu, type Dye, type Motif } from '@/shared/textile/Weave'
 
 const KIND_WEAVE: Record<AlmanacKind, { motif: Motif; dye: Dye }> = {
@@ -70,7 +71,7 @@ export function AlmanacRow({ item, dark = false }: { item: AlmanacItem; dark?: b
  * Versión oscura para ir sobre la escena del lago.
  */
 export function TodayPanel({ dark = false, className }: { dark?: boolean; className?: string }) {
-  const today = new Date()
+  const today = useNow()
   const moon = moonInfo(today)
   const season = altiplanoSeason(today)
   const lake = useLakeConditions()
@@ -139,7 +140,7 @@ export function TodayPanel({ dark = false, className }: { dark?: boolean; classN
  * Lo que pasa hoy queda en el almanaque.
  */
 export function TodayCards({ className }: { className?: string }) {
-  const today = new Date()
+  const today = useNow()
   const moon = moonInfo(today)
   const season = altiplanoSeason(today)
   const lake = useLakeConditions()

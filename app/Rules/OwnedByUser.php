@@ -18,8 +18,7 @@ class OwnedByUser implements ValidationRule
     public function __construct(
         private string $model,
         private string $message = 'Ese registro no pertenece a tu cuenta.',
-    ) {
-    }
+    ) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
@@ -37,7 +36,7 @@ class OwnedByUser implements ValidationRule
             ->where('user_id', $user->id)
             ->exists();
 
-        if (!$owned) {
+        if (! $owned) {
             $fail($this->message);
         }
     }

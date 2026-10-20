@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 import { formatDate } from '@/shared/lib/format'
+import { useNow } from '@/shared/lib/hooks'
 import type { UserCoupon } from '@/shared/api/types'
 import { discountText } from '@/features/catalog/components/ContentCard'
 import { StitchRow, Tocapu } from '@/shared/textile/Weave'
@@ -11,8 +12,9 @@ import { StatusBadge } from '@/shared/ui/Feedback'
  * para mostrar en caja y su estado. Funciona sin conexión si se guardó antes.
  */
 export function CouponCard({ coupon, action }: { coupon: UserCoupon; action?: ReactNode }) {
+  const now = useNow()
   const promo = coupon.promocion
-  const expired = coupon.status === 'expired' || (coupon.expires_at ? new Date(coupon.expires_at) < new Date() : false)
+  const expired = coupon.status === 'expired' || (coupon.expires_at ? new Date(coupon.expires_at) < now : false)
   const status = coupon.status === 'used' ? 'used' : expired ? 'expired' : 'available'
 
   return (

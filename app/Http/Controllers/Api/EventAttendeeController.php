@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\EventAttendee;
 use App\Models\Evento;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class EventAttendeeController extends Controller
 {
@@ -104,7 +104,7 @@ class EventAttendeeController extends Controller
             ->where('evento_id', $eventoId)
             ->first();
 
-        if (!$attendance) {
+        if (! $attendance) {
             return response()->json([
                 'success' => false,
                 'message' => 'No has confirmado asistencia a este evento.',

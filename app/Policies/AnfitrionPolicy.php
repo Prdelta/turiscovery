@@ -2,6 +2,4 @@
 
 namespace App\Policies;
 
-class AnfitrionPolicy extends OwnedContentPolicy
-{
-}
+class AnfitrionPolicy extends OwnedContentPolicy {}

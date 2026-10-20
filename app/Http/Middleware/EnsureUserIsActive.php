@@ -18,7 +18,7 @@ class EnsureUserIsActive
         $user = $request->user();
 
         // Si el usuario no está activo, cerrar sesión y bloquear
-        if ($user && !$user->is_active) {
+        if ($user && ! $user->is_active) {
             if ($request->hasSession()) {
                 auth()->guard('web')->logout();
                 $request->session()->invalidate();

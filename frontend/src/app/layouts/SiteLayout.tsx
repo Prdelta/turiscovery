@@ -1,6 +1,6 @@
 import { clsx } from 'clsx'
 import { Bookmark, Home, LogOut, MapPin, Menu, Search, User as UserIcon, X } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, NavLink, Outlet, ScrollRestoration, useLocation, useNavigate } from 'react-router'
 import { NotificationBell } from '@/features/notifications/NotificationBell'
 import { homeForRole, useAuth } from '@/shared/auth/AuthContext'
@@ -47,11 +47,12 @@ export function SiteLayout() {
 
 function Header() {
   const { user, logout } = useAuth()
-  const [open, setOpen] = useState(false)
+  // El menú queda abierto solo en la ruta donde se abrió: al navegar se cierra
+  const [openAt, setOpenAt] = useState<string | null>(null)
   const location = useLocation()
   const navigate = useNavigate()
 
-  useEffect(() => setOpen(false), [location.pathname])
+  const open = openAt === location.pathname
 
   const signOut = async () => {
     await logout()
@@ -105,7 +106,7 @@ function Header() {
           )}
           <button
             className="inline-flex size-11 items-center justify-center rounded-[var(--radius-control)] border-2 border-ink bg-white lg:hidden"
-            onClick={() => setOpen((o) => !o)}
+            onClick={() => setOpenAt(open ? null : location.pathname)}
             aria-expanded={open}
             aria-controls="menu-movil"
             aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
@@ -193,6 +194,8 @@ function BottomNav() {
   )
 }
 
+const CURRENT_YEAR = new Date().getFullYear()
+
 function Footer() {
   return (
     <footer className="bg-ink pb-20 text-white/80 lg:pb-0">
@@ -210,7 +213,7 @@ function Footer() {
         <FooterCol title="Turiscovery" links={[['/sobre-nosotros', 'Sobre nosotros'], ['/contacto', 'Contacto'], ['/terminos', 'Términos y condiciones'], ['/privacidad', 'Política de privacidad']]} />
       </div>
       <div className="border-t border-white/15">
-        <p className="container-page py-5 text-xs text-white/60">© {new Date().getFullYear()} Turiscovery · Puno, Perú</p>
+        <p className="container-page py-5 text-xs text-white/60">© {CURRENT_YEAR} Turiscovery · Puno, Perú</p>
       </div>
     </footer>
   )

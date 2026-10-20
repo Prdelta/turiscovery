@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
         $plain = env('SEED_USER_PASSWORD') ?: Str::password(16);
         $password = Hash::make($plain);
 
-        if (!env('SEED_USER_PASSWORD')) {
+        if (! env('SEED_USER_PASSWORD')) {
             $this->command?->warn("Contraseña generada para las cuentas de ejemplo: {$plain}");
             $this->command?->warn('Guárdala ahora o define SEED_USER_PASSWORD en .env antes de sembrar.');
         }

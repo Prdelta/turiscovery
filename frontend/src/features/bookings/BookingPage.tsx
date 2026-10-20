@@ -14,7 +14,7 @@ import { altitudeWarningFor } from '@/features/planner/altitude'
 import { parseApiError } from '@/shared/api/client'
 import { imageOf } from '@/shared/config/content'
 import { formatPrice, toDateInput } from '@/shared/lib/format'
-import { useDocumentTitle } from '@/shared/lib/hooks'
+import { useDocumentTitle, useNow } from '@/shared/lib/hooks'
 import { useContentItem } from '@/features/catalog/api'
 import { useOnline } from '@/shared/offline/offline'
 import type { Experiencia } from '@/shared/api/types'
@@ -43,7 +43,8 @@ export default function BookingPage() {
 
   const days = availability.data ?? []
   const fromPlan = params.get('fecha')
-  const tomorrow = toDateInput(new Date(Date.now() + 86_400_000).toISOString())
+  const now = useNow()
+  const tomorrow = toDateInput(new Date(now.getTime() + 86_400_000).toISOString())
   const [picked, setPicked] = useState<string | null>(null)
   // Sin elección propia: la fecha que viene del planificador, o el primer día con cupos
   const date =

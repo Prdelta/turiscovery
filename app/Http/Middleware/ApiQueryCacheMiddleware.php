@@ -46,7 +46,7 @@ class ApiQueryCacheMiddleware
         }
 
         // Solo cachear rutas específicas
-        if (!$this->shouldCache($request)) {
+        if (! $this->shouldCache($request)) {
             return $next($request);
         }
 
@@ -115,7 +115,7 @@ class ApiQueryCacheMiddleware
             $request->user() ? $request->user()->id : 'guest',
         ];
 
-        return 'api:' . md5(implode('|', $parts));
+        return 'api:'.md5(implode('|', $parts));
     }
 
     /**

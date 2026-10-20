@@ -19,7 +19,7 @@ trait BelongsToOwner
     /** Lo que gestiona un usuario: un administrador ve todo */
     public function scopeManagedBy(Builder $query, User $user): Builder
     {
-        return $user->isAdmin() ? $query : $query->where($this->getTable() . '.user_id', $user->id);
+        return $user->isAdmin() ? $query : $query->where($this->getTable().'.user_id', $user->id);
     }
 
     public function isOwnedBy(?User $user): bool

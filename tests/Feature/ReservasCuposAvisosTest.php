@@ -140,7 +140,7 @@ test('el socio ve la reserva nueva en sus avisos y la marca como leída', functi
     $socio = cuposUser('socio');
     $exp = cuposExperiencia($socio);
 
-    Sanctum::actingAs(cuposUser(['name' => 'Ana Viajera']));
+    Sanctum::actingAs(cuposUser(attrs: ['name' => 'Ana Viajera']));
     cuposReservar($this, $exp, 2)->assertCreated();
 
     Sanctum::actingAs($socio);

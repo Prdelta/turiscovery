@@ -2,6 +2,4 @@
 
 namespace App\Policies;
 
-class EventoPolicy extends OwnedContentPolicy
-{
-}
+class EventoPolicy extends OwnedContentPolicy {}

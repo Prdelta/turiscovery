@@ -18,7 +18,7 @@ class ReviewController extends Controller
     {
         $request->merge(['reviewable_type' => MorphTypes::normalize($request->input('reviewable_type'))]);
         $request->validate([
-            'reviewable_type' => 'required|string|in:' . implode(',', MorphTypes::REVIEWABLE),
+            'reviewable_type' => 'required|string|in:'.implode(',', MorphTypes::REVIEWABLE),
             'reviewable_id' => 'required|integer|min:1',
         ]);
 
@@ -41,7 +41,7 @@ class ReviewController extends Controller
     {
         $request->merge(['reviewable_type' => MorphTypes::normalize($request->input('reviewable_type'))]);
         $request->validate([
-            'reviewable_type' => 'required|string|in:' . implode(',', MorphTypes::REVIEWABLE),
+            'reviewable_type' => 'required|string|in:'.implode(',', MorphTypes::REVIEWABLE),
             'reviewable_id' => 'required|integer|min:1',
             'rating' => 'required|integer|min:1|max:5',
             'title' => 'nullable|string|max:255',
@@ -101,7 +101,7 @@ class ReviewController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 

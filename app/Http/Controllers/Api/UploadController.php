@@ -28,7 +28,7 @@ class UploadController extends Controller
     {
         $validated = $request->validate([
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB
-            'folder' => 'required|string|in:' . implode(',', $this->folders),
+            'folder' => 'required|string|in:'.implode(',', $this->folders),
         ]);
 
         $path = $request->file('image')->store($validated['folder'], 'public');
@@ -38,7 +38,7 @@ class UploadController extends Controller
             'data' => [
                 // URL según el host de la petición: funciona detrás del proxy de Vite
                 // en desarrollo y con el dominio de la API en producción
-                'url' => $request->getSchemeAndHttpHost() . '/storage/' . $path,
+                'url' => $request->getSchemeAndHttpHost().'/storage/'.$path,
                 'path' => $path,
             ],
         ], 201);
@@ -58,7 +58,7 @@ class UploadController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'url' => $request->getSchemeAndHttpHost() . '/storage/' . $path,
+                'url' => $request->getSchemeAndHttpHost().'/storage/'.$path,
                 'path' => $path,
             ],
         ], 201);

@@ -5,7 +5,7 @@ import { Tocapu, WovenBand } from '@/shared/textile/Weave'
 import { ErrorState, Spinner } from '@/shared/ui/Feedback'
 import { altiplanoSeason, happensOn, localDateKey, moonInfo, useAlmanac } from '@/features/almanac/model'
 import { parseApiError } from '@/shared/api/client'
-import { useDocumentTitle } from '@/shared/lib/hooks'
+import { useDocumentTitle, useNow } from '@/shared/lib/hooks'
 
 const RANGES = [
   { days: 7, label: 'Esta semana' },
@@ -16,14 +16,14 @@ export default function AlmanacPage() {
   useDocumentTitle('Almanaque')
   const [days, setDays] = useState(7)
   const { data, isLoading, isError, error, refetch } = useAlmanac(days)
+  const start = useNow()
 
   const calendar = useMemo(() => {
-    const start = new Date()
     return Array.from({ length: days }, (_, i) => {
       const day = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i)
       return { day, items: (data?.items ?? []).filter((it) => happensOn(it, day)) }
     })
-  }, [data, days])
+  }, [data, days, start])
 
   const dayFmt = new Intl.DateTimeFormat('es-PE', { weekday: 'long', day: 'numeric', month: 'long' })
 

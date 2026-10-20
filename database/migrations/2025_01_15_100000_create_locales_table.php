@@ -37,7 +37,7 @@ return new class extends Migration
                 'craft_shop',
                 'museum',
                 'cultural_center',
-                'other'
+                'other',
             ])->default('other');
 
             // Media (JSON array of image paths)

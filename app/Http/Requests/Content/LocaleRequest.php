@@ -15,14 +15,14 @@ class LocaleRequest extends ContentRequest
     public function rules(): array
     {
         return [
-            'name' => $this->required() . '|string|max:255',
-            'category' => $this->required() . '|in:restaurant,hotel,tour_agency,craft_shop,museum,cultural_center,other',
+            'name' => $this->required().'|string|max:255',
+            'category' => $this->required().'|in:restaurant,hotel,tour_agency,craft_shop,museum,cultural_center,other',
             'phone' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:255',
             'website' => 'nullable|url|max:255',
             ...$this->commonRules(),
             ...$this->locationRules(required: true, bounds: self::PUNO_BOUNDS),
-            'address' => $this->required() . '|string|max:500',
+            'address' => $this->required().'|string|max:500',
         ];
     }
 

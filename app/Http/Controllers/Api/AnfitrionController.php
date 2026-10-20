@@ -22,7 +22,7 @@ class AnfitrionController extends Controller
         }
 
         if ($request->filled('community')) {
-            $query->where('community', 'ILIKE', '%' . $request->community . '%');
+            $query->where('community', 'ILIKE', '%'.$request->community.'%');
         }
 
         return response()->json(['success' => true, 'data' => $query->get()]);
@@ -42,7 +42,7 @@ class AnfitrionController extends Controller
     {
         $query = Anfitrion::query()->withCount('experiencias')->orderBy('name');
 
-        if (!$request->user()->isAdmin()) {
+        if (! $request->user()->isAdmin()) {
             $query->where('user_id', $request->user()->id);
         }
 
@@ -78,7 +78,7 @@ class AnfitrionController extends Controller
     private function validated(Request $request, bool $partial = false): array
     {
         return $request->validate([
-            'name' => ($partial ? 'sometimes|' : '') . 'required|string|max:255',
+            'name' => ($partial ? 'sometimes|' : '').'required|string|max:255',
             'community' => 'nullable|string|max:255',
             'role_title' => 'nullable|string|max:255',
             'languages' => 'nullable|array',

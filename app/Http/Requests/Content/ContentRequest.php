@@ -59,7 +59,7 @@ abstract class ContentRequest extends FormRequest
     protected function commonRules(): array
     {
         return [
-            'description' => $this->required() . '|string',
+            'description' => $this->required().'|string',
             'images' => 'nullable|array|max:12',
             'images.*' => 'string|max:500',
             'is_active' => 'boolean',

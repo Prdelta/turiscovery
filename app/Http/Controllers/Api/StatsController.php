@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Locale;
 use App\Models\Evento;
 use App\Models\Experiencia;
+use App\Models\Locale;
 use App\Models\Promocion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -46,7 +46,7 @@ class StatsController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $stats
+            'data' => $stats,
         ]);
     }
 
@@ -72,6 +72,7 @@ class StatsController extends Controller
 
             $locales = $query->latest()->limit($limit)->get()->map(function ($item) {
                 $item->contentType = 'locales';
+
                 return $item;
             });
 
@@ -88,6 +89,7 @@ class StatsController extends Controller
 
             $eventos = $query->latest()->limit($limit)->get()->map(function ($item) {
                 $item->contentType = 'eventos';
+
                 return $item;
             });
 
@@ -104,6 +106,7 @@ class StatsController extends Controller
 
             $experiencias = $query->latest()->limit($limit)->get()->map(function ($item) {
                 $item->contentType = 'experiencias';
+
                 return $item;
             });
 
@@ -120,6 +123,7 @@ class StatsController extends Controller
 
             $promociones = $query->latest()->limit($limit)->get()->map(function ($item) {
                 $item->contentType = 'promociones';
+
                 return $item;
             });
 
@@ -136,7 +140,7 @@ class StatsController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $items
+            'data' => $items,
         ]);
     }
 }

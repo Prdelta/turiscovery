@@ -22,13 +22,12 @@ trait HasLocation
      * Contenido a menos de $radiusMeters de un punto, ordenado por distancia.
      * Las coordenadas van como parámetros enlazados, nunca dentro del SQL.
      */
-    public static function nearby(float $latitude, float $longitude, int $radiusMeters = 5000): Builder
+    public function scopeNearby(Builder $query, float $latitude, float $longitude, int $radiusMeters = 5000): Builder
     {
-        $model = new static();
         $point = 'ST_SetSRID(ST_MakePoint(?, ?), 4326)::geography';
 
-        return static::query()
-            ->select($model->getTable() . '.*')
+        return $query
+            ->select($this->getTable().'.*')
             ->selectRaw("ST_Distance(location, {$point}) as distance", [$longitude, $latitude])
             ->whereNotNull('location')
             ->whereRaw("ST_DWithin(location, {$point}, ?)", [$longitude, $latitude, $radiusMeters])

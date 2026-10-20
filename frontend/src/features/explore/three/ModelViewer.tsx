@@ -26,13 +26,11 @@ function Model({ url }: { url: string }) {
   )
 }
 
-class ModelErrorBoundary extends Component<{ children: ReactNode; resetKey: string }, { failed: boolean }> {
+/** Se reinicia al cambiar de modelo porque se monta con key={url} */
+class ModelErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false }
   static getDerivedStateFromError() {
     return { failed: true }
-  }
-  componentDidUpdate(prev: { resetKey: string }) {
-    if (prev.resetKey !== this.props.resetKey && this.state.failed) this.setState({ failed: false })
   }
   render() {
     if (this.state.failed) {
@@ -60,7 +58,7 @@ export default function ModelViewer({ url, autoRotate = true }: { url: string; a
         <Lightformer intensity={1} position={[-5, 1, 2]} rotation-y={Math.PI / 2} scale={[8, 4, 1]} color="#b6dfe7" />
         <Lightformer intensity={0.8} position={[5, 1, 2]} rotation-y={-Math.PI / 2} scale={[8, 4, 1]} color="#ffffff" />
       </Environment>
-      <ModelErrorBoundary resetKey={url}>
+      <ModelErrorBoundary key={url}>
         <Suspense fallback={<Loader />}>
           <Bounds fit clip observe margin={1.3} key={url}>
             <Model url={url} />

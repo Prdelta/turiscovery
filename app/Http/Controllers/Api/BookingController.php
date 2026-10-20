@@ -7,8 +7,8 @@ use App\Models\Booking;
 use App\Models\Experiencia;
 use App\Services\BookingService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class BookingController extends Controller
 {
@@ -102,7 +102,7 @@ class BookingController extends Controller
 
         $experiencia = Experiencia::findOrFail($validated['experiencia_id']);
 
-        if (!$experiencia->max_participants) {
+        if (! $experiencia->max_participants) {
             return response()->json([
                 'success' => true,
                 'available' => true,

@@ -21,7 +21,7 @@ return new class extends Migration
     public function up(): void
     {
         foreach ($this->columns as $table => $column) {
-            if (!Schema::hasTable($table)) {
+            if (! Schema::hasTable($table)) {
                 continue;
             }
             foreach (MorphTypes::MAP as $alias => $class) {
@@ -33,7 +33,7 @@ return new class extends Migration
     public function down(): void
     {
         foreach ($this->columns as $table => $column) {
-            if (!Schema::hasTable($table)) {
+            if (! Schema::hasTable($table)) {
                 continue;
             }
             foreach (MorphTypes::MAP as $alias => $class) {

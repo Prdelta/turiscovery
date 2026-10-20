@@ -21,7 +21,6 @@ class SessionController extends Controller
     /**
      * Login con sesión (no token en localStorage)
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function login(Request $request)
@@ -32,7 +31,7 @@ class SessionController extends Controller
         ]);
 
         // Rate limiting por IP
-        $key = 'login.' . $request->ip();
+        $key = 'login.'.$request->ip();
 
         if (RateLimiter::tooManyAttempts($key, 5)) {
             $seconds = RateLimiter::availableIn($key);
@@ -47,7 +46,7 @@ class SessionController extends Controller
         $user = User::where('email', $request->email)->first();
 
         // Verificar credenciales
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (! $user || ! Hash::check($request->password, $user->password)) {
             RateLimiter::hit($key, 60); // Incrementar contador por 60 segundos
 
             throw ValidationException::withMessages([
@@ -58,7 +57,7 @@ class SessionController extends Controller
         // Limpiar rate limiter si el login es exitoso
         RateLimiter::clear($key);
 
-        if (!$user->is_active) {
+        if (! $user->is_active) {
             return response()->json([
                 'success' => false,
                 'message' => 'Tu cuenta ha sido desactivada por un administrador.',
@@ -87,14 +86,13 @@ class SessionController extends Controller
                 ],
                 // NO se devuelve token - la cookie de sesión se establece automáticamente
                 // y es httpOnly (no accesible desde JavaScript)
-            ]
+            ],
         ], 200);
     }
 
     /**
      * Logout - Invalida la sesión
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function logout(Request $request)
@@ -117,14 +115,13 @@ class SessionController extends Controller
     /**
      * Obtener información del usuario autenticado
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function me(Request $request)
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'success' => false,
                 'message' => 'No autenticado',
@@ -153,7 +150,6 @@ class SessionController extends Controller
     /**
      * Verificar estado de autenticación
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function check(Request $request)

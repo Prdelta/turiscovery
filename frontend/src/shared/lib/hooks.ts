@@ -9,6 +9,12 @@ export function useDebounced<T>(value: T, delay = 350) {
   return debounced
 }
 
+/** Fecha y hora en que se montó el componente: estable entre renders */
+export function useNow() {
+  const [now] = useState(() => new Date())
+  return now
+}
+
 export function useDocumentTitle(title?: string) {
   useEffect(() => {
     document.title = title ? `${title} · Turiscovery` : 'Turiscovery · Puno'

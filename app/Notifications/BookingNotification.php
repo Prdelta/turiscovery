@@ -25,9 +25,7 @@ class BookingNotification extends Notification
 
     public const EVENTS = ['requested', 'cancelled_by_tourist', 'confirmed', 'cancelled', 'completed', 'reminder'];
 
-    public function __construct(public Booking $booking, public string $event)
-    {
-    }
+    public function __construct(public Booking $booking, public string $event) {}
 
     public function via(object $notifiable): array
     {
@@ -48,7 +46,7 @@ class BookingNotification extends Notification
             'confirmed' => ["Tu reserva de {$title} para el {$date} está confirmada.", '/cuenta/reservas'],
             'cancelled' => ["El anfitrión no puede recibirte en {$title} el {$date}. Elige otra fecha.", '/cuenta/reservas'],
             'completed' => ["¿Qué tal {$title}? Cuéntanos cómo te fue.", "/experiencias/{$booking->experiencia_id}#resenas"],
-            'reminder' => ["Mañana es {$title}" . $this->meetingText(' — ') . '.', '/cuenta/reservas'],
+            'reminder' => ["Mañana es {$title}".$this->meetingText(' — ').'.', '/cuenta/reservas'],
             default => ["Tu reserva de {$title} cambió de estado.", '/cuenta/reservas'],
         };
 
@@ -77,7 +75,7 @@ class BookingNotification extends Notification
             'requested' => $mail
                 ->subject("Nueva reserva: {$title}")
                 ->line("{$booking->user?->name} reservó **{$title}** para el {$date} ({$people}).")
-                ->line('Contacto: ' . collect([$booking->contact_email, $booking->contact_phone])->filter()->implode(' · '))
+                ->line('Contacto: '.collect([$booking->contact_email, $booking->contact_phone])->filter()->implode(' · '))
                 ->when($booking->notes, fn (MailMessage $m) => $m->line("Nota del viajero: “{$booking->notes}”"))
                 ->action('Confirmar o rechazar', "{$front}/dashboard/reservas")
                 ->line('El viajero espera tu confirmación.'),
@@ -91,7 +89,7 @@ class BookingNotification extends Notification
             'confirmed' => $mail
                 ->subject("Reserva confirmada: {$title}")
                 ->line("Tu reserva de **{$title}** para el {$date} ({$people}) está confirmada.")
-                ->when($this->meetingText(), fn (MailMessage $m) => $m->line('Punto de encuentro: ' . $this->meetingText() . '.'))
+                ->when($this->meetingText(), fn (MailMessage $m) => $m->line('Punto de encuentro: '.$this->meetingText().'.'))
                 ->line('Recuerda llegar con tiempo y abrigarte: en el altiplano el clima cambia rápido.')
                 ->action('Ver mi reserva', "{$front}/cuenta/reservas"),
 
@@ -110,7 +108,7 @@ class BookingNotification extends Notification
             'reminder' => $mail
                 ->subject("Mañana: {$title}")
                 ->line("Te esperamos mañana en **{$title}** ({$people}).")
-                ->when($this->meetingText(), fn (MailMessage $m) => $m->line('Punto de encuentro: ' . $this->meetingText() . '.'))
+                ->when($this->meetingText(), fn (MailMessage $m) => $m->line('Punto de encuentro: '.$this->meetingText().'.'))
                 ->line('Lleva abrigo, protector solar y agua. Si estás recién llegado a Puno, desayuna liviano.')
                 ->line('Guarda tu reserva para verla sin conexión: en el lago casi no hay señal.')
                 ->action('Ver mi reserva', "{$front}/cuenta/reservas"),
@@ -123,7 +121,7 @@ class BookingNotification extends Notification
     {
         $n = $this->booking->participants;
 
-        return $n . ' ' . ($n == 1 ? 'persona' : 'personas');
+        return $n.' '.($n == 1 ? 'persona' : 'personas');
     }
 
     private function shortDate(): string
@@ -135,8 +133,8 @@ class BookingNotification extends Notification
     private function meetingText(string $prefix = ''): string
     {
         $e = $this->booking->experiencia;
-        $text = collect([$e?->meeting_point, $e?->meeting_time ? substr($e->meeting_time, 0, 5) . ' h' : null])->filter()->implode(', ');
+        $text = collect([$e?->meeting_point, $e?->meeting_time ? substr($e->meeting_time, 0, 5).' h' : null])->filter()->implode(', ');
 
-        return $text ? $prefix . $text : '';
+        return $text ? $prefix.$text : '';
     }
 }

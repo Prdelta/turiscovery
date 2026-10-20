@@ -201,7 +201,7 @@ test('los favoritos aceptan el alias y el nombre de clase antiguo', function () 
     $this->postJson('/api/favorites/toggle', ['favoritable_type' => 'locale', 'favoritable_id' => $locale->id])
         ->assertOk()->assertJsonPath('is_favorited', true);
 
-    $this->getJson('/api/favorites/check?favoritable_type=' . urlencode(Locale::class) . "&favoritable_id={$locale->id}")
+    $this->getJson('/api/favorites/check?favoritable_type='.urlencode(Locale::class)."&favoritable_id={$locale->id}")
         ->assertOk()->assertJsonPath('is_favorited', true);
 
     $this->assertDatabaseHas('favorites', ['favoritable_type' => 'locale', 'favoritable_id' => $locale->id]);

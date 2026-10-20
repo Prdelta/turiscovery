@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use App\Models\User;
 
 class CandelariaGallerySeeder extends Seeder
 {
@@ -17,8 +17,9 @@ class CandelariaGallerySeeder extends Seeder
         // Obtener el admin que agregará el contenido
         $admin = User::where('role', 'admin')->first();
 
-        if (!$admin) {
+        if (! $admin) {
             $this->command->error('⚠️  No se encontró usuario admin. Ejecuta DatabaseSeeder primero.');
+
             return;
         }
 
@@ -135,7 +136,7 @@ class CandelariaGallerySeeder extends Seeder
             ]);
         }
 
-        $this->command->info('✅ Galería histórica creada: ' . count($galleries) . ' fotografías');
-        $this->command->info('   → Agregadas por: ' . $admin->name . ' (Admin)');
+        $this->command->info('✅ Galería histórica creada: '.count($galleries).' fotografías');
+        $this->command->info('   → Agregadas por: '.$admin->name.' (Admin)');
     }
 }

@@ -48,14 +48,14 @@ return new class extends Migration
         Schema::table('eventos', function (Blueprint $table) {
             $table->dropColumn([
                 'street', 'street_number', 'district', 'city', 'region',
-                'country', 'postal_code', 'address_notes', 'latitude', 'longitude'
+                'country', 'postal_code', 'address_notes', 'latitude', 'longitude',
             ]);
         });
 
         Schema::table('experiencias', function (Blueprint $table) {
             $table->dropColumn([
                 'street', 'street_number', 'district', 'city', 'region',
-                'country', 'postal_code', 'address_notes', 'latitude', 'longitude'
+                'country', 'postal_code', 'address_notes', 'latitude', 'longitude',
             ]);
         });
     }

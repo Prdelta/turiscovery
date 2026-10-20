@@ -31,7 +31,7 @@ class CandelariaLive
     {
         $item ??= $this->currentItem();
 
-        if (!$item) {
+        if (! $item) {
             return [
                 'live' => false,
                 'item' => null,

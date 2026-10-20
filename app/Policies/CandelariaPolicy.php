@@ -2,6 +2,4 @@
 
 namespace App\Policies;
 
-class CandelariaPolicy extends OwnedContentPolicy
-{
-}
+class CandelariaPolicy extends OwnedContentPolicy {}

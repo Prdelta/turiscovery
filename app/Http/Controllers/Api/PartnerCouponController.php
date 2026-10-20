@@ -41,7 +41,7 @@ class PartnerCouponController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $coupon->status === 'used'
-                    ? 'Este cupón ya se usó el ' . $coupon->used_at?->locale('es')->isoFormat('D [de] MMMM [a las] HH:mm') . '.'
+                    ? 'Este cupón ya se usó el '.$coupon->used_at?->locale('es')->isoFormat('D [de] MMMM [a las] HH:mm').'.'
                     : 'Este cupón ya venció.',
                 'data' => $this->present($coupon),
             ], 422);
@@ -63,7 +63,7 @@ class PartnerCouponController extends Controller
             ->where('status', 'used')
             ->latest('used_at');
 
-        if (!$request->user()->isAdmin()) {
+        if (! $request->user()->isAdmin()) {
             $query->whereHas('promocion', fn ($q) => $q->where('user_id', $request->user()->id));
         }
 
@@ -85,7 +85,7 @@ class PartnerCouponController extends Controller
             ->first();
 
         // Mismo mensaje si no existe o si es de otro socio: no se revela qué códigos existen
-        if (!$coupon || (!$request->user()->isAdmin() && (int) $coupon->promocion?->user_id !== (int) $request->user()->id)) {
+        if (! $coupon || (! $request->user()->isAdmin() && (int) $coupon->promocion?->user_id !== (int) $request->user()->id)) {
             abort(404, 'No encontramos ese código entre los cupones de tus promociones.');
         }
 

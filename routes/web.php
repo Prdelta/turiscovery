@@ -19,7 +19,7 @@ Route::get('/api/auth/google', [GoogleAuthController::class, 'redirectToGoogle']
 Route::get('/api/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
 
 // Laravel redirige aquí a los usuarios no autenticados en rutas web
-Route::get('/login', fn () => redirect()->away(rtrim(config('app.frontend_url'), '/') . '/login'))->name('login');
+Route::get('/login', fn () => redirect()->away(rtrim(config('app.frontend_url'), '/').'/login'))->name('login');
 
 // Cualquier otra URL web se envía a la misma ruta del frontend React
 Route::fallback(function () {
@@ -29,5 +29,5 @@ Route::fallback(function () {
         abort(404);
     }
 
-    return redirect()->away(rtrim(config('app.frontend_url'), '/') . $path);
+    return redirect()->away(rtrim(config('app.frontend_url'), '/').$path);
 });

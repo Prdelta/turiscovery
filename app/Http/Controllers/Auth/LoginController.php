@@ -5,10 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
@@ -23,7 +21,7 @@ class LoginController extends Controller
         ]);
 
         // Rate limiting: 5 attempts per minute
-        $key = 'login.' . $request->ip();
+        $key = 'login.'.$request->ip();
 
         if (RateLimiter::tooManyAttempts($key, 5)) {
             $seconds = RateLimiter::availableIn($key);
@@ -37,7 +35,7 @@ class LoginController extends Controller
         // Attempt authentication
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (! $user || ! Hash::check($request->password, $user->password)) {
             RateLimiter::hit($key, 60); // Lock for 60 seconds after 5 failed attempts
 
             return response()->json([
@@ -65,7 +63,7 @@ class LoginController extends Controller
                 ],
                 'access_token' => $token,
                 'token_type' => 'Bearer',
-            ]
+            ],
         ], 200);
     }
 

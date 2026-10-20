@@ -2,14 +2,14 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use App\Models\Locale;
 use App\Models\Candelaria;
-use App\Models\Experiencia;
 use App\Models\Evento;
+use App\Models\Experiencia;
+use App\Models\Favorite;
+use App\Models\Locale;
 use App\Models\Promocion;
 use App\Models\Review;
-use App\Models\Favorite;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB; // <--- Importante para DB::raw
 use Illuminate\Support\Facades\Hash;
@@ -167,7 +167,9 @@ class DatabaseSeeder extends Seeder
             // Since I am replacing the block, I am good.
             // Wait, I need to check Candelaria model fillable in Candelaria.php if I want to be 100% sure.
             // But for now I'll stick to 'images' array pattern.
-            if (isset($data['image_url'])) unset($data['image_url']); // Safety if I don't remove it in replacement? No, replacement overwrites.
+            if (isset($data['image_url'])) {
+                unset($data['image_url']);
+            } // Safety if I don't remove it in replacement? No, replacement overwrites.
             $createdCandelaria[] = Candelaria::create($data);
         }
 

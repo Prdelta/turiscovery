@@ -6,7 +6,7 @@ import { Link } from 'react-router'
 import { Button } from '@/shared/ui/Button'
 import { Alert, Badge, ErrorState, Spinner } from '@/shared/ui/Feedback'
 import { formatTime } from '@/shared/lib/format'
-import { useDocumentTitle } from '@/shared/lib/hooks'
+import { useDocumentTitle, useNow } from '@/shared/lib/hooks'
 import { PROGRAM_TYPES } from '@/shared/config/content'
 import type { LiveState, Performance, ProgramItem } from '@/shared/api/types'
 import { candelariaQueries, useDanzas } from '@/features/candelaria/api'
@@ -214,7 +214,8 @@ function NotLive({ state }: { state?: LiveState }) {
 
 function ProgramRow({ item, liveId }: { item: ProgramItem; liveId?: number }) {
   const isLive = liveId === item.id
-  const past = new Date(item.ends_at) < new Date()
+  const now = useNow()
+  const past = new Date(item.ends_at) < now
   return (
     <li className={clsx('flex flex-wrap items-center gap-4 card p-4', past && !isLive && 'opacity-60')}>
       <div className="w-36 shrink-0">

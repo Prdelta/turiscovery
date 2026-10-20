@@ -8,7 +8,7 @@ import { ChipGroup, TEXT_LINK } from '@/shared/ui/Panel'
 import { useToast } from '@/shared/ui/Toast'
 import { parseApiError } from '@/shared/api/client'
 import { formatDate, formatPrice } from '@/shared/lib/format'
-import { useDocumentTitle } from '@/shared/lib/hooks'
+import { useDocumentTitle, useNow } from '@/shared/lib/hooks'
 import type { Booking } from '@/shared/api/types'
 import { bookingQueries, useUpdatePartnerBooking } from '@/features/bookings/api'
 
@@ -28,7 +28,7 @@ export function PartnerBookingsPage() {
       }),
   }
   // Fecha local en formato YYYY-MM-DD, comparable con booking_date
-  const todayKey = new Date().toLocaleDateString('en-CA')
+  const todayKey = useNow().toLocaleDateString('en-CA')
   const busy = (id: number, s: string) => update.isPending && update.variables?.id === id && update.variables.status === s
 
   return (

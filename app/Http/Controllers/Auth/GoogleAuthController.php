@@ -8,8 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 
 class GoogleAuthController extends Controller
 {
@@ -19,7 +19,7 @@ class GoogleAuthController extends Controller
     public function redirectToGoogle()
     {
         // Sin credenciales, Google mostraría su propia página de error: se vuelve al login con un aviso
-        if (!config('services.google.client_id') || !config('services.google.client_secret')) {
+        if (! config('services.google.client_id') || ! config('services.google.client_secret')) {
             Log::warning('Google OAuth sin configurar: faltan GOOGLE_CLIENT_ID o GOOGLE_CLIENT_SECRET en .env');
 
             return redirect()->away($this->frontendUrl('/login?error=google_config'));
@@ -95,7 +95,7 @@ class GoogleAuthController extends Controller
             return redirect()->away($this->frontendUrl('/'));
         } catch (\Exception $e) {
             // Log the error for debugging
-            Log::error('Google OAuth Error: ' . $e->getMessage());
+            Log::error('Google OAuth Error: '.$e->getMessage());
 
             return redirect()->away($this->frontendUrl('/login?error=google'));
         }
@@ -106,6 +106,6 @@ class GoogleAuthController extends Controller
      */
     private function frontendUrl(string $path): string
     {
-        return rtrim(config('app.frontend_url'), '/') . $path;
+        return rtrim(config('app.frontend_url'), '/').$path;
     }
 }

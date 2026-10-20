@@ -30,7 +30,7 @@ class ResourceSearchController extends Controller
             'data' => [
                 'unsplash' => $unsplashResults,
                 'wikimedia' => $wikimediaResults,
-            ]
+            ],
         ]);
     }
 
@@ -47,7 +47,7 @@ class ResourceSearchController extends Controller
 
         try {
             // API de Wikipedia en español
-            $response = Http::get('https://es.wikipedia.org/api/rest_v1/page/summary/' . urlencode($query));
+            $response = Http::get('https://es.wikipedia.org/api/rest_v1/page/summary/'.urlencode($query));
 
             if ($response->successful()) {
                 $data = $response->json();
@@ -60,19 +60,19 @@ class ResourceSearchController extends Controller
                         'description' => $data['description'] ?? '',
                         'thumbnail' => $data['thumbnail']['source'] ?? null,
                         'url' => $data['content_urls']['desktop']['page'] ?? '',
-                    ]
+                    ],
                 ]);
             }
 
             return response()->json([
                 'success' => false,
-                'message' => 'No se encontró información en Wikipedia'
+                'message' => 'No se encontró información en Wikipedia',
             ], 404);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'No se pudo consultar Wikipedia en este momento.'
+                'message' => 'No se pudo consultar Wikipedia en este momento.',
             ], 500);
         }
     }
@@ -119,7 +119,7 @@ class ResourceSearchController extends Controller
                 'action' => 'query',
                 'format' => 'json',
                 'list' => 'search',
-                'srsearch' => $query . ' Puno Candelaria',
+                'srsearch' => $query.' Puno Candelaria',
                 'srnamespace' => 6, // Namespace for files
                 'srlimit' => 10,
             ]);
@@ -136,7 +136,7 @@ class ResourceSearchController extends Controller
                             'title' => $item['title'],
                             'snippet' => strip_tags($item['snippet'] ?? ''),
                             'source' => 'Wikimedia Commons',
-                            'page_url' => 'https://commons.wikimedia.org/wiki/' . urlencode($title),
+                            'page_url' => 'https://commons.wikimedia.org/wiki/'.urlencode($title),
                         ];
                     }
                 }
