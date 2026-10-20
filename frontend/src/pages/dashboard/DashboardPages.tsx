@@ -226,6 +226,7 @@ function toFormValues(type: ContentType, item: AnyContent | undefined): Values {
     else if (f.kind === 'date') v[f.name] = toDateInput(raw as string)
     else if (f.kind === 'tags') v[f.name] = Array.isArray(raw) ? raw.join(', ') : ''
     else if (f.kind === 'checkbox') v[f.name] = !!raw
+    else if (f.kind === 'time') v[f.name] = typeof raw === 'string' ? raw.slice(0, 5) : ''
     else v[f.name] = raw ?? ''
   }
   const located = item as { latitude?: number | null; longitude?: number | null } | undefined
@@ -457,7 +458,7 @@ function FieldInput({
         </div>
       )
     default: {
-      const inputType = { text: 'text', number: 'number', date: 'date', datetime: 'datetime-local', url: 'url', email: 'email', tel: 'tel', tags: 'text' }[f.kind]
+      const inputType = { text: 'text', number: 'number', date: 'date', datetime: 'datetime-local', url: 'url', email: 'email', tel: 'tel', tags: 'text', time: 'time' }[f.kind]
       return (
         <TextField
           {...common}

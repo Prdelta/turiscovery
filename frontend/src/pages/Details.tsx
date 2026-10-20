@@ -1,23 +1,24 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { clsx } from 'clsx'
-import { CalendarDays, CalendarPlus, ChevronLeft, Clock, Globe, Mail, MapPin, Phone, Share2, Ticket, Users } from 'lucide-react'
-import { lazy, Suspense, useState, type FormEvent, type ReactNode } from 'react'
+import { CalendarDays, CalendarPlus, ChevronLeft, Globe, Mail, MapPin, Phone, Share2, Star, Ticket } from 'lucide-react'
+import { lazy, Suspense, useState, type ReactNode } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router'
 import { useAuth } from '../auth/AuthContext'
 import { ContentCard } from '../components/ContentCard'
 import { FavoriteButton } from '../components/FavoriteButton'
 import { HostCard } from '../components/HostVoice'
 import { ReviewsSection } from '../components/ReviewsSection'
+import { TypeTag } from '../components/textile/Tags'
 import { WovenBand } from '../components/textile/Weave'
 import { Button, ButtonLink } from '../components/ui/Button'
-import { Alert, Badge, ErrorState, Spinner } from '../components/ui/Feedback'
-import { TextArea, TextField } from '../components/ui/Field'
+import { Alert, Badge, DifficultyBadge, ErrorState, Spinner } from '../components/ui/Feedback'
+import { TextField } from '../components/ui/Field'
 import { useToast } from '../components/ui/Toast'
-import { altitudeWarningFor } from '../lib/altitude'
 import { api, parseApiError } from '../lib/api'
-import { CANDELARIA_CATEGORIES, CONTENT, DIFFICULTY, EVENT_CATEGORIES, LOCALE_CATEGORIES, imageOf, titleOf, type ContentType } from '../lib/content'
-import { daysUntil, formatDate, formatPrice, formatTime, googleCalendarUrl, relativeDays, toDateInput } from '../lib/format'
+import { CANDELARIA_CATEGORIES, CONTENT, EVENT_CATEGORIES, LOCALE_CATEGORIES, imageOf, titleOf, type ContentType } from '../lib/content'
+import { daysUntil, formatDate, formatPrice, formatTime, googleCalendarUrl, relativeDays } from '../lib/format'
 import { useContentItem, useDocumentTitle } from '../lib/hooks'
+import { placeFor } from '../lib/places'
 import type { AnyContent, Candelaria, EventAttendance, Evento, Experiencia, Locale, Promocion, UserCoupon } from '../lib/types'
 
 const MapView = lazy(() => import('../components/Map').then((m) => ({ default: m.MapView })))
@@ -49,13 +50,35 @@ function DetailState({ isLoading, error, refetch }: { isLoading: boolean; error:
   )
 }
 
-function Gallery({ item, type }: { item: AnyContent; type: ContentType }) {
+const OVERLAY_BTN =
+  'inline-flex size-11 items-center justify-center rounded-[var(--radius-control)] border-2 border-ink bg-white text-ink hover:bg-sky'
+
+/** Galería: volver, compartir y favorito sobre la foto, y contador de fotos */
+function Gallery({ item, type, title }: { item: AnyContent; type: ContentType; title: string }) {
+  const navigate = useNavigate()
   const images = item.images?.length ? item.images : [imageOf(item, type)]
   const [active, setActive] = useState(0)
+  const back = () => (window.history.length > 1 ? navigate(-1) : navigate(CONTENT[type].path))
   return (
     <div className="flex flex-col gap-3">
-      <div>
-        <img src={images[active]} alt="" className="aspect-[16/10] w-full rounded-t-[var(--radius-card)] bg-line object-cover" />
+      <div className="card overflow-hidden">
+        <div className="relative bg-line">
+          <img src={images[active]} alt="" className="aspect-[4/3] w-full object-cover sm:aspect-[16/10]" />
+          <div className="absolute inset-x-3 top-3 flex justify-between gap-2">
+            <button onClick={back} aria-label="Volver" className={OVERLAY_BTN}>
+              <ChevronLeft className="size-5" />
+            </button>
+            <div className="flex gap-2">
+              <ShareButton title={title} />
+              <FavoriteButton type={type} id={item.id} compact />
+            </div>
+          </div>
+          {images.length > 1 && (
+            <span className="absolute bottom-3 right-3 rounded-[var(--radius-chip)] bg-ink px-2.5 py-1 text-sm font-bold text-white">
+              {active + 1} / {images.length}
+            </span>
+          )}
+        </div>
         <WovenBand motif={CONTENT[type].motif} dye={CONTENT[type].dye} height={16} />
       </div>
       {images.length > 1 && (
@@ -64,9 +87,9 @@ function Gallery({ item, type }: { item: AnyContent; type: ContentType }) {
             <button
               key={src + i}
               onClick={() => setActive(i)}
-              aria-label={`Ver imagen ${i + 1}`}
+              aria-label={`Ver foto ${i + 1}`}
               aria-pressed={i === active}
-              className={clsx('size-20 shrink-0 overflow-hidden rounded-xl border-2', i === active ? 'border-primary' : 'border-transparent')}
+              className={clsx('size-20 shrink-0 overflow-hidden rounded-[var(--radius-control)] border-2', i === active ? 'border-ink' : 'border-transparent opacity-80')}
             >
               <img src={src} alt="" className="size-full object-cover" />
             </button>
@@ -89,8 +112,8 @@ function ShareButton({ title }: { title: string }) {
     }
   }
   return (
-    <button onClick={share} className="inline-flex h-11 items-center gap-2 rounded-full border border-line bg-white px-5 font-semibold hover:border-ink/40">
-      <Share2 className="size-4.5" /> Compartir
+    <button onClick={share} aria-label="Compartir" className={OVERLAY_BTN}>
+      <Share2 className="size-5" />
     </button>
   )
 }
@@ -100,7 +123,9 @@ function DetailShell({
   type,
   kicker,
   meta,
+  facts,
   aside,
+  bottomBar,
   children,
   showMap = true,
 }: {
@@ -108,61 +133,87 @@ function DetailShell({
   type: ContentType
   kicker?: ReactNode
   meta?: ReactNode
+  /** Datos clave en cuadrícula, antes de la descripción */
+  facts?: ReactNode
   aside?: ReactNode
+  /** Barra fija inferior en móvil (precio + acción principal) */
+  bottomBar?: ReactNode
   children?: ReactNode
   showMap?: boolean
 }) {
-  const navigate = useNavigate()
   const title = titleOf(item as never)
   const withCoords = item as { latitude?: number | null; longitude?: number | null; formatted_address?: string | null; address?: string | null }
   const coords = withCoords.latitude && withCoords.longitude ? { latitude: withCoords.latitude, longitude: withCoords.longitude } : null
+  const place = placeFor(withCoords.latitude, withCoords.longitude)
+  const rating = (item as { average_rating?: number }).average_rating
+  const reviews = (item as { reviews_count?: number }).reviews_count
 
   return (
-    <article className="container-page py-8 sm:py-12">
-      <button onClick={() => navigate(-1)} className="mb-6 inline-flex items-center gap-1 text-sm font-semibold text-ink-soft hover:text-ink">
-        <ChevronLeft className="size-4" /> Volver
-      </button>
+    <article className={clsx('container-page py-6 sm:py-10', bottomBar && 'pb-28 lg:pb-10')}>
       <div className="grid gap-10 lg:grid-cols-[1fr_380px]">
         <div className="min-w-0">
-          <Gallery item={item} type={type} />
-          <header className="mt-8">
-            {kicker && <div className="mb-3 flex flex-wrap gap-2">{kicker}</div>}
-            <h1 className="text-4xl font-extrabold sm:text-5xl">{title}</h1>
-            {meta && <div className="mt-4 flex flex-col gap-2 text-ink-soft">{meta}</div>}
-            <div className="mt-6 flex flex-wrap gap-3">
-              <FavoriteButton type={type} id={item.id} />
-              <ShareButton title={title} />
+          <Gallery item={item} type={type} title={title} />
+          <header className="mt-6">
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              <TypeTag type={type} detail={place?.name} />
+              {kicker}
             </div>
+            <h1 className="t-h1">{title}</h1>
+            {rating ? (
+              <a href="#resenas" className="mt-2 inline-flex items-center gap-1.5 font-bold hover:underline">
+                <Star className="size-4.5 fill-sun-dark text-sun-dark" aria-hidden /> {rating.toFixed(1)}
+                {reviews ? <span className="font-normal text-ink-soft">({reviews} reseñas)</span> : null}
+              </a>
+            ) : null}
+            {meta && <div className="mt-4 flex flex-col gap-2 text-ink-soft">{meta}</div>}
           </header>
+          {facts && <dl className="mt-6 grid grid-cols-2 gap-3">{facts}</dl>}
           <div className="prose-measure mt-8 whitespace-pre-line text-lg leading-relaxed">{item.description}</div>
           {children}
           {showMap && coords?.latitude && coords?.longitude && (
             <section aria-labelledby="ubicacion" className="mt-12">
-              <h2 id="ubicacion" className="mb-2 text-2xl font-extrabold">Ubicación</h2>
+              <h2 id="ubicacion" className="t-h2 mb-2">Dónde</h2>
               {(withCoords.formatted_address || withCoords.address) && <p className="mb-4 text-ink-soft">{withCoords.formatted_address || withCoords.address}</p>}
-              <Suspense fallback={<div className="skeleton h-80" />}>
-                <MapView points={[{ id: item.id, lat: coords.latitude, lng: coords.longitude, title }]} height={340} />
-              </Suspense>
+              <div className="card overflow-hidden">
+                <Suspense fallback={<div className="skeleton h-80" />}>
+                  <MapView points={[{ id: item.id, lat: coords.latitude, lng: coords.longitude, title }]} height={300} />
+                </Suspense>
+              </div>
               <a
                 href={`https://www.google.com/maps/dir/?api=1&destination=${coords.latitude},${coords.longitude}`}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-3 inline-block font-semibold text-primary"
+                className="mt-3 inline-block font-bold text-primary-dark underline decoration-2 underline-offset-4"
               >
                 Cómo llegar con Google Maps
               </a>
             </section>
           )}
         </div>
-        {aside && <aside className="lg:sticky lg:top-24 lg:self-start">{aside}</aside>}
+        {aside && <aside className={clsx('lg:sticky lg:top-24 lg:self-start', bottomBar && 'hidden lg:block')}>{aside}</aside>}
       </div>
       <ReviewsSection type={type} id={item.id} />
+      {bottomBar && (
+        <div className="fixed inset-x-0 bottom-0 z-[1150] border-t-2 border-ink bg-white pb-[env(safe-area-inset-bottom)] lg:hidden">
+          <div className="container-page flex items-center justify-between gap-4 py-3">{bottomBar}</div>
+        </div>
+      )}
     </article>
   )
 }
 
+/** Dato de la cuadrícula de información */
+function Fact({ label, children, wide }: { label: string; children: ReactNode; wide?: boolean }) {
+  return (
+    <div className={clsx('card flex flex-col gap-1 p-4', wide && 'col-span-2')}>
+      <dt className="t-label text-ink-soft">{label}</dt>
+      <dd className="font-bold">{children}</dd>
+    </div>
+  )
+}
+
 function AsideCard({ children }: { children: ReactNode }) {
-  return <div className="flex flex-col gap-5 rounded-[var(--radius-card)] bg-white p-6">{children}</div>
+  return <div className="card flex flex-col gap-5 p-6">{children}</div>
 }
 
 function LoginPrompt({ action }: { action: string }) {
@@ -187,26 +238,68 @@ function LocaleLink({ locale }: { locale?: Locale | null }) {
 
 export function ExperienciaDetail() {
   const { data, isLoading, error, refetch } = useDetail<Experiencia>('experiencias')
+  const [params] = useSearchParams()
   if (!data) return <DetailState isLoading={isLoading} error={error} refetch={refetch} />
   const e = data
+  const fecha = params.get('fecha')
+  const bookHref = `/experiencias/${e.id}/reservar${fecha ? `?fecha=${fecha}` : ''}`
+  const price = formatPrice(e.price_pen)
+
   return (
     <DetailShell
       item={e}
       type="experiencias"
-      kicker={
+      kicker={e.tags?.map((t) => <Badge key={t}>{t}</Badge>)}
+      meta={<LocaleLink locale={e.locale} />}
+      facts={
         <>
-          <Badge className="bg-primary/10 text-primary">Dificultad {DIFFICULTY[e.difficulty]?.toLowerCase()}</Badge>
-          {e.tags?.map((t) => <Badge key={t}>{t}</Badge>)}
+          <Fact label="Duración">{e.duration_hours ? `${e.duration_hours} horas` : 'A consultar'}</Fact>
+          <Fact label="Dificultad">
+            <DifficultyBadge level={e.difficulty} />
+          </Fact>
+          {(e.altitude_m || e.effort_note) && (
+            <Fact label="Altura y esfuerzo" wide>
+              {e.altitude_m ? `Hasta ${e.altitude_m.toLocaleString('es-PE').replace(',', ' ')} m` : ''}
+              {e.altitude_m && e.effort_note ? ' · ' : ''}
+              {e.effort_note && <span className="font-normal">{e.effort_note}</span>}
+            </Fact>
+          )}
+          {(e.meeting_point || e.meeting_time) && (
+            <Fact label="Punto de encuentro" wide>
+              {e.meeting_point}
+              {e.meeting_time && (
+                <span className="font-normal text-ink-soft">
+                  {e.meeting_point ? ' · ' : ''}
+                  {e.meeting_time.slice(0, 5)} h
+                </span>
+              )}
+            </Fact>
+          )}
+          {e.max_participants ? <Fact label="Grupo">Hasta {e.max_participants} personas</Fact> : null}
         </>
       }
-      meta={
+      aside={
+        <AsideCard>
+          <div>
+            <p className="font-display text-4xl font-extrabold">{price ?? 'Precio a consultar'}</p>
+            {price && price !== 'Gratis' && <p className="text-sm text-ink-soft">por persona</p>}
+          </div>
+          <ButtonLink to={bookHref} size="lg" fullWidth>Reservar</ButtonLink>
+          <p className="text-sm text-ink-soft">No se cobra nada ahora. El socio confirma la fecha contigo.</p>
+          <Link to="/planificador" className="text-sm font-bold text-primary-dark underline decoration-2 underline-offset-4">
+            ¿Qué día te conviene según la altura?
+          </Link>
+        </AsideCard>
+      }
+      bottomBar={
         <>
-          {e.duration_hours && <p className="flex items-center gap-2"><Clock className="size-4.5" aria-hidden /> Duración: {e.duration_hours} horas</p>}
-          {e.max_participants && <p className="flex items-center gap-2"><Users className="size-4.5" aria-hidden /> Hasta {e.max_participants} personas por fecha</p>}
-          <LocaleLink locale={e.locale} />
+          <p>
+            <span className="block font-display text-2xl font-extrabold leading-none">{price ?? 'A consultar'}</span>
+            {price && price !== 'Gratis' && <span className="text-sm text-ink-soft">por persona</span>}
+          </p>
+          <ButtonLink to={bookHref} size="lg">Reservar</ButtonLink>
         </>
       }
-      aside={<BookingCard experiencia={e} />}
     >
       {e.anfitrion && (
         <div className="mt-10">
@@ -215,95 +308,11 @@ export function ExperienciaDetail() {
       )}
       {e.content && (
         <section className="mt-10">
-          <h2 className="mb-3 text-2xl font-extrabold">Itinerario y detalles</h2>
+          <h2 className="t-h2 mb-3">Itinerario y detalles</h2>
           <div className="prose-measure whitespace-pre-line text-ink-soft">{e.content}</div>
         </section>
       )}
     </DetailShell>
-  )
-}
-
-function BookingCard({ experiencia }: { experiencia: Experiencia }) {
-  const { user } = useAuth()
-  const notify = useToast()
-  const [params] = useSearchParams()
-  const tomorrow = toDateInput(new Date(Date.now() + 86_400_000).toISOString())
-  const fromPlan = params.get('fecha')
-  const [date, setDate] = useState(fromPlan && fromPlan >= tomorrow ? fromPlan : tomorrow)
-  const altitudeWarning = date ? altitudeWarningFor(experiencia.difficulty, date) : null
-  const [participants, setParticipants] = useState(1)
-  const [phone, setPhone] = useState(user?.phone ?? '')
-  const [notes, setNotes] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [done, setDone] = useState(false)
-  const price = Number(experiencia.price_pen ?? 0)
-
-  const book = useMutation({
-    mutationFn: () =>
-      api.post('/bookings', {
-        experiencia_id: experiencia.id,
-        booking_date: date,
-        participants,
-        contact_phone: phone || undefined,
-        notes: notes || undefined,
-      }),
-    onSuccess: () => {
-      setDone(true)
-      setError(null)
-      notify('Reserva enviada. El socio te contactará para confirmarla.')
-    },
-    onError: (e) => setError(parseApiError(e).message),
-  })
-
-  const onSubmit = (e: FormEvent) => {
-    e.preventDefault()
-    book.mutate()
-  }
-
-  return (
-    <AsideCard>
-      <div>
-        <p className="font-display text-3xl font-extrabold text-primary">{formatPrice(experiencia.price_pen) ?? 'Precio a consultar'}</p>
-        {price > 0 && <p className="text-sm text-ink-soft">por persona</p>}
-      </div>
-      {done ? (
-        <>
-          <Alert tone="success">Tu reserva quedó registrada como pendiente. Puedes seguirla desde tu cuenta.</Alert>
-          <ButtonLink to="/cuenta/reservas" variant="secondary">Ver mis reservas</ButtonLink>
-        </>
-      ) : user ? (
-        <form onSubmit={onSubmit} className="flex flex-col gap-4">
-          <TextField label="Fecha" type="date" min={tomorrow} value={date} onChange={(e) => setDate(e.target.value)} required />
-          {altitudeWarning && (
-            <Alert tone="info">
-              {altitudeWarning} <Link to="/planificador" className="font-semibold text-primary">Ver mi plan</Link>
-            </Alert>
-          )}
-          <TextField
-            label="Personas"
-            type="number"
-            min={1}
-            max={experiencia.max_participants ?? undefined}
-            value={participants}
-            onChange={(e) => setParticipants(Math.max(1, Number(e.target.value)))}
-            required
-          />
-          <TextField label="Teléfono de contacto" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+51 9…" />
-          <TextArea label="Notas para el guía" value={notes} onChange={(e) => setNotes(e.target.value)} maxLength={500} className="min-h-20" />
-          {price > 0 && (
-            <p className="flex justify-between border-t border-line pt-4 font-semibold">
-              <span>Total estimado</span> <span>{formatPrice(price * participants)}</span>
-            </p>
-          )}
-          {error && <Alert tone="error">{error}</Alert>}
-          <Button type="submit" loading={book.isPending}>Reservar</Button>
-          <p className="text-xs text-ink-soft">No se cobra nada ahora. El socio confirma la disponibilidad contigo.</p>
-          <Link to="/planificador" className="text-sm font-semibold text-primary">¿Qué día te conviene según la altura?</Link>
-        </form>
-      ) : (
-        <LoginPrompt action="reservar" />
-      )}
-    </AsideCard>
   )
 }
 

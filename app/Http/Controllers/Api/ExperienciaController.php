@@ -138,4 +138,39 @@ class ExperienciaController extends Controller
             'message' => 'Experiencia eliminada',
         ], 200);
     }
+
+    /**
+     * Cupos libres por fecha para los próximos días (salidas de la experiencia).
+     * Cuenta las reservas pendientes y confirmadas; sin cupo máximo, todas las fechas están libres.
+     */
+    public function availability(Request $request, $id)
+    {
+        $experiencia = Experiencia::active()->findOrFail($id);
+        $days = min(max($request->integer('days', 14), 1), 60);
+        $from = now('America/Lima')->addDay()->startOfDay();
+        $to = $from->copy()->addDays($days - 1);
+
+        $booked = $experiencia->bookings()
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->whereBetween('booking_date', [$from->toDateString(), $to->toDateString()])
+            ->selectRaw('booking_date, SUM(participants) as total')
+            ->groupBy('booking_date')
+            ->pluck('total', 'booking_date')
+            ->mapWithKeys(fn ($total, $date) => [substr((string) $date, 0, 10) => (int) $total]);
+
+        $capacity = $experiencia->max_participants;
+        $dates = [];
+        for ($d = $from->copy(); $d->lte($to); $d->addDay()) {
+            $key = $d->toDateString();
+            $taken = $booked[$key] ?? 0;
+            $dates[] = [
+                'date' => $key,
+                'departure_time' => $experiencia->meeting_time ? substr($experiencia->meeting_time, 0, 5) : null,
+                'capacity' => $capacity,
+                'available' => $capacity ? max(0, $capacity - $taken) : null,
+            ];
+        }
+
+        return response()->json(['success' => true, 'data' => $dates]);
+    }
 }

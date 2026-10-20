@@ -73,6 +73,18 @@ export interface Experiencia extends BaseContent, WithAddress {
   tags?: string[] | null
   anfitrion_id?: number | null
   anfitrion?: Anfitrion | null
+  altitude_m?: number | null
+  effort_note?: string | null
+  meeting_point?: string | null
+  meeting_time?: string | null
+}
+
+export interface DayAvailability {
+  date: string
+  departure_time?: string | null
+  capacity?: number | null
+  /** null = sin cupo máximo */
+  available?: number | null
 }
 
 export interface Evento extends BaseContent, WithAddress {

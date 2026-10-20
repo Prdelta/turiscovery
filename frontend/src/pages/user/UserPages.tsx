@@ -4,10 +4,11 @@ import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
 import { useAuth } from '../../auth/AuthContext'
 import { ContentCard } from '../../components/ContentCard'
+import { CouponCard } from '../../components/CouponCard'
 import { SaveForTripButton } from '../../components/OfflineTools'
 import { PageHeader } from '../../components/layout/PanelLayout'
 import { Button, ButtonLink } from '../../components/ui/Button'
-import { Alert, Badge, EmptyState, ErrorState, Pagination, Spinner, Stars } from '../../components/ui/Feedback'
+import { Alert, Badge, EmptyState, ErrorState, Pagination, Spinner, Stars, StatusBadge } from '../../components/ui/Feedback'
 import { TextArea, TextField } from '../../components/ui/Field'
 import { useToast } from '../../components/ui/Toast'
 import { api, getData, parseApiError, type Paginated } from '../../lib/api'
@@ -101,13 +102,6 @@ export function FavoritesPage() {
 
 /* ---------- Reservas ---------- */
 
-const BOOKING_STATUS: Record<Booking['status'], { label: string; cls: string }> = {
-  pending: { label: 'Pendiente', cls: 'bg-sun/25 text-ink' },
-  confirmed: { label: 'Confirmada', cls: 'bg-mint/40 text-ink' },
-  cancelled: { label: 'Cancelada', cls: 'bg-ink/10 text-ink-soft' },
-  completed: { label: 'Completada', cls: 'bg-primary/10 text-primary' },
-}
-
 export function BookingsPage() {
   useDocumentTitle('Reservas')
   const [page, setPage] = useState(1)
@@ -129,24 +123,34 @@ export function BookingsPage() {
       {isLoading ? (
         <Spinner />
       ) : data?.data.length ? (
-        <div className="flex flex-col gap-3">
+        <div className="grid gap-3 lg:grid-cols-2">
           {data.data.map((b) => {
             const future = new Date(b.booking_date) > new Date()
             return (
-              <article key={b.id} className="flex flex-wrap items-center gap-4 rounded-[var(--radius-card)] bg-white p-5">
-                <div className="min-w-0 flex-1">
-                  <Link to={`/experiencias/${b.experiencia_id}`} className="font-bold hover:text-primary">{b.experiencia?.title ?? 'Experiencia'}</Link>
-                  <p className="text-sm text-ink-soft">
-                    {formatDate(b.booking_date)} · {b.participants} persona{b.participants > 1 ? 's' : ''}
-                    {Number(b.total_price) > 0 && ` · ${formatPrice(b.total_price)}`}
-                  </p>
+              <article key={b.id} className="card flex flex-col gap-2 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <StatusBadge status={b.status} />
+                  <span className="font-display text-lg font-extrabold">{Number(b.total_price) > 0 ? formatPrice(b.total_price) : ''}</span>
                 </div>
-                <Badge className={BOOKING_STATUS[b.status].cls}>{BOOKING_STATUS[b.status].label}</Badge>
-                {['pending', 'confirmed'].includes(b.status) && future && (
-                  <Button size="sm" variant="secondary" loading={cancel.isPending && cancel.variables === b.id} onClick={() => confirm('¿Cancelar esta reserva?') && cancel.mutate(b.id)}>
-                    Cancelar
-                  </Button>
-                )}
+                <Link to={`/experiencias/${b.experiencia_id}`} className="t-h3 hover:text-primary-dark">{b.experiencia?.title ?? 'Experiencia'}</Link>
+                <p className="text-sm text-ink-soft first-letter:uppercase">
+                  {formatDate(b.booking_date)} · {b.participants} persona{b.participants > 1 ? 's' : ''}
+                </p>
+                <div className="flex flex-wrap items-center justify-between gap-3 border-t-2 border-line pt-3 text-sm">
+                  <span className="text-ink-soft">
+                    {b.status === 'pending' && 'Esperando que el socio la confirme'}
+                    {b.status === 'confirmed' && 'Confirmada · muéstrala al llegar'}
+                    {b.status === 'cancelled' && 'Cancelada · sin costo'}
+                    {b.status === 'completed' && (
+                      <Link to={`/experiencias/${b.experiencia_id}#resenas`} className="font-bold text-primary-dark underline decoration-2 underline-offset-4">Cuéntanos cómo te fue</Link>
+                    )}
+                  </span>
+                  {['pending', 'confirmed'].includes(b.status) && future && (
+                    <Button size="sm" variant="ghost" loading={cancel.isPending && cancel.variables === b.id} loadingText="Cancelando…" onClick={() => confirm('¿Cancelar esta reserva?') && cancel.mutate(b.id)}>
+                      Cancelar reserva
+                    </Button>
+                  )}
+                </div>
               </article>
             )
           })}
@@ -180,7 +184,7 @@ export function AttendancesPage() {
                 <Link to={`/eventos/${a.evento_id}`} className="font-bold hover:text-primary">{a.evento?.title ?? 'Evento'}</Link>
                 {a.evento && <p className="text-sm text-ink-soft">{formatDate(a.evento.start_time)}, {formatTime(a.evento.start_time)}</p>}
               </div>
-              <Badge className={a.status === 'confirmed' ? 'bg-mint/40 text-ink' : 'bg-sun/25 text-ink'}>{a.status === 'confirmed' ? 'Voy' : 'Quizás'}</Badge>
+              <StatusBadge status={a.status === 'confirmed' ? 'confirmed' : 'maybe'} label={a.status === 'confirmed' ? 'Voy' : 'Quizás'} />
             </article>
           ))}
           <Pagination page={data.current_page} lastPage={data.last_page} onChange={setPage} />
@@ -219,18 +223,17 @@ export function CouponsPage() {
       ) : data?.data.length ? (
         <div className="grid gap-4 sm:grid-cols-2">
           {data.data.map((c) => (
-            <article key={c.id} className="flex flex-col gap-3 rounded-[var(--radius-card)] border-2 border-dashed border-sun bg-white p-5">
-              <Link to={`/promociones/${c.promocion_id}`} className="font-bold hover:text-primary">{c.promocion?.title ?? 'Promoción'}</Link>
-              <p className="font-display text-2xl font-extrabold tracking-wider">{c.coupon_code}</p>
-              <p className="text-sm text-ink-soft">{c.expires_at ? `Vence el ${formatDate(c.expires_at)}` : 'Sin fecha de vencimiento'}</p>
-              {c.status === 'available' ? (
-                <Button size="sm" variant="secondary" loading={redeem.isPending && redeem.variables === c.id} onClick={() => confirm('¿Ya usaste este cupón en el local?') && redeem.mutate(c.id)}>
-                  Marcar como usado
-                </Button>
-              ) : (
-                <Badge>Usado {c.used_at ? `el ${formatDate(c.used_at)}` : ''}</Badge>
-              )}
-            </article>
+            <CouponCard
+              key={c.id}
+              coupon={c}
+              action={
+                c.status === 'available' && (
+                  <Button size="sm" variant="secondary" loading={redeem.isPending && redeem.variables === c.id} loadingText="Marcando…" onClick={() => confirm('¿Ya usaste este cupón en el local?') && redeem.mutate(c.id)}>
+                    Marcar como usado
+                  </Button>
+                )
+              }
+            />
           ))}
           <div className="sm:col-span-2">
             <Pagination page={data.current_page} lastPage={data.last_page} onChange={setPage} />

@@ -133,3 +133,48 @@ export function TodayPanel({ dark = false, className }: { dark?: boolean; classN
     </section>
   )
 }
+
+/**
+ * "Hoy en Puno" en tarjetas claras (portada): fecha y época, luna y estado del lago.
+ * Lo que pasa hoy queda en el almanaque.
+ */
+export function TodayCards({ className }: { className?: string }) {
+  const today = new Date()
+  const moon = moonInfo(today)
+  const season = altiplanoSeason(today)
+  const lake = useLakeConditions()
+  const dateFmt = new Intl.DateTimeFormat('es-PE', { weekday: 'long', day: 'numeric', month: 'long' })
+
+  return (
+    <div className={clsx('grid gap-3 sm:grid-cols-3', className)}>
+      <article className="card flex flex-col gap-2 p-4">
+        <Tocapu motif="sol" dye="solOscuro" size={28} />
+        <p className="t-label text-ink-soft">Hoy</p>
+        <p className="t-h3 first-letter:uppercase">{dateFmt.format(today)}</p>
+        <p className="text-sm text-ink-soft">{season.name}</p>
+      </article>
+      <article className="card flex flex-col gap-2 p-4">
+        <MoonGlyph phase={moon.phase} size={28} />
+        <p className="t-label text-ink-soft">Luna</p>
+        <p className="t-h3">{Math.round(moon.illumination * 100)}% iluminada</p>
+        <p className="text-sm text-ink-soft">{moon.name}</p>
+      </article>
+      <article className="card flex flex-col gap-2 p-4">
+        <Tocapu motif="olas" dye="lago" size={28} />
+        <p className="t-label text-ink-soft">Lago</p>
+        {lake.data ? (
+          <>
+            <p className="t-h3">{LAKE_TEXT[lake.data.status].label}</p>
+            <p className="text-sm text-ink-soft">
+              {lake.data.calmHours.length ? `Mejor para salir: ${hourRanges(lake.data.calmHours)}` : `Viento de ${lake.data.windNow} km/h`}
+            </p>
+          </>
+        ) : lake.isError ? (
+          <p className="text-sm text-ink-soft">Sin datos del lago por ahora.</p>
+        ) : (
+          <div className="skeleton h-10" />
+        )}
+      </article>
+    </div>
+  )
+}

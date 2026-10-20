@@ -20,7 +20,17 @@ export function OfflineBanner() {
 }
 
 /** Descarga ahora los datos del viaje para usarlos sin señal */
-export function SaveForTripButton({ variant = 'secondary' }: { variant?: 'primary' | 'secondary' }) {
+export function SaveForTripButton({
+  variant = 'secondary',
+  size,
+  fullWidth,
+  label = 'Guardar para usar sin conexión',
+}: {
+  variant?: 'primary' | 'secondary' | 'mint'
+  size?: 'sm' | 'md' | 'lg'
+  fullWidth?: boolean
+  label?: string
+}) {
   const { user } = useAuth()
   const online = useOnline()
   const notify = useToast()
@@ -29,8 +39,11 @@ export function SaveForTripButton({ variant = 'secondary' }: { variant?: 'primar
   return (
     <Button
       variant={variant}
+      size={size}
+      fullWidth={fullWidth}
       icon={<CloudDownload className="size-4.5" />}
       loading={loading}
+      loadingText="Guardando…"
       disabled={!online}
       onClick={async () => {
         setLoading(true)
@@ -45,7 +58,7 @@ export function SaveForTripButton({ variant = 'secondary' }: { variant?: 'primar
         }
       }}
     >
-      Guardar para usar sin conexión
+      {label}
     </Button>
   )
 }

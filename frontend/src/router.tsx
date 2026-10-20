@@ -40,6 +40,7 @@ export const router = createBrowserRouter([
 
       { path: '/experiencias', element: page(list, 'default', { type: 'experiencias' }) },
       { path: '/experiencias/:id', element: page(details, 'ExperienciaDetail') },
+      { path: '/experiencias/:id/reservar', element: page(() => import('./pages/BookingPage'), 'default') },
       { path: '/eventos', element: page(list, 'default', { type: 'eventos' }) },
       { path: '/eventos/:id', element: page(details, 'EventoDetail') },
       { path: '/promociones', element: page(list, 'default', { type: 'promociones' }) },
@@ -54,6 +55,7 @@ export const router = createBrowserRouter([
       { path: '/anfitriones', element: page(hosts, 'default') },
       { path: '/anfitriones/:id', element: page(hosts, 'HostDetail') },
       { path: '/guia-de-estilo', element: page(() => import('./pages/StyleGuidePage'), 'default') },
+      { path: '/viaje', element: page(() => import('./pages/TripPage'), 'default') },
       { path: '/hoy', element: page(() => import('./pages/AlmanacPage'), 'default') },
       { path: '/planificador', element: page(() => import('./pages/PlannerPage'), 'default') },
 

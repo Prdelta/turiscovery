@@ -50,6 +50,7 @@ export function FavoriteButton({ type, id, compact = false }: { type: ContentTyp
 
   const label = isFavorited ? 'Quitar de favoritos' : 'Guardar en favoritos'
 
+  // Sin animación de "latido": el cambio de relleno basta para mostrar el estado
   if (compact) {
     return (
       <button
@@ -57,9 +58,12 @@ export function FavoriteButton({ type, id, compact = false }: { type: ContentTyp
         aria-label={label}
         aria-pressed={isFavorited}
         disabled={toggle.isPending}
-        className="inline-flex size-10 items-center justify-center rounded-full bg-white/95 text-ink shadow-sm transition-transform hover:scale-105"
+        className={clsx(
+          'inline-flex size-11 items-center justify-center rounded-[var(--radius-control)] border-2 transition-colors',
+          isFavorited ? 'border-cochinilla bg-cochinilla text-white' : 'border-ink bg-white text-ink hover:bg-sky',
+        )}
       >
-        <Heart className={clsx('size-5', isFavorited && 'fill-danger text-danger')} />
+        <Heart className={clsx('size-5', isFavorited && 'fill-white')} />
       </button>
     )
   }
@@ -70,11 +74,11 @@ export function FavoriteButton({ type, id, compact = false }: { type: ContentTyp
       aria-pressed={isFavorited}
       disabled={toggle.isPending}
       className={clsx(
-        'inline-flex h-11 items-center gap-2 rounded-full border px-5 font-semibold transition-colors',
-        isFavorited ? 'border-danger/40 bg-danger/5 text-danger' : 'border-line bg-white hover:border-ink/40',
+        'inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] border-2 px-4 font-bold transition-colors',
+        isFavorited ? 'border-cochinilla bg-cochinilla text-white' : 'border-ink bg-white text-ink hover:bg-sky',
       )}
     >
-      <Heart className={clsx('size-5', isFavorited && 'fill-danger')} />
+      <Heart className={clsx('size-5', isFavorited && 'fill-white')} />
       {isFavorited ? 'En favoritos' : 'Guardar'}
     </button>
   )

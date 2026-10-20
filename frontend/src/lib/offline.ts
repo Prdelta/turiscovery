@@ -44,7 +44,26 @@ export async function saveForTrip(loggedIn: boolean): Promise<{ saved: number; f
 
   const results = await Promise.allSettled(urls.map((u) => api.get(u)))
   const saved = results.filter((r) => r.status === 'fulfilled').length
+  if (saved) {
+    try {
+      localStorage.setItem(SAVED_AT_KEY, new Date().toISOString())
+    } catch {
+      // Sin almacenamiento: solo no se muestra la fecha del último guardado
+    }
+  }
   return { saved, failed: results.length - saved }
+}
+
+const SAVED_AT_KEY = 'turiscovery-viaje-guardado'
+
+/** Fecha del último "Guardar para usar sin conexión" en este dispositivo */
+export function lastSavedAt(): Date | null {
+  try {
+    const v = localStorage.getItem(SAVED_AT_KEY)
+    return v ? new Date(v) : null
+  } catch {
+    return null
+  }
 }
 
 /* ---------- Instalar como app ---------- */

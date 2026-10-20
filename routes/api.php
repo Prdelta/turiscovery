@@ -77,6 +77,9 @@ Route::get('/candelaria-live', [CandelariaLiveController::class, 'live']);
 Route::get('/candelaria-program', [CandelariaLiveController::class, 'program']);
 Route::get('/candelaria-program/{id}', [CandelariaLiveController::class, 'show'])->whereNumber('id');
 
+// Cupos libres por fecha de una experiencia (sin caché: cambian con cada reserva)
+Route::get('/experiencias/{id}/availability', [ExperienciaController::class, 'availability'])->whereNumber('id');
+
 // Almanaque vivo: fiestas, eventos y programa de la Candelaria entre dos fechas
 Route::get('/almanaque', [AlmanacController::class, 'index']);
 

@@ -1,6 +1,6 @@
 import { CANDELARIA_CATEGORIES, DIFFICULTY, DISCOUNT_TYPES, EVENT_CATEGORIES, LOCALE_CATEGORIES, type ContentType } from '../../lib/content'
 
-export type FieldKind = 'text' | 'textarea' | 'number' | 'select' | 'date' | 'datetime' | 'url' | 'email' | 'tel' | 'tags' | 'checkbox' | 'locale' | 'anfitrion'
+export type FieldKind = 'text' | 'textarea' | 'number' | 'select' | 'date' | 'datetime' | 'url' | 'email' | 'tel' | 'tags' | 'checkbox' | 'locale' | 'anfitrion' | 'time'
 
 export interface FieldDef {
   name: string
@@ -52,6 +52,10 @@ export const FORM_CONFIG: Record<ContentType, FormConfig> = {
       { name: 'price_pen', label: 'Precio por persona (S/)', kind: 'number', min: 0, step: '0.01', hint: 'Usa 0 si es gratis.' },
       { name: 'duration_hours', label: 'Duración (horas)', kind: 'number', min: 1 },
       { name: 'max_participants', label: 'Cupo máximo por fecha', kind: 'number', min: 1, hint: 'Vacío = sin límite.' },
+      { name: 'meeting_point', label: 'Punto de encuentro', kind: 'text', hint: 'Ejemplo: Muelle de Puno' },
+      { name: 'meeting_time', label: 'Hora de salida', kind: 'time' },
+      { name: 'altitude_m', label: 'Altura máxima (m s. n. m.)', kind: 'number', min: 3000, max: 6500, hint: 'Ayuda al viajero a planificar según la altura.' },
+      { name: 'effort_note', label: 'Esfuerzo', kind: 'text', hint: 'Ejemplo: 540 escalones desde el muelle' },
       { name: 'tags', label: 'Etiquetas', kind: 'tags', hint: 'Separadas por comas. Ejemplo: lago, familia, cultura' },
       { name: 'address', label: 'Punto de encuentro', kind: 'text', wide: true },
       { name: 'description', label: 'Descripción', kind: 'textarea', required: true, wide: true },

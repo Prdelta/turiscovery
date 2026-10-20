@@ -37,12 +37,17 @@ class Experiencia extends Model
         'duration_hours',
         'price_pen',
         'max_participants',
+        'altitude_m',
+        'effort_note',
+        'meeting_point',
+        'meeting_time',
         'images',
         'tags',
         'is_active',
     ];
 
     protected $casts = [
+        'altitude_m' => 'integer',
         'tags' => 'array',
         'price_pen' => 'decimal:2',
         'is_active' => 'boolean',
