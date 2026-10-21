@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -27,7 +28,10 @@ return new class extends Migration
 
             // Geolocation using PostGIS
             // Store as geography type for accurate distance calculations
-            $table->geography('location', 'point', 4326);
+            // Sin PostGIS (SQLite de los tests) se guarda como texto WKT; latitude/longitude son la fuente para leer
+            DB::getDriverName() === 'pgsql'
+                ? $table->geography('location', 'point', 4326)
+                : $table->string('location')->nullable();
 
             // Category
             $table->enum('category', [
@@ -53,7 +57,9 @@ return new class extends Migration
             $table->index('user_id');
             $table->index('category');
             $table->index('is_active');
-            $table->spatialIndex('location');
+            if (DB::getDriverName() === 'pgsql') {
+                $table->spatialIndex('location');
+            }
         });
     }
 

@@ -22,7 +22,7 @@ class AnfitrionController extends Controller
         }
 
         if ($request->filled('community')) {
-            $query->where('community', 'ILIKE', '%'.$request->community.'%');
+            $query->whereLike('community', '%'.$request->community.'%');
         }
 
         return response()->json(['success' => true, 'data' => $query->get()]);

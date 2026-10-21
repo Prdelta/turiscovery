@@ -8,12 +8,6 @@ use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
-    if (DB::getDriverName() !== 'pgsql') {
-        $this->markTestSkipped('Requiere PostgreSQL con PostGIS (ver phpunit.xml).');
-    }
-});
-
 function parada(array $groups): CandelariaProgramItem
 {
     $item = CandelariaProgramItem::create([

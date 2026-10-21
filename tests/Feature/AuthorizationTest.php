@@ -11,13 +11,6 @@ use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
-    // Las migraciones usan columnas PostGIS (geography): no corren en SQLite
-    if (DB::getDriverName() !== 'pgsql') {
-        $this->markTestSkipped('Requiere PostgreSQL con PostGIS (ver phpunit.xml).');
-    }
-});
-
 function userWithRole(string $role, array $attrs = []): User
 {
     return User::factory()->create(array_merge(['role' => $role, 'is_active' => true], $attrs));

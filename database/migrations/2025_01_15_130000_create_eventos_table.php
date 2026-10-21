@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -26,7 +27,10 @@ return new class extends Migration
             $table->dateTime('end_time');
 
             // Geolocation
-            $table->geography('location', 'point', 4326)->nullable();
+            // Sin PostGIS (SQLite de los tests) se guarda como texto WKT
+            DB::getDriverName() === 'pgsql'
+                ? $table->geography('location', 'point', 4326)->nullable()
+                : $table->string('location')->nullable();
             $table->string('address')->nullable();
 
             // Event Details
@@ -57,7 +61,9 @@ return new class extends Migration
             $table->index('is_active');
             $table->index('start_time');
             $table->index('end_time');
-            $table->spatialIndex('location');
+            if (DB::getDriverName() === 'pgsql') {
+                $table->spatialIndex('location');
+            }
         });
     }
 

@@ -37,7 +37,7 @@ class MyContentController extends Controller
 
         if ($request->filled('search')) {
             $column = $type === 'locales' ? 'name' : 'title';
-            $query->where($column, 'ILIKE', '%'.$request->search.'%');
+            $query->whereLike($column, '%'.$request->search.'%');
         }
 
         $items = $query->latest()->paginate($this->getValidatedPerPage($request, $type));

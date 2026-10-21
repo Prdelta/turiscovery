@@ -24,6 +24,10 @@ trait HasLocation
      */
     public function scopeNearby(Builder $query, float $latitude, float $longitude, int $radiusMeters = 5000): Builder
     {
+        if (DB::getDriverName() !== 'pgsql') {
+            return $this->scopeNearbyWithoutPostgis($query, $latitude, $longitude, $radiusMeters);
+        }
+
         $point = 'ST_SetSRID(ST_MakePoint(?, ?), 4326)::geography';
 
         return $query
@@ -34,11 +38,34 @@ trait HasLocation
             ->orderBy('distance');
     }
 
+    /**
+     * Cercanía sin PostGIS (SQLite de los tests): recuadro aproximado sobre latitude/longitude
+     * ordenado por la distancia plana al cuadrado (SQLite no siempre trae sqrt). Solo para pruebas
+     * y desarrollo sin PostGIS; en producción se usa PostGIS.
+     */
+    private function scopeNearbyWithoutPostgis(Builder $query, float $latitude, float $longitude, int $radiusMeters): Builder
+    {
+        $dLat = $radiusMeters / 111_320;
+        $dLng = $radiusMeters / (111_320 * max(cos(deg2rad($latitude)), 0.01));
+        $kx = 111_320 * cos(deg2rad($latitude));
+
+        return $query
+            ->select($this->getTable().'.*')
+            ->selectRaw('((latitude - ?) * (latitude - ?) * ? + (longitude - ?) * (longitude - ?) * ?) as distance', [
+                $latitude, $latitude, 111_320 ** 2, $longitude, $longitude, $kx ** 2,
+            ])
+            ->whereBetween('latitude', [$latitude - $dLat, $latitude + $dLat])
+            ->whereBetween('longitude', [$longitude - $dLng, $longitude + $dLng])
+            ->orderBy('distance');
+    }
+
     /** Guarda el punto en PostGIS y en las columnas numéricas */
     public function setLocationFromCoordinates(float $latitude, float $longitude): static
     {
         // %F formatea el número sin depender del idioma del sistema: no se puede inyectar SQL
-        $this->location = DB::raw(sprintf('ST_SetSRID(ST_MakePoint(%F, %F), 4326)::geography', $longitude, $latitude));
+        $this->location = DB::getDriverName() === 'pgsql'
+            ? DB::raw(sprintf('ST_SetSRID(ST_MakePoint(%F, %F), 4326)::geography', $longitude, $latitude))
+            : sprintf('POINT(%F %F)', $longitude, $latitude);
         $this->latitude = $latitude;
         $this->longitude = $longitude;
 

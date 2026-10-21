@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -22,7 +23,10 @@ return new class extends Migration
             $table->longText('content')->nullable();
 
             // Geolocation (optional - for experiences at specific locations)
-            $table->geography('location', 'point', 4326)->nullable();
+            // Sin PostGIS (SQLite de los tests) se guarda como texto WKT
+            DB::getDriverName() === 'pgsql'
+                ? $table->geography('location', 'point', 4326)->nullable()
+                : $table->string('location')->nullable();
             $table->string('address')->nullable();
 
             // Experience Details
@@ -46,7 +50,9 @@ return new class extends Migration
             $table->index('locale_id');
             $table->index('difficulty');
             $table->index('is_active');
-            $table->spatialIndex('location');
+            if (DB::getDriverName() === 'pgsql') {
+                $table->spatialIndex('location');
+            }
         });
     }
 
