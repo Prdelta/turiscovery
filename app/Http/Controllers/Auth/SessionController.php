@@ -97,8 +97,8 @@ class SessionController extends Controller
      */
     public function logout(Request $request)
     {
-        // Cerrar sesión de Laravel
-        Auth::logout();
+        // La ruta usa auth:sanctum, cuyo guard no cierra sesiones: la sesión con cookie vive en "web"
+        Auth::guard('web')->logout();
 
         // Invalidar sesión actual
         $request->session()->invalidate();

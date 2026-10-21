@@ -24,7 +24,8 @@ class Booking extends Model
     ];
 
     protected $casts = [
-        'booking_date' => 'date',
+        // Día de la salida en Puno: se envía como AAAA-MM-DD, sin hora ni zona horaria
+        'booking_date' => 'date:Y-m-d',
         'total_price' => 'decimal:2',
         'reminded_at' => 'datetime',
     ];

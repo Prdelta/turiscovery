@@ -5,7 +5,6 @@ use App\Models\Experiencia;
 use App\Models\User;
 use App\Notifications\BookingNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\Sanctum;
 
@@ -39,6 +38,22 @@ function cuposReservar($test, Experiencia $exp, int $participants, ?string $date
         'participants' => $participants,
     ]);
 }
+
+/* ---------- Fecha de la reserva ---------- */
+
+test('la fecha de la reserva viaja sin hora ni zona horaria', function () {
+    $socio = cuposUser('socio');
+    $exp = cuposExperiencia($socio);
+    $date = now()->addWeek()->toDateString();
+
+    Sanctum::actingAs(cuposUser());
+    // Con hora UTC, en Lima (UTC−5) la SPA mostraba el día anterior
+    cuposReservar($this, $exp, 1, $date)->assertCreated()->assertJsonPath('data.booking_date', $date);
+    $this->getJson('/api/bookings')->assertOk()->assertJsonPath('data.data.0.booking_date', $date);
+
+    Sanctum::actingAs($socio);
+    $this->getJson('/api/partner/bookings')->assertOk()->assertJsonPath('data.data.0.booking_date', $date);
+});
 
 /* ---------- Cupos ---------- */
 

@@ -3,19 +3,25 @@ const shortDateFmt = new Intl.DateTimeFormat('es-PE', { day: 'numeric', month: '
 const timeFmt = new Intl.DateTimeFormat('es-PE', { hour: '2-digit', minute: '2-digit' })
 const money = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' })
 
+/** Fecha de la API. Un AAAA-MM-DD es un día local: new Date() lo tomaría como medianoche UTC (el día anterior en Puno) */
+export function toDate(value: string) {
+  const day = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
+  return day ? new Date(Number(day[1]), Number(day[2]) - 1, Number(day[3])) : new Date(value)
+}
+
 export function formatDate(value?: string | null) {
   if (!value) return ''
-  return dateFmt.format(new Date(value))
+  return dateFmt.format(toDate(value))
 }
 
 export function formatShortDate(value?: string | null) {
   if (!value) return ''
-  return shortDateFmt.format(new Date(value))
+  return shortDateFmt.format(toDate(value))
 }
 
 export function formatTime(value?: string | null) {
   if (!value) return ''
-  return timeFmt.format(new Date(value))
+  return timeFmt.format(toDate(value))
 }
 
 export function formatPrice(value?: string | number | null) {
@@ -27,7 +33,7 @@ export function formatPrice(value?: string | number | null) {
 
 /** Días que faltan hasta una fecha (0 = hoy, negativo = ya pasó) */
 export function daysUntil(value: string) {
-  const ms = new Date(value).setHours(0, 0, 0, 0) - new Date().setHours(0, 0, 0, 0)
+  const ms = toDate(value).setHours(0, 0, 0, 0) - new Date().setHours(0, 0, 0, 0)
   return Math.round(ms / 86_400_000)
 }
 

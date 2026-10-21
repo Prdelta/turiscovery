@@ -2,6 +2,7 @@ import { BarChart3, TicketCheck } from 'lucide-react'
 import { CONTENT } from '@/shared/config/content'
 import { defineFeature, type NavItem } from '@/shared/routing/feature'
 import { lazyPage } from '@/shared/routing/lazyPage'
+import { ManagedTypeRoute } from './ManagedTypeRoute'
 import { MANAGED } from './managed'
 
 const form = () => import('./ContentFormPage')
@@ -16,9 +17,9 @@ export const partnerFeature = defineFeature({
       { index: true, element: lazyPage(() => import('./PartnerHome'), 'PartnerHome') },
       // Antes de ':type' para que "cupones" no se tome como tipo de contenido
       { path: 'cupones', element: lazyPage(() => import('./CouponRedeemPage'), 'CouponRedeemPage') },
-      { path: ':type', element: lazyPage(() => import('./ContentManager'), 'ContentManager') },
-      { path: ':type/nuevo', element: lazyPage(form, 'ContentFormPage') },
-      { path: ':type/:id', element: lazyPage(form, 'ContentFormPage') },
+      { path: ':type', element: <ManagedTypeRoute>{lazyPage(() => import('./ContentManager'), 'ContentManager')}</ManagedTypeRoute> },
+      { path: ':type/nuevo', element: <ManagedTypeRoute>{lazyPage(form, 'ContentFormPage')}</ManagedTypeRoute> },
+      { path: ':type/:id', element: <ManagedTypeRoute>{lazyPage(form, 'ContentFormPage')}</ManagedTypeRoute> },
     ],
   },
   nav: {

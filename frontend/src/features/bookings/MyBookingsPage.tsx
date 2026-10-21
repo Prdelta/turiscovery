@@ -7,7 +7,7 @@ import { Button, ButtonLink } from '@/shared/ui/Button'
 import { EmptyState, Pagination, Spinner, StatusBadge } from '@/shared/ui/Feedback'
 import { useToast } from '@/shared/ui/Toast'
 import { parseApiError } from '@/shared/api/client'
-import { formatDate, formatPrice } from '@/shared/lib/format'
+import { formatDate, formatPrice, toDate } from '@/shared/lib/format'
 import { useDocumentTitle, useNow } from '@/shared/lib/hooks'
 import { bookingQueries, useCancelBooking } from '@/features/bookings/api'
 
@@ -35,7 +35,7 @@ export function MyBookingsPage() {
       ) : data?.data.length ? (
         <div className="grid gap-3 lg:grid-cols-2">
           {data.data.map((b) => {
-            const future = new Date(b.booking_date) > now
+            const future = toDate(b.booking_date) > now
             return (
               <article key={b.id} className="card flex flex-col gap-2 p-4">
                 <div className="flex items-start justify-between gap-3">

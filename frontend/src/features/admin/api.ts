@@ -19,12 +19,6 @@ export interface CommonsResult {
   snippet: string
   page_url: string
 }
-export interface ImageResult {
-  url: string
-  title: string
-  source: string
-}
-
 export interface UserFilters {
   search?: string
   role?: string
@@ -57,7 +51,7 @@ export const adminQueries = {
   images: (query: string) =>
     queryOptions({
       queryKey: adminKeys.resources('images', query),
-      queryFn: () => getData<{ unsplash: ImageResult[]; wikimedia: CommonsResult[] }>('/admin/resources/search-images', { query }),
+      queryFn: () => getData<{ wikimedia: CommonsResult[] }>('/admin/resources/search-images', { query }),
       enabled: query.length >= 3,
     }),
 }
