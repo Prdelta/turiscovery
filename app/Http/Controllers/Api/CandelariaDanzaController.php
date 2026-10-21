@@ -92,17 +92,4 @@ class CandelariaDanzaController extends Controller
             'message' => 'Danza eliminada exitosamente.',
         ]);
     }
-
-    public function featured()
-    {
-        $danzas = CandelariaDanza::where('is_active', true)
-            ->where('is_featured', true)
-            ->orderBy('order', 'asc')
-            ->get();
-
-        return response()->json([
-            'success' => true,
-            'data' => $danzas,
-        ]);
-    }
 }

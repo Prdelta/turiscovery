@@ -52,9 +52,6 @@ class RegisterController extends Controller
             $request->session()->regenerate();
         }
 
-        // Create Sanctum token for API authentication
-        $token = $user->createToken('auth_token')->plainTextToken;
-
         return response()->json([
             'success' => true,
             'message' => 'User registered successfully',
@@ -66,8 +63,6 @@ class RegisterController extends Controller
                     'role' => $user->role,
                     'email_verified_at' => null,
                 ],
-                'access_token' => $token,
-                'token_type' => 'Bearer',
             ],
         ], 201);
     }

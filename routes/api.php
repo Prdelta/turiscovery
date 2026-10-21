@@ -27,7 +27,6 @@ use App\Http\Controllers\Api\StatsController;
 use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\UserCouponController;
 use App\Http\Controllers\Auth\EmailVerificationController;
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\SessionController;
@@ -41,9 +40,8 @@ use Illuminate\Support\Facades\Route;
 
 // ========== Public Routes (No Authentication Required) ==========
 
-// Authentication Routes (Legacy - Token Based)
+// Registro (la cuenta nueva entra con sesión, igual que /session/login)
 Route::post('/register', [RegisterController::class, 'register'])->middleware('throttle:register');
-Route::post('/login', [LoginController::class, 'login']);
 
 // Session-Based Authentication (Secure - httpOnly Cookies)
 Route::post('/session/login', [SessionController::class, 'login']);
@@ -83,7 +81,6 @@ Route::middleware(['validate.params', 'api.cache'])->group(function () {
 
     // Candelaria Danzas (Public)
     Route::get('/candelaria-danzas', [CandelariaDanzaController::class, 'index']);
-    Route::get('/candelaria-danzas/featured', [CandelariaDanzaController::class, 'featured']);
     Route::get('/candelaria-danzas/{id}', [CandelariaDanzaController::class, 'show']);
 });
 
@@ -110,13 +107,8 @@ Route::get('/event-attendances/count/{eventoId}', [EventAttendeeController::clas
 
 Route::middleware(['auth:sanctum', 'user.active', 'validate.params'])->group(function () {
 
-    // User Info & Logout (Legacy - Token Based)
-    Route::post('/logout', [LoginController::class, 'logout']);
-    Route::get('/me', [LoginController::class, 'me']);
-
-    // Session-Based Auth Routes
+    // Sesión
     Route::post('/session/logout', [SessionController::class, 'logout']);
-    Route::get('/session/me', [SessionController::class, 'me']);
 
     // Perfil del usuario
     Route::get('/profile', [ProfileController::class, 'show']);
@@ -195,14 +187,12 @@ Route::middleware(['auth:sanctum', 'user.active', 'validate.params'])->group(fun
     Route::get('/favorites', [FavoriteController::class, 'index']);
     Route::post('/favorites/toggle', [FavoriteController::class, 'toggle']);
     Route::get('/favorites/check', [FavoriteController::class, 'check']);
-    Route::delete('/favorites/{id}', [FavoriteController::class, 'destroy']);
 
     // Bookings (Reservas de Experiencias)
     Route::get('/bookings', [BookingController::class, 'index']);
     Route::post('/bookings', [BookingController::class, 'store']);
     Route::get('/bookings/{id}', [BookingController::class, 'show']);
     Route::post('/bookings/{id}/cancel', [BookingController::class, 'cancel']);
-    Route::post('/bookings/check-availability', [BookingController::class, 'checkAvailability']);
 
     // Avisos dentro de la app (reservas nuevas, confirmaciones, recordatorios)
     Route::get('/notifications', [NotificationController::class, 'index']);
@@ -212,7 +202,6 @@ Route::middleware(['auth:sanctum', 'user.active', 'validate.params'])->group(fun
     // Event Attendances (Confirmación de asistencia a eventos)
     Route::get('/event-attendances', [EventAttendeeController::class, 'index']);
     Route::post('/event-attendances', [EventAttendeeController::class, 'store']);
-    Route::put('/event-attendances/{id}', [EventAttendeeController::class, 'update']);
     Route::delete('/event-attendances/{eventoId}', [EventAttendeeController::class, 'destroy']);
     Route::get('/event-attendances/check/{eventoId}', [EventAttendeeController::class, 'check']);
 
@@ -265,13 +254,4 @@ Route::middleware(['auth:sanctum', 'user.active', 'validate.params'])->group(fun
         Route::put('/candelaria-danzas/{id}', [CandelariaDanzaController::class, 'update']);
         Route::delete('/candelaria-danzas/{id}', [CandelariaDanzaController::class, 'destroy']);
     });
-});
-
-// Test route to verify API is working
-Route::get('/test', function () {
-    return response()->json([
-        'success' => true,
-        'message' => 'Turiscovery API is working!',
-        'timestamp' => now(),
-    ]);
 });

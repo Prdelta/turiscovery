@@ -5,5 +5,5 @@ test('la raíz web redirige al frontend React', function () {
 });
 
 test('la API responde', function () {
-    $this->getJson('/api/test')->assertOk()->assertJsonPath('success', true);
+    $this->get('/up')->assertOk();
 });

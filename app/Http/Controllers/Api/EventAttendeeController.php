@@ -7,7 +7,6 @@ use App\Models\EventAttendee;
 use App\Models\Evento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 
 class EventAttendeeController extends Controller
 {
@@ -75,27 +74,6 @@ class EventAttendeeController extends Controller
             'message' => '¡Asistencia confirmada! Nos vemos en el evento.',
             'data' => $attendance,
         ], 201);
-    }
-
-    public function update(Request $request, $id)
-    {
-        $attendance = EventAttendee::findOrFail($id);
-
-        Gate::authorize('update', $attendance);
-
-        $validated = $request->validate([
-            'status' => 'required|in:confirmed,maybe,cancelled',
-            'guests' => 'nullable|integer|min:1|max:10',
-        ]);
-
-        $attendance->update($validated);
-        $attendance->load('evento');
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Confirmación actualizada.',
-            'data' => $attendance,
-        ]);
     }
 
     public function destroy($eventoId)

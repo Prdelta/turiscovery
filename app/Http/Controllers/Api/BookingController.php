@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
-use App\Models\Experiencia;
 use App\Services\BookingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -87,40 +86,5 @@ class BookingController extends Controller
             'success' => false,
             'message' => 'Esta reserva no puede ser cancelada.',
         ], 422);
-    }
-
-    /**
-     * Verificar disponibilidad para una experiencia en una fecha
-     */
-    public function checkAvailability(Request $request, BookingService $bookings)
-    {
-        $validated = $request->validate([
-            'experiencia_id' => 'required|exists:experiencias,id',
-            'booking_date' => 'required|date|after:today',
-            'participants' => 'required|integer|min:1',
-        ]);
-
-        $experiencia = Experiencia::findOrFail($validated['experiencia_id']);
-
-        if (! $experiencia->max_participants) {
-            return response()->json([
-                'success' => true,
-                'available' => true,
-                'message' => 'Esta experiencia no tiene límite de participantes.',
-            ]);
-        }
-
-        $availableSlots = $bookings->availableSeats($experiencia, $validated['booking_date']);
-        $isAvailable = $validated['participants'] <= $availableSlots;
-
-        return response()->json([
-            'success' => true,
-            'available' => $isAvailable,
-            'available_slots' => $availableSlots,
-            'max_participants' => $experiencia->max_participants,
-            'message' => $isAvailable
-                ? "Hay {$availableSlots} cupos disponibles."
-                : "Solo hay {$availableSlots} cupos disponibles.",
-        ]);
     }
 }

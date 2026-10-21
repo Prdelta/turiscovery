@@ -82,26 +82,4 @@ class FavoriteController extends Controller
             'is_favorited' => $isFavorited,
         ], 200);
     }
-
-    /**
-     * Remove favorite
-     */
-    public function destroy(Request $request, $id)
-    {
-        $favorite = Favorite::findOrFail($id);
-
-        if ($favorite->user_id !== $request->user()->id) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized to remove this favorite.',
-            ], 403);
-        }
-
-        $favorite->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Removed from favorites',
-        ], 200);
-    }
 }

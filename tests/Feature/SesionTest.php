@@ -3,6 +3,7 @@
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 uses(RefreshDatabase::class);
 
@@ -11,6 +12,18 @@ function sesionSpa($test)
 {
     return $test->withHeaders(['Referer' => 'http://localhost:5173/', 'Origin' => 'http://localhost:5173']);
 }
+
+test('registrarse abre sesión sin emitir tokens de API', function () {
+    sesionSpa($this)->postJson('/api/register', [
+        'name' => 'Rosa Viajera',
+        'email' => 'rosa@example.com',
+        'password' => 'Clave-segura-123',
+        'password_confirmation' => 'Clave-segura-123',
+    ])->assertCreated()->assertJsonMissingPath('data.access_token');
+
+    expect(Auth::guard('web')->user()?->email)->toBe('rosa@example.com')
+        ->and(DB::table('personal_access_tokens')->count())->toBe(0);
+});
 
 test('cerrar sesión termina la sesión en el servidor', function () {
     $user = User::factory()->create(['role' => 'tourist', 'is_active' => true]);

@@ -7,11 +7,11 @@
 ## 🔴 URGENTE - Antes de Producción
 
 ### Seguridad
-- [ ] Implementar CSRF tokens en todos los formularios web
+- [x] Implementar CSRF tokens en todos los formularios web (Sanctum: cookie XSRF-TOKEN en cada petición de la SPA)
 - [x] Configurar CORS para producción (`config/cors.php`)
 - [x] Agregar rate limiting en endpoints públicos
 - [x] Implementar validación de tipos MIME en uploads
-- [ ] Sanitización de HTML en contenido de usuario (XSS)
+- [x] Sanitización de HTML en contenido de usuario (XSS): React escapa todo el texto y no hay `dangerouslySetInnerHTML`
 - [ ] Configurar HTTPS/SSL en producción
 - [x] Cambiar todas las contraseñas por defecto
 
@@ -58,7 +58,7 @@
   - [x] Galería de imágenes
   - [x] Itinerario completo
   - [x] Botón "Reservar"
-  - [ ] Reviews y ratings
+  - [x] Reviews y ratings
 
 - [x] `/promociones/{id}` - Detalle de promoción
   - [x] Términos y condiciones
@@ -70,8 +70,8 @@
   - [x] Información completa
   - [x] Ubicación en mapa
   - [x] Eventos, experiencias, promociones del local
-  - [ ] Reviews y ratings
-  - [ ] Formulario de contacto
+  - [x] Reviews y ratings
+  - [ ] Formulario de contacto (hoy solo hay un enlace `mailto:` en /contacto)
 
 ### Sistema de Búsqueda
 - [x] Página `/search` con filtros avanzados:
@@ -126,9 +126,9 @@
   - [ ] Exportar estadísticas (PDF)
 
 ### Panel Admin - Dashboard Principal
-- [ ] Crear `/admin/dashboard`:
-  - [ ] Total de usuarios (tourists, socios)
-  - [ ] Total de contenido (locales, eventos, etc.)
+- [x] Crear `/admin/dashboard` (es "Supervisión", en `/admin`):
+  - [x] Total de usuarios (tourists, socios)
+  - [x] Total de contenido (locales, eventos, etc.)
   - [ ] Gráfico de registros por mes
   - [ ] Contenido más popular
   - [ ] Reviews recientes
@@ -156,7 +156,7 @@
 - [x] Estado: pendiente, confirmada, cancelada
 - [x] Relación con experiencias
 - [x] Panel de gestión de reservas para socios
-- [ ] Notificaciones por email
+- [x] Notificaciones por email (`BookingNotification`, si el usuario las tiene activadas; siempre llega el aviso en la app)
 
 ### Sistema de Mensajería
 - [ ] Modelo `Message`
@@ -200,8 +200,8 @@
 - [ ] Forzar HTTPS en Laravel (`AppServiceProvider`)
 
 ### CI/CD
-- [ ] GitHub Actions workflow:
-  - [ ] Ejecutar tests automáticamente
+- [x] GitHub Actions workflow (`.github/workflows/ci.yml`):
+  - [x] Ejecutar tests automáticamente (Pest con PostGIS y build del frontend)
   - [ ] Deploy automático a staging
   - [ ] Deploy manual a producción
 

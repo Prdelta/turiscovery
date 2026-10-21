@@ -113,41 +113,6 @@ class SessionController extends Controller
     }
 
     /**
-     * Obtener información del usuario autenticado
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function me(Request $request)
-    {
-        $user = $request->user();
-
-        if (! $user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No autenticado',
-            ], 401);
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'role' => $user->role,
-                    'avatar' => $user->avatar,
-                    'email_verified_at' => $user->email_verified_at,
-                    'preferences' => $user->resolvedPreferences(),
-                    'phone' => $user->phone,
-                    'bio' => $user->bio,
-                    'created_at' => $user->created_at,
-                ],
-            ],
-        ], 200);
-    }
-
-    /**
      * Verificar estado de autenticación
      *
      * @return \Illuminate\Http\JsonResponse
