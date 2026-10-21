@@ -17,17 +17,17 @@
 
 ### Testing
 - [ ] Tests unitarios de modelos (User, Locale, etc.)
-- [ ] Tests de API endpoints (GET, POST, PUT, DELETE)
+- [x] Tests de API endpoints (GET, POST, PUT, DELETE)
 - [x] Tests de autorización (verificar RBAC)
-- [ ] Tests de geolocalización (PostGIS)
+- [x] Tests de geolocalización (PostGIS)
 - [ ] Tests de validación de formularios
 
 ### Performance
 - [ ] Implementar paginación en:
-  - [ ] `/api/locales`
-  - [ ] `/api/eventos`
-  - [ ] `/api/experiencias`
-  - [ ] `/api/promociones`
+  - [x] `/api/locales`
+  - [x] `/api/eventos`
+  - [x] `/api/experiencias`
+  - [x] `/api/promociones`
   - [ ] `/admin/socios`
   - [ ] `/admin/candelaria/danzas`
 - [ ] Optimizar queries con `eager loading`:
