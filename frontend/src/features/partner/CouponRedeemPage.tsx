@@ -79,7 +79,7 @@ export function CouponRedeemPage() {
           <form onSubmit={onSearch} className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <TextField
               label="Código del cupón"
-              placeholder="TURISCO-XXXXXXXX"
+              placeholder="NANPUNO-XXXXXXXX"
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
               autoComplete="off"

@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Http;
  */
 class ResourceSearchController extends Controller
 {
-    private const USER_AGENT = 'Turiscovery/1.0 (contacto@turiscovery.com)';
+    private const USER_AGENT = 'NanPuno/1.0 (contacto@nanpuno.pe)';
 
     /** Archivos de Wikimedia Commons sobre el tema */
     public function searchImages(Request $request)

@@ -55,7 +55,7 @@ class AppServiceProvider extends ServiceProvider
         ResetPassword::toMailUsing(fn (User $user, string $token) => (new MailMessage)
             ->subject('Crea una nueva contraseña')
             ->greeting("Hola, {$user->name}")
-            ->line('Recibimos un pedido para cambiar la contraseña de tu cuenta de Turiscovery.')
+            ->line('Recibimos un pedido para cambiar la contraseña de tu cuenta de Ñan Puno.')
             ->action('Crear nueva contraseña', "{$front}/restablecer?".http_build_query(['token' => $token, 'email' => $user->getEmailForPasswordReset()]))
             ->line('El enlace vence en '.config('auth.passwords.users.expire', 60).' minutos.')
             ->line('Si no lo pediste, ignora este correo: tu contraseña no cambia.'));
@@ -65,7 +65,7 @@ class AppServiceProvider extends ServiceProvider
             ->greeting("Hola, {$user->name}")
             ->line('Confirma que este correo es tuyo para que los anfitriones puedan escribirte sobre tus reservas.')
             ->action('Confirmar mi correo', $url)
-            ->line('Si no creaste una cuenta en Turiscovery, ignora este correo.'));
+            ->line('Si no creaste una cuenta en Ñan Puno, ignora este correo.'));
 
         // Recuperar contraseña: pocos intentos por correo e IP
         RateLimiter::for('password-reset', function (Request $request) {

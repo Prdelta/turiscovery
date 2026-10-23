@@ -77,7 +77,7 @@ export default function StyleGuidePage() {
     <div className="container-page py-12">
       <header>
         <p className="flex items-center gap-2 font-bold text-ink-soft">
-          <Tocapu motif="estrella" dye="cochinilla" size={28} framed={false} /> Turiscovery · guía de estilo v1 · dirección Telar
+          <Tocapu motif="estrella" dye="cochinilla" size={28} framed={false} /> Ñan Puno · guía de estilo v1 · dirección Telar
         </p>
         <h1 className="t-display mt-4 max-w-3xl">La faja tejida organiza todo lo que se ve.</h1>
         <p className="prose-measure mt-4 text-lg text-ink-soft">

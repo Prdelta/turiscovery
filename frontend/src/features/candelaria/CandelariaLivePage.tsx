@@ -17,8 +17,8 @@ const dayFmt = new Intl.DateTimeFormat('es-PE', { weekday: 'long', day: 'numeric
 
 /* ---------- Danzas seguidas (en este dispositivo, sin necesidad de cuenta) ---------- */
 
-const FOLLOW_KEY = 'turiscovery-danzas-seguidas'
-const NOTIFIED_KEY = 'turiscovery-avisos-enviados'
+const FOLLOW_KEY = 'nanpuno-danzas-seguidas'
+const NOTIFIED_KEY = 'nanpuno-avisos-enviados'
 
 function readIds(key: string, storage: Storage): number[] {
   try {
@@ -308,7 +308,7 @@ function useAlerts(state: LiveState | undefined, followed: number[]) {
 
   // En una pestaña de fondo, el título también avisa
   useEffect(() => {
-    document.title = banner ? `🔔 ${banner}` : 'Candelaria en vivo · Turiscovery'
+    document.title = banner ? `🔔 ${banner}` : 'Candelaria en vivo · Ñan Puno'
   }, [banner])
 
   return banner

@@ -17,9 +17,9 @@ function TextPage({ title, children }: { title: string; children: ReactNode }) {
 
 export function AboutPage() {
   return (
-    <TextPage title="Sobre Turiscovery">
+    <TextPage title="Sobre Ñan Puno">
       <p>
-        Turiscovery reúne en un solo lugar lo que ofrecen los negocios de Puno: experiencias en el lago, eventos, promociones y
+        Ñan Puno reúne en un solo lugar lo que ofrecen los negocios de Puno: experiencias en el lago, eventos, promociones y
         locales, además de la historia y las danzas de la Festividad de la Virgen de la Candelaria.
       </p>
       <p>
@@ -43,11 +43,11 @@ export function ContactPage() {
       <p>¿Quieres publicar tu negocio, reportar un error o hacer una consulta? Escríbenos y te respondemos en un plazo de dos días hábiles.</p>
       <p>
         Correo:{' '}
-        <a href="mailto:contacto@turiscovery.com" className="font-bold text-primary-dark underline decoration-2 underline-offset-4">contacto@turiscovery.com</a>
+        <a href="mailto:contacto@nanpuno.pe" className="font-bold text-primary-dark underline decoration-2 underline-offset-4">contacto@nanpuno.pe</a>
       </p>
       <p>Puno, Perú.</p>
       <div>
-        <ButtonLink to="/sobre-nosotros" variant="secondary">Conocer más sobre Turiscovery</ButtonLink>
+        <ButtonLink to="/sobre-nosotros" variant="secondary">Conocer más sobre Ñan Puno</ButtonLink>
       </div>
     </TextPage>
   )
@@ -56,7 +56,7 @@ export function ContactPage() {
 export function TermsPage() {
   return (
     <TextPage title="Términos y condiciones">
-      <p>Al usar Turiscovery aceptas estas condiciones. Si no estás de acuerdo, no uses la plataforma.</p>
+      <p>Al usar Ñan Puno aceptas estas condiciones. Si no estás de acuerdo, no uses la plataforma.</p>
       <h2>Contenido de los socios</h2>
       <p>
         Las experiencias, eventos y promociones son publicados por negocios independientes. Cada socio es responsable de la
@@ -64,7 +64,7 @@ export function TermsPage() {
       </p>
       <h2>Reservas y cupones</h2>
       <p>
-        Las reservas hechas en Turiscovery quedan pendientes hasta que el socio las confirma. Los cupones solo son válidos
+        Las reservas hechas en Ñan Puno quedan pendientes hasta que el socio las confirma. Los cupones solo son válidos
         durante la vigencia de la promoción y según sus términos.
       </p>
       <h2>Reseñas</h2>
@@ -89,7 +89,7 @@ export function PrivacyPage() {
       <h2>Tus derechos</h2>
       <p>
         Puedes pedir acceso, corrección o eliminación de tus datos escribiendo a{' '}
-        <a href="mailto:contacto@turiscovery.com" className="font-bold text-primary-dark underline decoration-2 underline-offset-4">contacto@turiscovery.com</a>.
+        <a href="mailto:contacto@nanpuno.pe" className="font-bold text-primary-dark underline decoration-2 underline-offset-4">contacto@nanpuno.pe</a>.
       </p>
     </TextPage>
   )

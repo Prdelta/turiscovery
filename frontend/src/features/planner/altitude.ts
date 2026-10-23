@@ -142,7 +142,7 @@ export function buildPlan(plan: PlanInput, experiences: Experiencia[], events: E
 
 /* ---------- Guardado y enlace compartible ---------- */
 
-const STORAGE_KEY = 'turiscovery-plan'
+const STORAGE_KEY = 'nanpuno-plan'
 
 export function savePlan(plan: PlanInput) {
   try {

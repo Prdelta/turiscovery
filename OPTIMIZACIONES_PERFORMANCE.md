@@ -1,4 +1,4 @@
-# ⚡ Optimizaciones de Performance - Turiscovery
+# ⚡ Optimizaciones de Performance - Ñan Puno
 
 **Fecha:** 2026-02-09
 **Problema:** Navegación lenta en el dashboard

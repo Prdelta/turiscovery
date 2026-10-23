@@ -1,4 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <circle cx="256" cy="256" r="256" fill="#5930e8"/>
-  <path d="M342 164 H252 A92 92 0 0 0 252 348 H342" fill="none" stroke="#74fa8a" stroke-width="68" stroke-linejoin="round"/>
+  <!-- Ñ de Ñan Puno: N trazada y la virgulilla encima, sin depender de una tipografía -->
+  <path d="M176 382 V212 L336 382 V212" fill="none" stroke="#74fa8a" stroke-width="56" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M184 150 C210 120 236 120 256 138 C276 156 302 156 328 126" fill="none" stroke="#74fa8a" stroke-width="34" stroke-linecap="round"/>
 </svg>

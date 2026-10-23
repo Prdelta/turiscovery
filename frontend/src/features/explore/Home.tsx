@@ -132,7 +132,7 @@ function Intro({ selectedId, onSelect }: { selectedId: string | null; onSelect: 
         </div>
         <form onSubmit={onSubmit} role="search" className="flex w-full items-center gap-2 rounded-[var(--radius-control)] border-2 border-ink bg-white p-1.5 pl-4 lg:w-[380px]">
           <Search className="size-5 shrink-0 text-ink-soft" aria-hidden />
-          <label htmlFor="hero-search" className="sr-only">Buscar en Turiscovery</label>
+          <label htmlFor="hero-search" className="sr-only">Buscar en Ñan Puno</label>
           <input
             id="hero-search"
             value={q}

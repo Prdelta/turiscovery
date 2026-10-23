@@ -22,8 +22,8 @@ export default defineConfig(({ mode }) => {
         registerType: 'autoUpdate',
         includeAssets: ['favicon.ico', 'apple-touch-icon-180x180.png', 'icon.svg'],
         manifest: {
-          name: 'Turiscovery · Puno',
-          short_name: 'Turiscovery',
+          name: 'Ñan Puno',
+          short_name: 'Ñan Puno',
           description: 'Experiencias, eventos, promociones y la Candelaria de Puno. Funciona sin conexión en el lago y las islas.',
           lang: 'es-PE',
           start_url: '/',
@@ -58,7 +58,7 @@ export default defineConfig(({ mode }) => {
               urlPattern: ({ url, request }) => url.pathname.startsWith('/api/') && request.method === 'GET' && !url.pathname.startsWith('/api/auth/'),
               handler: 'NetworkFirst',
               options: {
-                cacheName: 'turiscovery-api',
+                cacheName: 'nanpuno-api',
                 networkTimeoutSeconds: 6,
                 expiration: { maxEntries: 400, maxAgeSeconds: 14 * 24 * 60 * 60 },
                 cacheableResponse: { statuses: [200] },
@@ -69,7 +69,7 @@ export default defineConfig(({ mode }) => {
               urlPattern: ({ url }) => url.pathname.startsWith('/storage/'),
               handler: 'CacheFirst',
               options: {
-                cacheName: 'turiscovery-fotos',
+                cacheName: 'nanpuno-fotos',
                 expiration: { maxEntries: 300, maxAgeSeconds: 30 * 24 * 60 * 60 },
                 cacheableResponse: { statuses: [0, 200] },
               },
@@ -79,7 +79,7 @@ export default defineConfig(({ mode }) => {
               urlPattern: ({ url }) => url.hostname.endsWith('tile.openstreetmap.org'),
               handler: 'CacheFirst',
               options: {
-                cacheName: 'turiscovery-mapa',
+                cacheName: 'nanpuno-mapa',
                 expiration: { maxEntries: 600, maxAgeSeconds: 30 * 24 * 60 * 60 },
                 cacheableResponse: { statuses: [0, 200] },
               },
@@ -89,7 +89,7 @@ export default defineConfig(({ mode }) => {
               urlPattern: ({ url }) => url.hostname === 'api.open-meteo.com',
               handler: 'NetworkFirst',
               options: {
-                cacheName: 'turiscovery-clima',
+                cacheName: 'nanpuno-clima',
                 networkTimeoutSeconds: 5,
                 expiration: { maxEntries: 10, maxAgeSeconds: 2 * 24 * 60 * 60 },
                 cacheableResponse: { statuses: [200] },
@@ -99,7 +99,7 @@ export default defineConfig(({ mode }) => {
               urlPattern: ({ url }) => url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com',
               handler: 'CacheFirst',
               options: {
-                cacheName: 'turiscovery-fuentes',
+                cacheName: 'nanpuno-fuentes',
                 expiration: { maxEntries: 20, maxAgeSeconds: 365 * 24 * 60 * 60 },
                 cacheableResponse: { statuses: [0, 200] },
               },

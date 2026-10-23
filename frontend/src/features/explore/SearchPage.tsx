@@ -38,7 +38,7 @@ export default function SearchPage() {
 
   return (
     <div className="container-page py-12 sm:py-16">
-      <h1 className="t-h1">Buscar en Turiscovery</h1>
+      <h1 className="t-h1">Buscar en Ñan Puno</h1>
       <div role="search" className="mt-8 flex flex-col gap-4">
         <div className="relative max-w-2xl">
           <label htmlFor="search-q" className="sr-only">Qué buscas</label>

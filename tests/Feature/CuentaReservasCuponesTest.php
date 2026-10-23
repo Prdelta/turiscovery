@@ -71,7 +71,7 @@ function cuentaCupon(User $socio, User $tourist, array $attrs = []): UserCoupon
     return UserCoupon::create(array_merge([
         'user_id' => $tourist->id,
         'promocion_id' => $promo->id,
-        'coupon_code' => 'TURISCO-ABCD1234',
+        'coupon_code' => 'NANPUNO-ABCD1234',
         'status' => 'available',
         'claimed_at' => now(),
     ], $attrs));
@@ -177,7 +177,7 @@ test('la tarea diaria completa reservas pasadas y vence cupones', function () {
     $stale = Booking::create(['user_id' => $tourist->id, 'experiencia_id' => $exp->id, 'booking_date' => now()->subDays(2), 'participants' => 1, 'total_price' => 80, 'status' => 'pending']);
     $coupon = cuentaCupon($socio, $tourist, ['expires_at' => now()->subHour()]);
 
-    $this->artisan('turiscovery:expire')->assertSuccessful();
+    $this->artisan('nanpuno:expire')->assertSuccessful();
 
     expect($done->fresh()->status)->toBe('completed')
         ->and($stale->fresh()->status)->toBe('cancelled')
@@ -191,9 +191,9 @@ test('el socio canjea en su local el cupón que le muestra el viajero', function
     $coupon = cuentaCupon($socio, cuentaUser());
     Sanctum::actingAs($socio);
 
-    $this->getJson('/api/partner/coupons/lookup?code=turisco-abcd1234')->assertOk()->assertJsonPath('data.status', 'available');
-    $this->postJson('/api/partner/coupons/redeem', ['code' => 'TURISCO-ABCD1234'])->assertOk();
-    $this->postJson('/api/partner/coupons/redeem', ['code' => 'TURISCO-ABCD1234'])->assertStatus(422);
+    $this->getJson('/api/partner/coupons/lookup?code=nanpuno-abcd1234')->assertOk()->assertJsonPath('data.status', 'available');
+    $this->postJson('/api/partner/coupons/redeem', ['code' => 'NANPUNO-ABCD1234'])->assertOk();
+    $this->postJson('/api/partner/coupons/redeem', ['code' => 'NANPUNO-ABCD1234'])->assertStatus(422);
 
     expect($coupon->fresh()->status)->toBe('used');
 });

@@ -1,4 +1,4 @@
-# Turiscovery
+# Ñan Puno
 
 Guía turística de Puno y el lago Titicaca. Los socios locales publican experiencias, eventos, promociones y locales. Los viajeros descubren, reservan, obtienen cupones y escuchan a los anfitriones de las comunidades.
 
@@ -94,8 +94,8 @@ GOOGLE_REDIRECT_URI=http://localhost:5173/api/auth/google/callback
 # Correos (reservas, verificación, recuperar contraseña). Con "log" quedan en storage/logs
 MAIL_MAILER=smtp
 MAIL_HOST=...
-MAIL_FROM_ADDRESS=hola@turiscovery.com
-MAIL_FROM_NAME=Turiscovery
+MAIL_FROM_ADDRESS=hola@nanpuno.pe
+MAIL_FROM_NAME=Ñan Puno
 ```
 
 Para Google OAuth, crea un cliente "Web application" en Google Cloud Console con la URI de redirección `http://localhost:5173/api/auth/google/callback` (y la de producción).
@@ -108,7 +108,7 @@ php artisan schedule:work   # en desarrollo; en producción, el cron de Laravel 
 
 | Comando | Cuándo | Qué hace |
 |---------|--------|----------|
-| `turiscovery:expire` | 03:00 | Vence cupones caducados, completa reservas confirmadas de días pasados (y pide la reseña) y cancela las pendientes que nadie confirmó |
+| `nanpuno:expire` | 03:00 | Vence cupones caducados, completa reservas confirmadas de días pasados (y pide la reseña) y cancela las pendientes que nadie confirmó |
 | `bookings:remind` | 17:00 hora de Puno | Recuerda al viajero sus salidas confirmadas del día siguiente |
 
 Ambos aceptan `--dry-run`.
@@ -127,7 +127,7 @@ php artisan test
 El workflow `.github/workflows/ci.yml` también las corre contra PostgreSQL + PostGIS, junto con el lint y el build del frontend. Para replicarlo en local: `docker compose up -d` (PostGIS en el puerto 5433) y
 
 ```bash
-DB_CONNECTION=pgsql DB_HOST=127.0.0.1 DB_PORT=5433 DB_DATABASE=turiscovery_test DB_USERNAME=turiscovery DB_PASSWORD=turiscovery php artisan test
+DB_CONNECTION=pgsql DB_HOST=127.0.0.1 DB_PORT=5433 DB_DATABASE=nanpuno_test DB_USERNAME=nanpuno DB_PASSWORD=nanpuno php artisan test
 ```
 
 Frontend:

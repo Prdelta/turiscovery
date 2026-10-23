@@ -1,4 +1,4 @@
-# Turiscovery - Guía de Inicio Rápido
+# Ñan Puno - Guía de Inicio Rápido
 
 ## ¡Comenzar en 5 Minutos! 🚀
 
@@ -25,7 +25,7 @@ psql --version
 psql -U postgres
 
 # Crear base de datos
-CREATE DATABASE turiscovery;
+CREATE DATABASE nanpuno;
 
 # Salir
 \q
@@ -39,7 +39,7 @@ Edita el archivo `.env`:
 DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1
 DB_PORT=5432
-DB_DATABASE=turiscovery
+DB_DATABASE=nanpuno
 DB_USERNAME=postgres
 DB_PASSWORD=tu_contraseña
 
@@ -144,7 +144,7 @@ Content-Type: application/json
 ## Estructura del Proyecto
 
 ```
-turiscovery/
+nanpuno/
 ├── app/
 │   ├── Http/
 │   │   ├── Controllers/
@@ -278,4 +278,4 @@ icacls "bootstrap/cache" /grant Everyone:F /t
 
 ---
 
-¡Disfruta desarrollando con Turiscovery! 🏔️
+¡Disfruta desarrollando con Ñan Puno! 🏔️

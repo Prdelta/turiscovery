@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 /** Caché de respuestas de la API que guarda el service worker (ver vite.config.ts) */
-const API_CACHE = 'turiscovery-api'
+const API_CACHE = 'nanpuno-api'
 
 export function useOnline() {
   const [online, setOnline] = useState(() => (typeof navigator === 'undefined' ? true : navigator.onLine))
@@ -25,6 +25,55 @@ export function useOnline() {
 export async function clearPrivateCaches() {
   if (typeof caches === 'undefined') return
   await caches.delete(API_CACHE).catch(() => false)
+}
+
+/* ---------- Nombre anterior (Turiscovery) ---------- */
+
+const LEGACY_PREFIX = 'turiscovery-'
+const PREFIX = 'nanpuno-'
+
+/**
+ * La app se llamaba Turiscovery y guardaba el plan, el viaje y las cachés con ese prefijo.
+ * Copia lo guardado a las claves nuevas (sin pisar lo ya migrado) y borra las viejas, para que
+ * nadie pierda su plan ni lo guardado para el lago. Se puede borrar cuando ya nadie use la versión anterior.
+ */
+export function migrateLegacyStorage() {
+  for (const storage of [safeStorage('localStorage'), safeStorage('sessionStorage')]) {
+    if (!storage) continue
+    const legacy = Array.from({ length: storage.length }, (_, i) => storage.key(i)).filter((k): k is string => !!k?.startsWith(LEGACY_PREFIX))
+    for (const key of legacy) {
+      const renamed = PREFIX + key.slice(LEGACY_PREFIX.length)
+      if (storage.getItem(renamed) === null) storage.setItem(renamed, storage.getItem(key) ?? '')
+      storage.removeItem(key)
+    }
+  }
+  void migrateLegacyCaches()
+}
+
+function safeStorage(name: 'localStorage' | 'sessionStorage'): Storage | null {
+  try {
+    return window[name]
+  } catch {
+    // Almacenamiento bloqueado (modo privado o permisos del navegador)
+    return null
+  }
+}
+
+async function migrateLegacyCaches() {
+  if (typeof caches === 'undefined') return
+  try {
+    for (const name of await caches.keys()) {
+      if (!name.startsWith(LEGACY_PREFIX)) continue
+      const [from, to] = await Promise.all([caches.open(name), caches.open(PREFIX + name.slice(LEGACY_PREFIX.length))])
+      for (const request of await from.keys()) {
+        const response = await from.match(request)
+        if (response && !(await to.match(request))) await to.put(request, response)
+      }
+      await caches.delete(name)
+    }
+  } catch {
+    // Si falla, la caché vieja queda: el service worker vuelve a llenar la nueva al navegar
+  }
 }
 
 /* ---------- Instalar como app ---------- */

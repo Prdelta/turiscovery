@@ -31,7 +31,7 @@ class MonitorDatabasePerformance extends Command
      */
     public function handle()
     {
-        $this->info('📊 Monitor de Rendimiento de Base de Datos - Turiscovery');
+        $this->info('📊 Monitor de Rendimiento de Base de Datos - Ñan Puno');
         $this->newLine();
 
         if ($this->option('connections')) {

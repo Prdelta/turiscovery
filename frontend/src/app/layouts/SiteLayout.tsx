@@ -62,7 +62,7 @@ function Header() {
   return (
     <header className="sticky top-0 z-[1000] bg-lana">
       <div className="container-page flex h-16 items-center gap-4">
-        <Link to="/" aria-label="Turiscovery, inicio" className="shrink-0">
+        <Link to="/" aria-label="Ñan Puno, inicio" className="shrink-0">
           <Brand />
         </Link>
 
@@ -210,10 +210,10 @@ function Footer() {
         </div>
         <FooterCol title="Descubre" links={[['/candelaria', 'Candelaria'], ['/experiencias', 'Experiencias'], ['/eventos', 'Eventos'], ['/promociones', 'Promociones']]} />
         <FooterCol title="Explora" links={[['/hoy', 'Almanaque'], ['/planificador', 'Planifica tu viaje'], ['/anfitriones', 'Anfitriones'], ['/locales', 'Locales'], ['/mapa', 'Mapa'], ['/puno-3d', 'Modelos 3D']]} />
-        <FooterCol title="Turiscovery" links={[['/sobre-nosotros', 'Sobre nosotros'], ['/contacto', 'Contacto'], ['/terminos', 'Términos y condiciones'], ['/privacidad', 'Política de privacidad']]} />
+        <FooterCol title="Ñan Puno" links={[['/sobre-nosotros', 'Sobre nosotros'], ['/contacto', 'Contacto'], ['/terminos', 'Términos y condiciones'], ['/privacidad', 'Política de privacidad']]} />
       </div>
       <div className="border-t border-white/15">
-        <p className="container-page py-5 text-xs text-white/60">© {CURRENT_YEAR} Turiscovery · Puno, Perú</p>
+        <p className="container-page py-5 text-xs text-white/60">© {CURRENT_YEAR} Ñan Puno · Perú</p>
       </div>
     </footer>
   )

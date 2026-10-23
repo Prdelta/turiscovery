@@ -2,7 +2,7 @@ import { clsx } from 'clsx'
 import { useId } from 'react'
 
 /*
-  Identidad textil de Turiscovery.
+  Identidad textil de Ñan Puno.
   Los motivos se dibujan como en un telar: una cuadrícula de 8 × 8 puntadas.
   Cada tipo de contenido tiene su motivo (tocapu) y su color de tinte natural,
   inspirados en los tejidos de Taquile y del altiplano.

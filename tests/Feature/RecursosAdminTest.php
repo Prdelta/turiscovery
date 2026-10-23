@@ -15,7 +15,7 @@ beforeEach(function () {
 /** Wikimedia responde 403 a las peticiones sin User-Agent identificado */
 function wikimediaFake(array $responses): void
 {
-    Http::fake(fn (Request $request) => str_starts_with($request->header('User-Agent')[0] ?? '', 'Turiscovery/')
+    Http::fake(fn (Request $request) => str_starts_with($request->header('User-Agent')[0] ?? '', 'NanPuno/')
         ? $responses[parse_url($request->url(), PHP_URL_HOST)] ?? Http::response([], 404)
         : Http::response('Please set a user-agent', 403));
 }

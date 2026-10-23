@@ -17,13 +17,13 @@ jobs:
       postgres:
         image: postgis/postgis:16-3.4
         env:
-          POSTGRES_USER: turiscovery
-          POSTGRES_PASSWORD: turiscovery
-          POSTGRES_DB: turiscovery_test
+          POSTGRES_USER: nanpuno
+          POSTGRES_PASSWORD: nanpuno
+          POSTGRES_DB: nanpuno_test
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U turiscovery"
+          --health-cmd "pg_isready -U nanpuno"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
@@ -32,9 +32,9 @@ jobs:
       DB_CONNECTION: pgsql
       DB_HOST: 127.0.0.1
       DB_PORT: 5432
-      DB_DATABASE: turiscovery_test
-      DB_USERNAME: turiscovery
-      DB_PASSWORD: turiscovery
+      DB_DATABASE: nanpuno_test
+      DB_USERNAME: nanpuno
+      DB_PASSWORD: nanpuno
       DB_PERSISTENT: 'false'
     steps:
       - uses: actions/checkout@v4

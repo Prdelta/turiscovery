@@ -17,6 +17,6 @@ export function useNow() {
 
 export function useDocumentTitle(title?: string) {
   useEffect(() => {
-    document.title = title ? `${title} · Turiscovery` : 'Turiscovery · Puno'
+    document.title = title ? `${title} · Ñan Puno` : 'Ñan Puno'
   }, [title])
 }

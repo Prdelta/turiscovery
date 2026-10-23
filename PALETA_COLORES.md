@@ -1,7 +1,7 @@
-# 🎨 Paleta de Colores Oficial - Turiscovery
+# 🎨 Paleta de Colores Oficial - Ñan Puno
 
 ## Descripción
-Identidad visual de marca para Turiscovery. Paleta vibrante, moderna y energética que transmite innovación, frescura y confianza.
+Identidad visual de marca para Ñan Puno. Paleta vibrante, moderna y energética que transmite innovación, frescura y confianza.
 
 ---
 
@@ -73,7 +73,7 @@ color: var(--color-primary);
 
 ## 🔵 5️⃣ Celeste/Cyan Claro (INFORMACIÓN)
 
-**Uso:** Badges informativos (ej: "EXPLORA TURISCOVERY"), tooltips, mensajes informativos
+**Uso:** Badges informativos (ej: "EXPLORA ÑAN PUNO"), tooltips, mensajes informativos
 
 | Nombre | Hex | RGB | Carácter |
 |--------|-----|-----|----------|
@@ -169,7 +169,7 @@ color: var(--color-primary);
 
 <!-- Badge Informativo -->
 <span style="background: var(--color-info); color: #2C3E50; padding: 0.25rem 0.75rem; border-radius: 9999px;">
-    EXPLORA TURISCOVERY
+    EXPLORA ÑAN PUNO
 </span>
 ```
 
@@ -260,7 +260,7 @@ Los siguientes archivos definen y usan la paleta de colores:
 ## 🎨 Identidad Visual
 
 ### Personalidad de Marca
-La paleta de Turiscovery comunica:
+La paleta de Ñan Puno comunica:
 - **Innovación** (Azul/Morado vibrante)
 - **Energía** (Verde Menta neón)
 - **Optimismo** (Amarillo/Dorado)
@@ -280,7 +280,7 @@ La paleta de Turiscovery comunica:
 **Fecha:** 2026-02-08
 **Versión:** 2.0
 **Cambios:**
-- ✅ Restaurada paleta oficial de Turiscovery
+- ✅ Restaurada paleta oficial de Ñan Puno
 - ✅ Organización profesional del uso de colores
 - ✅ Reducción de saturación visual en dashboard
 - ✅ Uso estratégico de colores vibrantes

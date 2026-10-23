@@ -67,7 +67,7 @@ export function AccountHome() {
   ] as const
   return (
     <>
-      <PageHeader title={`Hola, ${user?.name.split(' ')[0]}`} description="Todo lo que guardaste y reservaste en Turiscovery." />
+      <PageHeader title={`Hola, ${user?.name.split(' ')[0]}`} description="Todo lo que guardaste y reservaste en Ñan Puno." />
       <EmailVerification verifiedAt={data ? data.email_verified_at ?? null : user?.email_verified_at} />
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-5">
         {cards.map((c) => (

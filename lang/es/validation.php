@@ -1,7 +1,7 @@
 <?php
 
 /*
-| Mensajes de validación en español para la API de Turiscovery.
+| Mensajes de validación en español para la API de Ñan Puno.
 | Los nombres de campo se traducen en 'attributes' (al final del archivo).
 */
 

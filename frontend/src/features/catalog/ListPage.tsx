@@ -41,7 +41,7 @@ const PAGE_INFO: Partial<Record<ContentType, { title: string; text: string; filt
   },
   locales: {
     title: 'Locales',
-    text: 'Restaurantes, hoteles, agencias, museos y tiendas de artesanía asociados a Turiscovery.',
+    text: 'Restaurantes, hoteles, agencias, museos y tiendas de artesanía asociados a Ñan Puno.',
     filters: [{ param: 'category', label: 'Categoría', all: 'Todos', options: LOCALE_CATEGORIES }],
   },
 }
@@ -146,7 +146,7 @@ export default function ListPage({ type }: { type: ContentType }) {
             icon={<Tocapu motif={CONTENT[type].motif} dye={CONTENT[type].dye} size={40} framed={false} />}
             action={hasFilters ? <Button variant="secondary" onClick={clear}>Quitar filtros</Button> : undefined}
           >
-            {hasFilters ? 'Prueba con otras palabras o quita algún filtro.' : 'Los socios de Turiscovery publican contenido nuevo cada semana.'}
+            {hasFilters ? 'Prueba con otras palabras o quita algún filtro.' : 'Los socios de Ñan Puno publican contenido nuevo cada semana.'}
           </EmptyState>
         )}
       </div>

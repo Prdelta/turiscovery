@@ -1,6 +1,20 @@
-# ✅ Lista de Tareas Pendientes - Turiscovery
+# ✅ Lista de Tareas Pendientes - Ñan Puno
 
-**Última actualización:** 2026-10-19 (migración a React + Three.js)
+**Última actualización:** 2026-10-23 (cambio de nombre: Turiscovery → Ñan Puno)
+
+---
+
+## 🔁 Cambio de nombre (Turiscovery → Ñan Puno)
+
+El código, los textos, el logo, los íconos del PWA y la documentación ya usan "Ñan Puno" (`nanpuno` como identificador técnico). Falta lo que vive fuera del repositorio:
+
+- [ ] Renombrar el repositorio en GitHub a `nanpuno` y actualizar el remoto local (`git remote set-url origin https://github.com/Prdelta/nanpuno.git`)
+- [ ] Renombrar la carpeta local y la ruta de `DB_DATABASE` en `.claude/launch.json`
+- [ ] Producción: `APP_NAME="Ñan Puno"` en `.env` (cambia el nombre de la cookie de sesión: todos vuelven a iniciar sesión una vez)
+- [ ] Dominio `nanpuno.pe`: correo `contacto@nanpuno.pe` funcionando y `MAIL_FROM_ADDRESS` en `.env`
+- [ ] Producción: el cron que corre `php artisan schedule:run` ahora lanza `nanpuno:expire` (antes `turiscovery:expire`); si alguien lo llamaba a mano, actualizarlo
+- [ ] Cuentas ya creadas con correos `@turiscovery.com` (los seeders nuevos usan `@nanpuno.pe`)
+- [ ] Borrar `migrateLegacyStorage()` (offline.ts) cuando ya nadie use la versión anterior de la app
 
 ---
 

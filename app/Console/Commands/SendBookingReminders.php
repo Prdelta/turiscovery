@@ -11,7 +11,7 @@ use Illuminate\Console\Command;
  * Recordatorio del día anterior: avisa al viajero de cada reserva confirmada para mañana
  * (hora de Puno), con el punto y la hora de encuentro. Cada reserva se recuerda una sola vez.
  *
- * Se ejecuta a diario desde routes/console.php. No cambia estados: de eso se encarga turiscovery:expire.
+ * Se ejecuta a diario desde routes/console.php. No cambia estados: de eso se encarga nanpuno:expire.
  */
 class SendBookingReminders extends Command
 {

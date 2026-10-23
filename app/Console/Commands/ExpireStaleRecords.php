@@ -17,7 +17,7 @@ use Illuminate\Console\Command;
  */
 class ExpireStaleRecords extends Command
 {
-    protected $signature = 'turiscovery:expire {--dry-run : Solo contar, sin cambiar nada}';
+    protected $signature = 'nanpuno:expire {--dry-run : Solo contar, sin cambiar nada}';
 
     protected $description = 'Vence cupones y cierra reservas de fechas pasadas';
 

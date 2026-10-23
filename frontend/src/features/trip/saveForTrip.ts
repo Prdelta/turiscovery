@@ -26,7 +26,7 @@ export async function saveForTrip(loggedIn: boolean): Promise<{ saved: number; f
   return { saved, failed: results.length - saved }
 }
 
-const SAVED_AT_KEY = 'turiscovery-viaje-guardado'
+const SAVED_AT_KEY = 'nanpuno-viaje-guardado'
 
 /** Fecha del último "Guardar para usar sin conexión" en este dispositivo */
 export function lastSavedAt(): Date | null {

@@ -23,7 +23,7 @@ export function PartnerHome() {
   return (
     <>
       <PageHeader
-        title={user?.role === 'admin' ? 'Contenido de la plataforma' : 'Tu negocio en Turiscovery'}
+        title={user?.role === 'admin' ? 'Contenido de la plataforma' : 'Tu negocio en Ñan Puno'}
         description={user?.role === 'admin' ? 'Como administrador ves y gestionas el contenido de todos los socios.' : 'Publica y actualiza lo que ofreces. Los cambios se ven en el sitio en unos minutos.'}
       />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">

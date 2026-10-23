@@ -198,7 +198,7 @@ for (const m of models) {
 writeFileSync(
   join(outDir, 'manifest.json'),
   JSON.stringify(
-    models.map(({ id, file, title, description }) => ({ id, file, title, description, credit: 'Modelo ilustrativo generado por Turiscovery' })),
+    models.map(({ id, file, title, description }) => ({ id, file, title, description, credit: 'Modelo ilustrativo generado por Ñan Puno' })),
     null,
     2,
   ) + '\n',

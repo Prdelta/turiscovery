@@ -1,6 +1,6 @@
-# Turiscovery · Frontend React
+# Ñan Puno · Frontend React
 
-SPA de Turiscovery. Consume la API Laravel del directorio superior.
+SPA de Ñan Puno. Consume la API Laravel del directorio superior.
 
 ```bash
 npm install

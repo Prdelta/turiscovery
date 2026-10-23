@@ -26,8 +26,8 @@ class UserSeeder extends Seeder
 
         // Admin user
         User::create([
-            'name' => 'Admin Turiscovery',
-            'email' => 'admin@turiscovery.com',
+            'name' => 'Admin Ñan Puno',
+            'email' => 'admin@nanpuno.pe',
             'password' => $password,
             'role' => 'admin',
             'email_verified_at' => now(),
@@ -36,7 +36,7 @@ class UserSeeder extends Seeder
         // Socio users
         User::create([
             'name' => 'Carlos Mendoza',
-            'email' => 'carlos@turiscovery.com',
+            'email' => 'carlos@nanpuno.pe',
             'password' => $password,
             'role' => 'socio',
             'phone' => '+51 987 654 321',
@@ -46,7 +46,7 @@ class UserSeeder extends Seeder
 
         User::create([
             'name' => 'María López',
-            'email' => 'maria@turiscovery.com',
+            'email' => 'maria@nanpuno.pe',
             'password' => $password,
             'role' => 'socio',
             'phone' => '+51 912 345 678',

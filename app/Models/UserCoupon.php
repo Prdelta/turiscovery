@@ -49,7 +49,7 @@ class UserCoupon extends Model
         $this->update(['status' => 'expired']);
     }
 
-    public static function generateCouponCode($prefix = 'TURISCO'): string
+    public static function generateCouponCode($prefix = 'NANPUNO'): string
     {
         do {
             $code = $prefix.'-'.strtoupper(Str::random(8));

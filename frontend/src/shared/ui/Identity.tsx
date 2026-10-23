@@ -7,7 +7,7 @@ export function Brand({ dark = false }: { dark?: boolean }) {
   return (
     <span className="flex items-center gap-2">
       <Tocapu motif="estrella" dye="cochinilla" size={32} framed={false} />
-      <span className={clsx('font-display text-xl font-extrabold tracking-tight', dark ? 'text-white' : 'text-ink')}>Turiscovery</span>
+      <span className={clsx('font-display text-xl font-extrabold tracking-tight', dark ? 'text-white' : 'text-ink')}>Ñan Puno</span>
     </span>
   )
 }
