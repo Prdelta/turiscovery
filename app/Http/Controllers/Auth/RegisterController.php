@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 
@@ -31,7 +31,7 @@ class RegisterController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -42,12 +42,15 @@ class RegisterController extends Controller
             'role' => 'tourist', // Force all self-registrations to be tourists
         ]);
 
+        // Envía el enlace de verificación (un fallo de correo no impide crear la cuenta)
+        rescue(fn () => event(new Registered($user)));
 
         // Authenticate user in web session (for browser-based registration)
         Auth::login($user);
 
-        // Create Sanctum token for API authentication
-        $token = $user->createToken('auth_token')->plainTextToken;
+        if ($request->hasSession()) {
+            $request->session()->regenerate();
+        }
 
         return response()->json([
             'success' => true,
@@ -58,10 +61,9 @@ class RegisterController extends Controller
                     'name' => $user->name,
                     'email' => $user->email,
                     'role' => $user->role,
+                    'email_verified_at' => null,
                 ],
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-            ]
+            ],
         ], 201);
     }
 }

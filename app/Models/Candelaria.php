@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOwner;
+use App\Models\Concerns\HasImages;
+use App\Models\Concerns\Reviewable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Candelaria extends Model
 {
-    use HasFactory, SoftDeletes;
+    use BelongsToOwner, HasFactory, HasImages, Reviewable, SoftDeletes;
 
     protected $table = 'candelaria';
 
@@ -26,7 +29,6 @@ class Candelaria extends Model
     ];
 
     protected $casts = [
-        'images' => 'array',
         'event_date' => 'datetime',
         'is_featured' => 'boolean',
         'is_active' => 'boolean',
@@ -34,24 +36,9 @@ class Candelaria extends Model
 
     // ========== Relationships ==========
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
     public function locale()
     {
         return $this->belongsTo(Locale::class);
-    }
-
-    public function reviews()
-    {
-        return $this->morphMany(Review::class, 'reviewable');
-    }
-
-    public function favorites()
-    {
-        return $this->morphMany(Favorite::class, 'favoritable');
     }
 
     // ========== Query Scopes ==========
@@ -74,17 +61,5 @@ class Candelaria extends Model
     public function scopeUpcoming($query)
     {
         return $query->where('event_date', '>=', now());
-    }
-
-    // ========== Accessors ==========
-
-    public function getAverageRatingAttribute()
-    {
-        return $this->reviews()->avg('rating') ?? 0;
-    }
-
-    public function getReviewsCountAttribute()
-    {
-        return $this->reviews()->count();
     }
 }

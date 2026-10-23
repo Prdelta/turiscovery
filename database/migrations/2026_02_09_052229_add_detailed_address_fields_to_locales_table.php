@@ -44,7 +44,7 @@ return new class extends Migration
                 'postal_code',
                 'address_notes',
                 'latitude',
-                'longitude'
+                'longitude',
             ]);
         });
     }

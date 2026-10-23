@@ -1,4 +1,4 @@
-# 📚 Índice de Documentación - Turiscovery
+# 📚 Índice de Documentación - Ñan Puno
 
 **Guía rápida para navegar toda la documentación del proyecto**
 
@@ -86,7 +86,7 @@ Contenido:
 ## 📂 Estructura de Archivos del Proyecto
 
 ```
-turiscovery/
+nanpuno/
 ├── 📄 DOCUMENTACION_COMPLETA.md    ← Documento maestro
 ├── 📄 PENDIENTES.md                ← Lista de tareas
 ├── 📄 PALETA_COLORES.md            ← Sistema de diseño
@@ -284,6 +284,6 @@ Para dudas sobre la documentación:
 ---
 
 **Última actualización:** 2026-02-09
-**Mantenido por:** Equipo de Desarrollo Turiscovery
+**Mantenido por:** Equipo de Desarrollo Ñan Puno
 
-🏔️ **Turiscovery** - Descubre Puno, Vive la Experiencia
+🏔️ **Ñan Puno** - Descubre Puno, Vive la Experiencia

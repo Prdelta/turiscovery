@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\Locale;
-use App\Models\Experiencia;
-use App\Models\Evento;
-use App\Models\Promocion;
 use App\Models\Candelaria;
+use App\Models\Evento;
+use App\Models\Experiencia;
+use App\Models\Locale;
+use App\Models\Promocion;
+use Illuminate\Database\Seeder;
 
 class FixImagesSeeder extends Seeder
 {

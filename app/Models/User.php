@@ -2,14 +2,25 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+/**
+ * La verificación del correo no bloquea rutas (no se usa el middleware "verified"):
+ * solo se envía el enlace al registrarse y se muestra un aviso hasta confirmarlo.
+ */
+class User extends Authenticatable implements MustVerifyEmail
 {
+    /** Preferencias por defecto; las guardadas en "preferences" las sobrescriben */
+    public const DEFAULT_PREFERENCES = [
+        'notifications' => ['bookings' => true, 'promotions' => true],
+        'interests' => [],
+        'pace' => null,
+    ];
+
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
@@ -18,6 +29,7 @@ class User extends Authenticatable
         'password',
         'role',
         'google_id',
+        'email_verified_at',
         'avatar',
         'phone',
         'bio',
@@ -96,19 +108,21 @@ class User extends Authenticatable
         return $this->hasMany(UserCoupon::class);
     }
 
-    public function isTourist(): bool
-    {
-        return $this->role === 'tourist';
-    }
-
-    public function isSocio(): bool
-    {
-        return $this->role === 'socio';
-    }
-
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    /** Preferencias completas: las guardadas sobre los valores por defecto */
+    public function resolvedPreferences(): array
+    {
+        return array_replace_recursive(self::DEFAULT_PREFERENCES, $this->preferences ?? []);
+    }
+
+    /** ¿Quiere recibir correos de este tipo? (bookings, promotions) */
+    public function wantsEmail(string $type): bool
+    {
+        return (bool) ($this->resolvedPreferences()['notifications'][$type] ?? true);
     }
 
     public function hasRole(string|array $roles): bool

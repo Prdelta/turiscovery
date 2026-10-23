@@ -31,7 +31,7 @@ class MonitorDatabasePerformance extends Command
      */
     public function handle()
     {
-        $this->info('📊 Monitor de Rendimiento de Base de Datos - Turiscovery');
+        $this->info('📊 Monitor de Rendimiento de Base de Datos - Ñan Puno');
         $this->newLine();
 
         if ($this->option('connections')) {
@@ -65,11 +65,11 @@ class MonitorDatabasePerformance extends Command
         $this->line("🗄️  <fg=cyan>Base de Datos:</> {$database}");
 
         // Configuración de pool
-        $persistent = config('database.connections.pgsql.options.' . PDO::ATTR_PERSISTENT);
-        $this->line("♻️  <fg=cyan>Conexiones Persistentes:</> " . ($persistent ? '<fg=green>✓ Habilitado</>' : '<fg=red>✗ Deshabilitado</>'));
+        $persistent = config('database.connections.pgsql.options.'.PDO::ATTR_PERSISTENT);
+        $this->line('♻️  <fg=cyan>Conexiones Persistentes:</> '.($persistent ? '<fg=green>✓ Habilitado</>' : '<fg=red>✗ Deshabilitado</>'));
 
         // Timeout configurado
-        $timeout = config('database.connections.pgsql.options.' . PDO::ATTR_TIMEOUT, 'N/A');
+        $timeout = config('database.connections.pgsql.options.'.PDO::ATTR_TIMEOUT, 'N/A');
         $this->line("⏱️  <fg=cyan>Timeout de Conexión:</> {$timeout}s");
 
         $this->newLine();
@@ -90,9 +90,9 @@ class MonitorDatabasePerformance extends Command
     {
         try {
             // Tamaño de la base de datos
-            $size = DB::selectOne("
+            $size = DB::selectOne('
                 SELECT pg_size_pretty(pg_database_size(?)) as size
-            ", [DB::connection()->getDatabaseName()]);
+            ', [DB::connection()->getDatabaseName()]);
 
             $this->line("💾 <fg=cyan>Tamaño de BD:</> {$size->size}");
 
@@ -107,16 +107,16 @@ class MonitorDatabasePerformance extends Command
             $this->line("📋 <fg=cyan>Tablas:</> {$tables[0]->count}");
 
             // Conexiones activas
-            $connections = DB::select("
+            $connections = DB::select('
                 SELECT COUNT(*) as count
                 FROM pg_stat_activity
                 WHERE datname = ?
-            ", [DB::connection()->getDatabaseName()]);
+            ', [DB::connection()->getDatabaseName()]);
 
             $this->line("👥 <fg=cyan>Conexiones Activas:</> {$connections[0]->count}");
 
         } catch (\Exception $e) {
-            $this->error('Error al obtener estadísticas: ' . $e->getMessage());
+            $this->error('Error al obtener estadísticas: '.$e->getMessage());
         }
     }
 
@@ -129,7 +129,7 @@ class MonitorDatabasePerformance extends Command
         $this->newLine();
 
         try {
-            $connections = DB::select("
+            $connections = DB::select('
                 SELECT
                     pid,
                     usename,
@@ -144,10 +144,11 @@ class MonitorDatabasePerformance extends Command
                 WHERE datname = ?
                 ORDER BY state_change DESC
                 LIMIT 20
-            ", [DB::connection()->getDatabaseName()]);
+            ', [DB::connection()->getDatabaseName()]);
 
             if (empty($connections)) {
                 $this->warn('No hay conexiones activas');
+
                 return;
             }
 
@@ -168,12 +169,12 @@ class MonitorDatabasePerformance extends Command
             );
 
             // Resumen por estado
-            $states = DB::select("
+            $states = DB::select('
                 SELECT state, COUNT(*) as count
                 FROM pg_stat_activity
                 WHERE datname = ?
                 GROUP BY state
-            ", [DB::connection()->getDatabaseName()]);
+            ', [DB::connection()->getDatabaseName()]);
 
             $this->newLine();
             $this->info('Resumen por Estado:');
@@ -182,7 +183,7 @@ class MonitorDatabasePerformance extends Command
             }
 
         } catch (\Exception $e) {
-            $this->error('Error: ' . $e->getMessage());
+            $this->error('Error: '.$e->getMessage());
         }
     }
 
@@ -209,15 +210,15 @@ class MonitorDatabasePerformance extends Command
             $this->line("📦 <fg=cyan>Entries de API en Caché:</> {$apiCacheCount}");
 
             // Probar hit/miss ratio (simulado)
-            $testKey = 'test_' . time();
+            $testKey = 'test_'.time();
             Cache::put($testKey, 'test', 1);
             $hit = Cache::has($testKey);
             Cache::forget($testKey);
 
-            $this->line("✅ <fg=cyan>Test de Caché:</> " . ($hit ? '<fg=green>OK</>' : '<fg=red>ERROR</>'));
+            $this->line('✅ <fg=cyan>Test de Caché:</> '.($hit ? '<fg=green>OK</>' : '<fg=red>ERROR</>'));
 
         } catch (\Exception $e) {
-            $this->error('Error al obtener estadísticas de caché: ' . $e->getMessage());
+            $this->error('Error al obtener estadísticas de caché: '.$e->getMessage());
         }
 
         $this->newLine();
@@ -233,7 +234,7 @@ class MonitorDatabasePerformance extends Command
         $this->newLine();
 
         try {
-            $queries = DB::select("
+            $queries = DB::select('
                 SELECT
                     query,
                     calls,
@@ -244,20 +245,21 @@ class MonitorDatabasePerformance extends Command
                 WHERE dbid = (SELECT oid FROM pg_database WHERE datname = ?)
                 ORDER BY mean_exec_time DESC
                 LIMIT 10
-            ", [DB::connection()->getDatabaseName()]);
+            ', [DB::connection()->getDatabaseName()]);
 
             if (empty($queries)) {
                 $this->warn('pg_stat_statements no está habilitado o no hay datos');
                 $this->info('Habilita pg_stat_statements en postgresql.conf para ver estadísticas de queries');
+
                 return;
             }
 
             $tableData = array_map(function ($q) {
                 return [
-                    substr($q->query, 0, 60) . '...',
+                    substr($q->query, 0, 60).'...',
                     $q->calls,
-                    round($q->mean_exec_time, 2) . 'ms',
-                    round($q->max_exec_time, 2) . 'ms',
+                    round($q->mean_exec_time, 2).'ms',
+                    round($q->max_exec_time, 2).'ms',
                 ];
             }, $queries);
 
@@ -267,7 +269,7 @@ class MonitorDatabasePerformance extends Command
             );
 
         } catch (\Exception $e) {
-            $this->error('Error: ' . $e->getMessage());
+            $this->error('Error: '.$e->getMessage());
             $this->warn('pg_stat_statements probablemente no está habilitado en PostgreSQL');
         }
     }

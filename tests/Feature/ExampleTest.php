@@ -1,7 +1,9 @@
 <?php
 
-test('the application returns a successful response', function () {
-    $response = $this->get('/');
+test('la raíz web redirige al frontend React', function () {
+    $this->get('/')->assertRedirect(rtrim(config('app.frontend_url'), '/').'/');
+});
 
-    $response->assertStatus(200);
+test('la API responde', function () {
+    $this->get('/up')->assertOk();
 });

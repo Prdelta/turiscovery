@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\UserCoupon;
 use App\Models\Promocion;
+use App\Models\UserCoupon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class UserCouponController extends Controller
 {
@@ -81,12 +82,7 @@ class UserCouponController extends Controller
     {
         $coupon = UserCoupon::findOrFail($id);
 
-        if ($coupon->user_id !== Auth::id()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No tienes permiso para usar este cupón.',
-            ], 403);
-        }
+        Gate::authorize('redeem', $coupon);
 
         if ($coupon->status !== 'available') {
             return response()->json([
@@ -109,12 +105,7 @@ class UserCouponController extends Controller
     {
         $coupon = UserCoupon::with('promocion')->findOrFail($id);
 
-        if ($coupon->user_id !== Auth::id()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No tienes permiso para ver este cupón.',
-            ], 403);
-        }
+        Gate::authorize('view', $coupon);
 
         return response()->json([
             'success' => true,

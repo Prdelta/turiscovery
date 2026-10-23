@@ -1,22 +1,35 @@
 <?php
 
-use App\Http\Controllers\Auth\{GoogleAuthController, LoginController, RegisterController, SessionController};
-use App\Http\Controllers\Api\{
-    BookingController,
-    CandelariaController,
-    CandelariaDanzaController,
-    CandelariaGalleryController,
-    EventAttendeeController,
-    EventoController,
-    ExperienciaController,
-    FavoriteController,
-    LocaleController,
-    PromocionController,
-    ReviewController,
-    StatsController,
-    UserCouponController
-};
-use Illuminate\Http\Request;
+use App\Http\Controllers\Admin\ResourceSearchController;
+use App\Http\Controllers\Api\Admin\CandelariaContentController;
+use App\Http\Controllers\Api\Admin\CandelariaLiveAdminController;
+use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Api\AlmanacController;
+use App\Http\Controllers\Api\AnfitrionController;
+use App\Http\Controllers\Api\BookingController;
+use App\Http\Controllers\Api\CandelariaController;
+use App\Http\Controllers\Api\CandelariaDanzaController;
+use App\Http\Controllers\Api\CandelariaGalleryController;
+use App\Http\Controllers\Api\CandelariaLiveController;
+use App\Http\Controllers\Api\EventAttendeeController;
+use App\Http\Controllers\Api\EventoController;
+use App\Http\Controllers\Api\ExperienciaController;
+use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\LocaleController;
+use App\Http\Controllers\Api\MyContentController;
+use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\PartnerBookingController;
+use App\Http\Controllers\Api\PartnerCouponController;
+use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\PromocionController;
+use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\StatsController;
+use App\Http\Controllers\Api\UploadController;
+use App\Http\Controllers\Api\UserCouponController;
+use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\SessionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,17 +40,24 @@ use Illuminate\Support\Facades\Route;
 
 // ========== Public Routes (No Authentication Required) ==========
 
-// Authentication Routes (Legacy - Token Based)
-Route::post('/register', [RegisterController::class, 'register']);
-Route::post('/login', [LoginController::class, 'login']);
+// Registro (la cuenta nueva entra con sesión, igual que /session/login)
+Route::post('/register', [RegisterController::class, 'register'])->middleware('throttle:register');
 
 // Session-Based Authentication (Secure - httpOnly Cookies)
 Route::post('/session/login', [SessionController::class, 'login']);
 Route::get('/session/check', [SessionController::class, 'check']);
 
-// Google OAuth Routes
-Route::get('/auth/google', [GoogleAuthController::class, 'redirectToGoogle']);
-Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
+// Recuperar contraseña (el enlace del correo abre /restablecer en el frontend)
+Route::post('/forgot-password', [PasswordResetController::class, 'sendLink'])->middleware('throttle:password-reset');
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])->middleware('throttle:password-reset');
+
+// Enlace firmado del correo de verificación (no requiere sesión)
+Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+    ->whereNumber('id')
+    ->middleware('throttle:6,1')
+    ->name('verification.verify');
+
+// Google OAuth: definido en routes/web.php (necesita sesión web)
 
 // Public Read-Only Routes for 4 Pillars (with parameter validation + API cache)
 Route::middleware(['validate.params', 'api.cache'])->group(function () {
@@ -61,21 +81,42 @@ Route::middleware(['validate.params', 'api.cache'])->group(function () {
 
     // Candelaria Danzas (Public)
     Route::get('/candelaria-danzas', [CandelariaDanzaController::class, 'index']);
-    Route::get('/candelaria-danzas/featured', [CandelariaDanzaController::class, 'featured']);
     Route::get('/candelaria-danzas/{id}', [CandelariaDanzaController::class, 'show']);
 });
 
+// Candelaria en vivo: programa y conjunto que está pasando (sin caché, cambia a cada minuto)
+Route::get('/candelaria-live', [CandelariaLiveController::class, 'live']);
+Route::get('/candelaria-program', [CandelariaLiveController::class, 'program']);
+Route::get('/candelaria-program/{id}', [CandelariaLiveController::class, 'show'])->whereNumber('id');
+
+// Cupos libres por fecha de una experiencia (sin caché: cambian con cada reserva)
+Route::get('/experiencias/{id}/availability', [ExperienciaController::class, 'availability'])->whereNumber('id');
+
+// Almanaque vivo: fiestas, eventos y programa de la Candelaria entre dos fechas
+Route::get('/almanaque', [AlmanacController::class, 'index']);
+
+// Anfitriones (personas que reciben al viajero)
+Route::get('/anfitriones', [AnfitrionController::class, 'index']);
+Route::get('/anfitriones/{id}', [AnfitrionController::class, 'show'])->whereNumber('id');
+
+// Reseñas públicas de un contenido y asistentes a un evento
+Route::get('/reviews', [ReviewController::class, 'index']);
+Route::get('/event-attendances/count/{eventoId}', [EventAttendeeController::class, 'count'])->whereNumber('eventoId');
+
 // ========== Protected Routes (Sanctum Authentication Required) ==========
 
-Route::middleware(['auth:sanctum', 'validate.params'])->group(function () {
+Route::middleware(['auth:sanctum', 'user.active', 'validate.params'])->group(function () {
 
-    // User Info & Logout (Legacy - Token Based)
-    Route::post('/logout', [LoginController::class, 'logout']);
-    Route::get('/me', [LoginController::class, 'me']);
-
-    // Session-Based Auth Routes
+    // Sesión
     Route::post('/session/logout', [SessionController::class, 'logout']);
-    Route::get('/session/me', [SessionController::class, 'me']);
+
+    // Perfil del usuario
+    Route::get('/profile', [ProfileController::class, 'show']);
+    Route::put('/profile', [ProfileController::class, 'update']);
+    Route::post('/profile/avatar', [ProfileController::class, 'avatar']);
+
+    // Reenviar el correo de verificación
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])->middleware('throttle:3,1');
 
     // ========== Stats & Dashboard (Optimized) ==========
     Route::get('/stats', [StatsController::class, 'index']);
@@ -84,6 +125,27 @@ Route::middleware(['auth:sanctum', 'validate.params'])->group(function () {
     // ========== Socio Routes (Partners can manage their own content) ==========
 
     Route::middleware('role:socio,admin')->group(function () {
+
+        // Contenido propio (incluye inactivos) y subida de imágenes
+        Route::get('/my/{type}', [MyContentController::class, 'index'])
+            ->whereIn('type', ['locales', 'eventos', 'experiencias', 'promociones', 'candelaria']);
+        Route::post('/uploads', [UploadController::class, 'store']);
+        Route::post('/uploads/audio', [UploadController::class, 'audio']);
+
+        // Anfitriones del socio
+        Route::get('/my-anfitriones', [AnfitrionController::class, 'mine']);
+        Route::post('/anfitriones', [AnfitrionController::class, 'store']);
+        Route::put('/anfitriones/{anfitrion}', [AnfitrionController::class, 'update']);
+        Route::delete('/anfitriones/{anfitrion}', [AnfitrionController::class, 'destroy']);
+
+        // Reservas recibidas en las experiencias del socio
+        Route::get('/partner/bookings', [PartnerBookingController::class, 'index']);
+        Route::put('/partner/bookings/{id}', [PartnerBookingController::class, 'updateStatus']);
+
+        // Canje de cupones en el local
+        Route::get('/partner/coupons', [PartnerCouponController::class, 'index']);
+        Route::get('/partner/coupons/lookup', [PartnerCouponController::class, 'lookup']);
+        Route::post('/partner/coupons/redeem', [PartnerCouponController::class, 'redeem']);
 
         // Locales (Partner Venues) - Full CRUD for own locales
         Route::post('/locales', [LocaleController::class, 'store']);
@@ -116,7 +178,6 @@ Route::middleware(['auth:sanctum', 'validate.params'])->group(function () {
     // All authenticated users can create reviews and favorites
 
     // Reviews
-    Route::get('/reviews', [ReviewController::class, 'index']); // Get reviews for item
     Route::post('/reviews', [ReviewController::class, 'store']);
     Route::put('/reviews/{id}', [ReviewController::class, 'update']);
     Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
@@ -126,22 +187,23 @@ Route::middleware(['auth:sanctum', 'validate.params'])->group(function () {
     Route::get('/favorites', [FavoriteController::class, 'index']);
     Route::post('/favorites/toggle', [FavoriteController::class, 'toggle']);
     Route::get('/favorites/check', [FavoriteController::class, 'check']);
-    Route::delete('/favorites/{id}', [FavoriteController::class, 'destroy']);
 
     // Bookings (Reservas de Experiencias)
     Route::get('/bookings', [BookingController::class, 'index']);
     Route::post('/bookings', [BookingController::class, 'store']);
     Route::get('/bookings/{id}', [BookingController::class, 'show']);
     Route::post('/bookings/{id}/cancel', [BookingController::class, 'cancel']);
-    Route::post('/bookings/check-availability', [BookingController::class, 'checkAvailability']);
+
+    // Avisos dentro de la app (reservas nuevas, confirmaciones, recordatorios)
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead']);
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead'])->whereUuid('notification');
 
     // Event Attendances (Confirmación de asistencia a eventos)
     Route::get('/event-attendances', [EventAttendeeController::class, 'index']);
     Route::post('/event-attendances', [EventAttendeeController::class, 'store']);
-    Route::put('/event-attendances/{id}', [EventAttendeeController::class, 'update']);
     Route::delete('/event-attendances/{eventoId}', [EventAttendeeController::class, 'destroy']);
     Route::get('/event-attendances/check/{eventoId}', [EventAttendeeController::class, 'check']);
-    Route::get('/event-attendances/count/{eventoId}', [EventAttendeeController::class, 'count']);
 
     // User Coupons (Cupones de promociones)
     Route::get('/user-coupons', [UserCouponController::class, 'index']);
@@ -152,6 +214,36 @@ Route::middleware(['auth:sanctum', 'validate.params'])->group(function () {
     // ========== Admin Routes (Full Control) ==========
 
     Route::middleware('role:admin')->group(function () {
+        // Gestión de usuarios y socios
+        Route::get('/admin/supervision', [AdminUserController::class, 'supervision']);
+        Route::post('/admin/users/{user}/toggle-status', [AdminUserController::class, 'toggleStatus']);
+        Route::apiResource('admin/users', AdminUserController::class);
+
+        // Listados completos de Candelaria (incluye inactivos)
+        Route::get('/admin/candelaria-gallery', [CandelariaContentController::class, 'gallery']);
+        Route::get('/admin/candelaria-danzas', [CandelariaContentController::class, 'danzas']);
+
+        // Candelaria en vivo: programa y control de conjuntos
+        Route::get('/admin/candelaria-program', [CandelariaLiveAdminController::class, 'index']);
+        Route::post('/admin/candelaria-program', [CandelariaLiveAdminController::class, 'store']);
+        Route::put('/admin/candelaria-program/{item}', [CandelariaLiveAdminController::class, 'update']);
+        Route::delete('/admin/candelaria-program/{item}', [CandelariaLiveAdminController::class, 'destroy']);
+        Route::get('/admin/candelaria-program/{item}/performances', [CandelariaLiveAdminController::class, 'performances']);
+        Route::post('/admin/candelaria-program/{item}/performances', [CandelariaLiveAdminController::class, 'addPerformances']);
+        Route::post('/admin/candelaria-program/{item}/advance', [CandelariaLiveAdminController::class, 'advance']);
+        Route::put('/admin/candelaria-performances/{performance}', [CandelariaLiveAdminController::class, 'updatePerformance']);
+        Route::delete('/admin/candelaria-performances/{performance}', [CandelariaLiveAdminController::class, 'destroyPerformance']);
+
+        // Almanaque: fechas que se repiten cada año
+        Route::get('/admin/almanaque', [AlmanacController::class, 'adminIndex']);
+        Route::post('/admin/almanaque', [AlmanacController::class, 'store']);
+        Route::put('/admin/almanaque/{entry}', [AlmanacController::class, 'update']);
+        Route::delete('/admin/almanaque/{entry}', [AlmanacController::class, 'destroy']);
+
+        // Búsqueda de recursos (Wikipedia / Wikimedia Commons)
+        Route::get('/admin/resources/search-images', [ResourceSearchController::class, 'searchImages']);
+        Route::get('/admin/resources/search-wikipedia', [ResourceSearchController::class, 'searchWikipedia']);
+
         // Candelaria Gallery Management
         Route::post('/candelaria-gallery', [CandelariaGalleryController::class, 'store']);
         Route::put('/candelaria-gallery/{id}', [CandelariaGalleryController::class, 'update']);
@@ -162,13 +254,4 @@ Route::middleware(['auth:sanctum', 'validate.params'])->group(function () {
         Route::put('/candelaria-danzas/{id}', [CandelariaDanzaController::class, 'update']);
         Route::delete('/candelaria-danzas/{id}', [CandelariaDanzaController::class, 'destroy']);
     });
-});
-
-// Test route to verify API is working
-Route::get('/test', function () {
-    return response()->json([
-        'success' => true,
-        'message' => 'Turiscovery API is working!',
-        'timestamp' => now(),
-    ]);
 });

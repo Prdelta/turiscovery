@@ -1,4 +1,4 @@
-# 📚 Documentación Completa del Sistema Turiscovery
+# 📚 Documentación Completa del Sistema Ñan Puno
 
 **Versión:** 2.0
 **Última actualización:** 2026-02-09
@@ -27,7 +27,7 @@
 
 ### 🎯 Objetivo del Proyecto
 
-**Turiscovery** es una plataforma web turística para Puno, Perú, que conecta turistas con la oferta local, enfocándose en **4 pilares fundamentales**:
+**Ñan Puno** es una plataforma web turística para Puno, Perú, que conecta turistas con la oferta local, enfocándose en **4 pilares fundamentales**:
 
 1. **🎭 Candelaria** - Festividad, danzas, galería histórica
 2. **🧭 Experiencias** - Tours, actividades, paquetes turísticos
@@ -1045,7 +1045,7 @@ const marker = L.marker([-15.8402, -70.0219], {draggable: true}).addTo(map);
 
 ```env
 # Aplicación
-APP_NAME=Turiscovery
+APP_NAME=Ñan Puno
 APP_ENV=local|production
 APP_KEY=base64:...
 APP_DEBUG=true|false
@@ -1055,7 +1055,7 @@ APP_URL=http://localhost:8000
 DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1
 DB_PORT=5432
-DB_DATABASE=turiscovery
+DB_DATABASE=nanpuno
 DB_USERNAME=postgres
 DB_PASSWORD=tu_password
 
@@ -1100,8 +1100,8 @@ sudo apt install nginx
 **2. Clonar Proyecto**
 ```bash
 cd /var/www
-git clone https://github.com/tu-repo/turiscovery.git
-cd turiscovery
+git clone https://github.com/Prdelta/nanpuno.git
+cd nanpuno
 composer install --optimize-autoloader --no-dev
 npm install
 npm run build
@@ -1117,7 +1117,7 @@ php artisan key:generate
 **4. Configurar Base de Datos**
 ```bash
 sudo -u postgres psql
-CREATE DATABASE turiscovery;
+CREATE DATABASE nanpuno;
 \q
 
 php artisan migrate --force
@@ -1126,18 +1126,18 @@ php artisan db:seed --force
 
 **5. Configurar Permisos**
 ```bash
-sudo chown -R www-data:www-data /var/www/turiscovery
-sudo chmod -R 755 /var/www/turiscovery
-sudo chmod -R 775 /var/www/turiscovery/storage
-sudo chmod -R 775 /var/www/turiscovery/bootstrap/cache
+sudo chown -R www-data:www-data /var/www/nanpuno
+sudo chmod -R 755 /var/www/nanpuno
+sudo chmod -R 775 /var/www/nanpuno/storage
+sudo chmod -R 775 /var/www/nanpuno/bootstrap/cache
 ```
 
 **6. Configurar Nginx**
 ```nginx
 server {
     listen 80;
-    server_name turiscovery.com;
-    root /var/www/turiscovery/public;
+    server_name nanpuno.pe;
+    root /var/www/nanpuno/public;
 
     index index.php;
 
@@ -1155,7 +1155,7 @@ server {
 **7. SSL con Let's Encrypt**
 ```bash
 sudo apt install certbot python3-certbot-nginx
-sudo certbot --nginx -d turiscovery.com
+sudo certbot --nginx -d nanpuno.pe
 ```
 
 **8. Optimizaciones**
@@ -1168,26 +1168,26 @@ php artisan view:cache
 **9. Queue Worker (si se usa)**
 ```bash
 # Crear servicio systemd
-sudo nano /etc/systemd/system/turiscovery-worker.service
+sudo nano /etc/systemd/system/nanpuno-worker.service
 ```
 
 ```ini
 [Unit]
-Description=Turiscovery Queue Worker
+Description=Ñan Puno Queue Worker
 
 [Service]
 User=www-data
 Group=www-data
 Restart=always
-ExecStart=/usr/bin/php /var/www/turiscovery/artisan queue:work
+ExecStart=/usr/bin/php /var/www/nanpuno/artisan queue:work
 
 [Install]
 WantedBy=multi-user.target
 ```
 
 ```bash
-sudo systemctl enable turiscovery-worker
-sudo systemctl start turiscovery-worker
+sudo systemctl enable nanpuno-worker
+sudo systemctl start nanpuno-worker
 ```
 
 ---
@@ -1338,26 +1338,26 @@ npm update package-name
 ```bash
 #!/bin/bash
 DATE=$(date +%Y%m%d_%H%M%S)
-BACKUP_DIR="/backups/turiscovery"
-DB_NAME="turiscovery"
+BACKUP_DIR="/backups/nanpuno"
+DB_NAME="nanpuno"
 
 mkdir -p $BACKUP_DIR
 
 # Backup completo
-pg_dump -U postgres $DB_NAME > $BACKUP_DIR/turiscovery_$DATE.sql
+pg_dump -U postgres $DB_NAME > $BACKUP_DIR/nanpuno_$DATE.sql
 
 # Comprimir
-gzip $BACKUP_DIR/turiscovery_$DATE.sql
+gzip $BACKUP_DIR/nanpuno_$DATE.sql
 
 # Mantener solo últimos 30 días
 find $BACKUP_DIR -name "*.sql.gz" -mtime +30 -delete
 
-echo "Backup completado: turiscovery_$DATE.sql.gz"
+echo "Backup completado: nanpuno_$DATE.sql.gz"
 ```
 
 **Restaurar Backup:**
 ```bash
-gunzip -c backup.sql.gz | psql -U postgres turiscovery
+gunzip -c backup.sql.gz | psql -U postgres nanpuno
 ```
 
 ### 🧹 Limpieza de Archivos
@@ -1428,7 +1428,7 @@ sudo systemctl restart php8.2-fpm
 sudo apt install postgresql-14-postgis-3
 
 # Habilitar en la BD
-sudo -u postgres psql turiscovery
+sudo -u postgres psql nanpuno
 CREATE EXTENSION IF NOT EXISTS postgis;
 ```
 
@@ -1577,10 +1577,10 @@ Para reportar bugs o solicitar funcionalidades:
 
 ---
 
-**Documento creado por:** Sistema Turiscovery
+**Documento creado por:** Sistema Ñan Puno
 **Última revisión:** 2026-02-09
 **Mantenido por:** Equipo de Desarrollo
 
 ---
 
-🏔️ **Turiscovery** - Descubre Puno, Vive la Experiencia
+🏔️ **Ñan Puno** - Descubre Puno, Vive la Experiencia

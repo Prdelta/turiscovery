@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOwner;
+use App\Models\Concerns\HasImages;
+use App\Models\Concerns\Reviewable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Promocion extends Model
 {
-    use HasFactory, SoftDeletes;
+    use BelongsToOwner, HasFactory, HasImages, Reviewable, SoftDeletes;
 
     protected $table = 'promociones';
 
@@ -36,53 +39,26 @@ class Promocion extends Model
         'discount_amount' => 'decimal:2',
         'original_price' => 'decimal:2',
         'final_price' => 'decimal:2',
-        'images' => 'array',
         'is_active' => 'boolean',
     ];
 
-    protected $appends = ['image_url'];
-
     // ========== Relationships ==========
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 
     public function locale()
     {
         return $this->belongsTo(Locale::class);
     }
 
-    public function reviews()
-    {
-        return $this->morphMany(Review::class, 'reviewable');
-    }
-
-    public function favorites()
-    {
-        return $this->morphMany(Favorite::class, 'favoritable');
-    }
-
     // ========== Query Scopes (Time-Sensitive Filtering) ==========
 
     /**
-     * Filter only active promotions (is_active = true AND not expired)
-     * This is the PRIMARY method for filtering time-sensitive content
+     * Promociones vigentes: publicadas, ya empezaron y no vencieron
      */
     public function scopeActive($query)
     {
         return $query->where('is_active', true)
             ->where('end_date', '>', now())
             ->where('start_date', '<=', now());
-    }
-
-    /**
-     * Filter expired promotions (for analytics/historical data)
-     */
-    public function scopeExpired($query)
-    {
-        return $query->where('end_date', '<', now());
     }
 
     public function scopeUpcoming($query)
@@ -111,20 +87,5 @@ class Promocion extends Model
     public function getIsActiveNowAttribute()
     {
         return $this->start_date <= now() && $this->end_date > now() && $this->is_active;
-    }
-
-    public function getAverageRatingAttribute()
-    {
-        return $this->reviews()->avg('rating') ?? 0;
-    }
-
-    public function getReviewsCountAttribute()
-    {
-        return $this->reviews()->count();
-    }
-
-    public function getImageUrlAttribute()
-    {
-        return $this->images[0] ?? null;
     }
 }

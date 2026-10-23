@@ -33,6 +33,8 @@ class ApiQueryCacheMiddleware
      */
     protected int $cacheTTL = 300; // 5 minutos
 
+    public const VERSION_KEY = 'api-cache-version';
+
     /**
      * Handle an incoming request.
      */
@@ -44,7 +46,7 @@ class ApiQueryCacheMiddleware
         }
 
         // Solo cachear rutas específicas
-        if (!$this->shouldCache($request)) {
+        if (! $this->shouldCache($request)) {
             return $next($request);
         }
 
@@ -104,29 +106,25 @@ class ApiQueryCacheMiddleware
      */
     protected function getCacheKey(Request $request): string
     {
-        // Incluir path, query params y usuario autenticado (si aplica)
+        // Incluir versión global, path, query params y usuario autenticado (si aplica)
         $parts = [
             'api-cache',
+            Cache::get(self::VERSION_KEY, 1),
             $request->path(),
             http_build_query($request->query()),
             $request->user() ? $request->user()->id : 'guest',
         ];
 
-        return 'api:' . md5(implode('|', $parts));
+        return 'api:'.md5(implode('|', $parts));
     }
 
     /**
-     * Limpiar caché de una ruta específica
-     * (Útil para cuando se crean/actualizan/eliminan recursos)
+     * Invalida todo el caché de la API pública.
+     * Se llama al crear, editar o borrar contenido (ver AppServiceProvider):
+     * subir la versión hace que las claves anteriores dejen de usarse y expiren solas.
      */
-    public static function clearCache(string $route): void
+    public static function clearCache(): void
     {
-        // Limpiar todo el caché de esa ruta
-        Cache::forget("api-cache:{$route}");
-
-        // Limpiar tags si se usan
-        if (config('cache.default') === 'redis') {
-            Cache::tags(['api-cache', $route])->flush();
-        }
+        Cache::forever(self::VERSION_KEY, ((int) Cache::get(self::VERSION_KEY, 1)) + 1);
     }
 }

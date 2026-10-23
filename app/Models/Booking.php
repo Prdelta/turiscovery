@@ -20,11 +20,14 @@ class Booking extends Model
         'notes',
         'contact_phone',
         'contact_email',
+        'reminded_at',
     ];
 
     protected $casts = [
-        'booking_date' => 'date',
+        // Día de la salida en Puno: se envía como AAAA-MM-DD, sin hora ni zona horaria
+        'booking_date' => 'date:Y-m-d',
         'total_price' => 'decimal:2',
+        'reminded_at' => 'datetime',
     ];
 
     /**
@@ -41,14 +44,6 @@ class Booking extends Model
     public function experiencia()
     {
         return $this->belongsTo(Experiencia::class);
-    }
-
-    /**
-     * Scope para obtener solo reservas pendientes
-     */
-    public function scopePending($query)
-    {
-        return $query->where('status', 'pending');
     }
 
     /**
@@ -84,8 +79,10 @@ class Booking extends Model
         if ($this->canBeCancelled()) {
             $this->status = 'cancelled';
             $this->save();
+
             return true;
         }
+
         return false;
     }
 
@@ -97,8 +94,10 @@ class Booking extends Model
         if ($this->status === 'pending') {
             $this->status = 'confirmed';
             $this->save();
+
             return true;
         }
+
         return false;
     }
 }

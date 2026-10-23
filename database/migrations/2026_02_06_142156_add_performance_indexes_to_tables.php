@@ -18,24 +18,24 @@ return new class extends Migration
         if (Schema::hasTable('locales')) {
             Schema::table('locales', function (Blueprint $table) {
                 // Índices para filtros comunes
-                if (!$this->hasIndex('locales', 'locales_is_active_index')) {
+                if (! $this->hasIndex('locales', 'locales_is_active_index')) {
                     $table->index('is_active'); // Filtro active()
                 }
-                if (!$this->hasIndex('locales', 'locales_category_index')) {
+                if (! $this->hasIndex('locales', 'locales_category_index')) {
                     $table->index('category'); // Filtro byCategory()
                 }
-                if (!$this->hasIndex('locales', 'locales_user_id_index')) {
+                if (! $this->hasIndex('locales', 'locales_user_id_index')) {
                     $table->index('user_id'); // JOIN con users
                 }
 
                 // Índices compuestos para queries complejas
-                if (!$this->hasIndex('locales', 'locales_active_category_index')) {
-                    $table->index(['is_active', 'category', 'created_at']); // Listados filtrados
+                if (! $this->hasIndex('locales', 'locales_active_category_index')) {
+                    $table->index(['is_active', 'category', 'created_at'], 'locales_active_category_index'); // Listados filtrados
                 }
 
                 // Índice para búsqueda de texto
-                if (!$this->hasIndex('locales', 'locales_search_index')) {
-                    $table->index(['name', 'address']); // Búsqueda por nombre/dirección
+                if (! $this->hasIndex('locales', 'locales_search_index')) {
+                    $table->index(['name', 'address'], 'locales_search_index'); // Búsqueda por nombre/dirección
                 }
             });
         }
@@ -44,27 +44,27 @@ return new class extends Migration
         if (Schema::hasTable('eventos')) {
             Schema::table('eventos', function (Blueprint $table) {
                 // Índices para filtros de fecha (muy importantes para eventos)
-                if (!$this->hasIndex('eventos', 'eventos_start_time_index')) {
+                if (! $this->hasIndex('eventos', 'eventos_start_time_index')) {
                     $table->index('start_time'); // Ordenamiento y filtros
                 }
-                if (!$this->hasIndex('eventos', 'eventos_end_time_index')) {
+                if (! $this->hasIndex('eventos', 'eventos_end_time_index')) {
                     $table->index('end_time'); // Scope active()
                 }
 
                 // Índices para filtros comunes
-                if (!$this->hasIndex('eventos', 'eventos_is_active_index')) {
+                if (! $this->hasIndex('eventos', 'eventos_is_active_index')) {
                     $table->index('is_active');
                 }
-                if (!$this->hasIndex('eventos', 'eventos_category_index')) {
+                if (! $this->hasIndex('eventos', 'eventos_category_index')) {
                     $table->index('category');
                 }
-                if (!$this->hasIndex('eventos', 'eventos_user_id_index')) {
+                if (! $this->hasIndex('eventos', 'eventos_user_id_index')) {
                     $table->index('user_id');
                 }
 
                 // Índice compuesto para listados de eventos activos
-                if (!$this->hasIndex('eventos', 'eventos_active_upcoming_index')) {
-                    $table->index(['is_active', 'end_time', 'start_time']); // Eventos activos ordenados
+                if (! $this->hasIndex('eventos', 'eventos_active_upcoming_index')) {
+                    $table->index(['is_active', 'end_time', 'start_time'], 'eventos_active_upcoming_index'); // Eventos activos ordenados
                 }
             });
         }
@@ -73,27 +73,27 @@ return new class extends Migration
         if (Schema::hasTable('experiencias')) {
             Schema::table('experiencias', function (Blueprint $table) {
                 // Índices para filtros comunes
-                if (!$this->hasIndex('experiencias', 'experiencias_is_active_index')) {
+                if (! $this->hasIndex('experiencias', 'experiencias_is_active_index')) {
                     $table->index('is_active');
                 }
-                if (!$this->hasIndex('experiencias', 'experiencias_difficulty_index')) {
+                if (! $this->hasIndex('experiencias', 'experiencias_difficulty_index')) {
                     $table->index('difficulty'); // byDifficulty()
                 }
-                if (!$this->hasIndex('experiencias', 'experiencias_user_id_index')) {
+                if (! $this->hasIndex('experiencias', 'experiencias_user_id_index')) {
                     $table->index('user_id');
                 }
-                if (!$this->hasIndex('experiencias', 'experiencias_locale_id_index')) {
+                if (! $this->hasIndex('experiencias', 'experiencias_locale_id_index')) {
                     $table->index('locale_id'); // JOIN con locales
                 }
 
                 // Índice para filtro de precio
-                if (!$this->hasIndex('experiencias', 'experiencias_price_index')) {
+                if (! $this->hasIndex('experiencias', 'experiencias_price_index')) {
                     $table->index('price_pen'); // withinBudget()
                 }
 
                 // Índice compuesto
-                if (!$this->hasIndex('experiencias', 'experiencias_active_price_index')) {
-                    $table->index(['is_active', 'price_pen', 'created_at']);
+                if (! $this->hasIndex('experiencias', 'experiencias_active_price_index')) {
+                    $table->index(['is_active', 'price_pen', 'created_at'], 'experiencias_active_price_index');
                 }
             });
         }
@@ -102,27 +102,27 @@ return new class extends Migration
         if (Schema::hasTable('promociones')) {
             Schema::table('promociones', function (Blueprint $table) {
                 // Índices para filtros de fecha (críticos para promociones)
-                if (!$this->hasIndex('promociones', 'promociones_start_date_index')) {
+                if (! $this->hasIndex('promociones', 'promociones_start_date_index')) {
                     $table->index('start_date');
                 }
-                if (!$this->hasIndex('promociones', 'promociones_end_date_index')) {
+                if (! $this->hasIndex('promociones', 'promociones_end_date_index')) {
                     $table->index('end_date');
                 }
 
                 // Índices para filtros comunes
-                if (!$this->hasIndex('promociones', 'promociones_is_active_index')) {
+                if (! $this->hasIndex('promociones', 'promociones_is_active_index')) {
                     $table->index('is_active');
                 }
-                if (!$this->hasIndex('promociones', 'promociones_discount_type_index')) {
+                if (! $this->hasIndex('promociones', 'promociones_discount_type_index')) {
                     $table->index('discount_type'); // byType()
                 }
-                if (!$this->hasIndex('promociones', 'promociones_locale_id_index')) {
+                if (! $this->hasIndex('promociones', 'promociones_locale_id_index')) {
                     $table->index('locale_id'); // byLocale()
                 }
 
                 // Índice compuesto para promociones activas
-                if (!$this->hasIndex('promociones', 'promociones_active_dates_index')) {
-                    $table->index(['is_active', 'start_date', 'end_date', 'created_at']);
+                if (! $this->hasIndex('promociones', 'promociones_active_dates_index')) {
+                    $table->index(['is_active', 'start_date', 'end_date', 'created_at'], 'promociones_active_dates_index');
                 }
             });
         }
@@ -131,19 +131,19 @@ return new class extends Migration
         if (Schema::hasTable('candelaria')) {
             Schema::table('candelaria', function (Blueprint $table) {
                 // Índices para filtros comunes
-                if (!$this->hasIndex('candelaria', 'candelaria_is_active_index')) {
+                if (! $this->hasIndex('candelaria', 'candelaria_is_active_index')) {
                     $table->index('is_active');
                 }
-                if (!$this->hasIndex('candelaria', 'candelaria_category_index')) {
+                if (! $this->hasIndex('candelaria', 'candelaria_category_index')) {
                     $table->index('category');
                 }
-                if (!$this->hasIndex('candelaria', 'candelaria_is_featured_index')) {
+                if (! $this->hasIndex('candelaria', 'candelaria_is_featured_index')) {
                     $table->index('is_featured'); // featured()
                 }
 
                 // Índice compuesto
-                if (!$this->hasIndex('candelaria', 'candelaria_active_featured_index')) {
-                    $table->index(['is_active', 'is_featured', 'created_at']);
+                if (! $this->hasIndex('candelaria', 'candelaria_active_featured_index')) {
+                    $table->index(['is_active', 'is_featured', 'created_at'], 'candelaria_active_featured_index');
                 }
             });
         }
@@ -152,58 +152,42 @@ return new class extends Migration
         if (Schema::hasTable('reviews')) {
             Schema::table('reviews', function (Blueprint $table) {
                 // Índices para relaciones polimórficas
-                if (!$this->hasIndex('reviews', 'reviews_reviewable_index')) {
-                    $table->index(['reviewable_type', 'reviewable_id']); // Relación polimórfica
+                if (! $this->hasIndex('reviews', 'reviews_reviewable_index')) {
+                    $table->index(['reviewable_type', 'reviewable_id'], 'reviews_reviewable_index'); // Relación polimórfica
                 }
-                if (!$this->hasIndex('reviews', 'reviews_user_id_index')) {
+                if (! $this->hasIndex('reviews', 'reviews_user_id_index')) {
                     $table->index('user_id');
                 }
 
                 // Índice para rating
-                if (!$this->hasIndex('reviews', 'reviews_rating_index')) {
+                if (! $this->hasIndex('reviews', 'reviews_rating_index')) {
                     $table->index('rating'); // Cálculo de promedios
                 }
             });
         }
 
-        // ========== Tabla: favorites ==========
-        if (Schema::hasTable('favorites')) {
-            Schema::table('favorites', function (Blueprint $table) {
-                // Índices para relaciones polimórficas
-                if (!$this->hasIndex('favorites', 'favorites_favoriteable_index')) {
-                    $table->index(['favoriteable_type', 'favoriteable_id']);
-                }
-                if (!$this->hasIndex('favorites', 'favorites_user_id_index')) {
-                    $table->index('user_id');
-                }
-
-                // Índice compuesto para búsquedas de favoritos
-                if (!$this->hasIndex('favorites', 'favorites_user_favoriteable_index')) {
-                    $table->index(['user_id', 'favoriteable_type', 'favoriteable_id']); // Check de favoritos
-                }
-            });
-        }
+        // favorites ya tiene sus índices desde create_favorites_table (morphs, unique y user_id)
 
         // ========== Tabla: bookings ==========
         if (Schema::hasTable('bookings')) {
             Schema::table('bookings', function (Blueprint $table) {
                 // Índices para filtros comunes
-                if (!$this->hasIndex('bookings', 'bookings_user_id_index')) {
+                if (! $this->hasIndex('bookings', 'bookings_user_id_index')) {
                     $table->index('user_id');
                 }
-                if (!$this->hasIndex('bookings', 'bookings_experiencia_id_index')) {
+                if (! $this->hasIndex('bookings', 'bookings_experiencia_id_index')) {
                     $table->index('experiencia_id');
                 }
-                if (!$this->hasIndex('bookings', 'bookings_status_index')) {
+                if (! $this->hasIndex('bookings', 'bookings_status_index')) {
                     $table->index('status');
                 }
-                if (!$this->hasIndex('bookings', 'bookings_date_index')) {
-                    $table->index('date');
+                if (! $this->hasIndex('bookings', 'bookings_date_index')) {
+                    $table->index('booking_date', 'bookings_date_index');
                 }
 
                 // Índice compuesto
-                if (!$this->hasIndex('bookings', 'bookings_user_status_index')) {
-                    $table->index(['user_id', 'status', 'date']);
+                if (! $this->hasIndex('bookings', 'bookings_user_status_index')) {
+                    $table->index(['user_id', 'status', 'booking_date'], 'bookings_user_status_index');
                 }
             });
         }
@@ -223,14 +207,6 @@ return new class extends Migration
                 $table->dropIndex('bookings_status_index');
                 $table->dropIndex('bookings_experiencia_id_index');
                 $table->dropIndex('bookings_user_id_index');
-            });
-        }
-
-        if (Schema::hasTable('favorites')) {
-            Schema::table('favorites', function (Blueprint $table) {
-                $table->dropIndex('favorites_user_favoriteable_index');
-                $table->dropIndex('favorites_user_id_index');
-                $table->dropIndex('favorites_favoriteable_index');
             });
         }
 
@@ -300,14 +276,6 @@ return new class extends Migration
      */
     protected function hasIndex(string $table, string $indexName): bool
     {
-        try {
-            $connection = Schema::getConnection();
-            $schemaManager = $connection->getDoctrineSchemaManager();
-            $indexes = $schemaManager->listTableIndexes($table);
-            return isset($indexes[$indexName]);
-        } catch (\Exception $e) {
-            // Si hay error, asumir que no existe (será creado)
-            return false;
-        }
+        return Schema::hasIndex($table, $indexName);
     }
 };

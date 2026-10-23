@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use App\Models\User;
 
 class CandelariaDanzasSeeder extends Seeder
 {
@@ -17,8 +17,9 @@ class CandelariaDanzasSeeder extends Seeder
         // Obtener el admin que agregará el contenido
         $admin = User::where('role', 'admin')->first();
 
-        if (!$admin) {
+        if (! $admin) {
             $this->command->error('⚠️  No se encontró usuario admin. Ejecuta DatabaseSeeder primero.');
+
             return;
         }
 
@@ -216,13 +217,13 @@ class CandelariaDanzasSeeder extends Seeder
             ]);
         }
 
-        $mestizas = count(array_filter($danzas, fn($d) => $d['type'] === 'mestiza'));
-        $autoctonas = count(array_filter($danzas, fn($d) => $d['type'] === 'autoctona'));
+        $mestizas = count(array_filter($danzas, fn ($d) => $d['type'] === 'mestiza'));
+        $autoctonas = count(array_filter($danzas, fn ($d) => $d['type'] === 'autoctona'));
 
         $this->command->info('✅ Danzas creadas exitosamente:');
         $this->command->info("   → {$mestizas} danzas mestizas");
         $this->command->info("   → {$autoctonas} danzas autóctonas");
-        $this->command->info("   → Total: " . count($danzas) . " danzas");
+        $this->command->info('   → Total: '.count($danzas).' danzas');
         $this->command->info("   → Agregadas por: {$admin->name} (Admin)");
     }
 }

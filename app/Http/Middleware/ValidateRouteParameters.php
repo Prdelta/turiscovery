@@ -48,13 +48,13 @@ class ValidateRouteParameters
             $value = $request->route($param);
 
             // Si el parámetro existe y no es numérico, rechazar
-            if ($value !== null && !$this->isValidNumeric($value)) {
+            if ($value !== null && ! $this->isValidNumeric($value)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Formato de parámetro inválido. Se esperaba un ID numérico.',
                     'errors' => [
-                        $param => ["El parámetro '{$param}' debe ser un número entero positivo."]
-                    ]
+                        $param => ["El parámetro '{$param}' debe ser un número entero positivo."],
+                    ],
                 ], 400);
             }
 
@@ -64,8 +64,8 @@ class ValidateRouteParameters
                     'success' => false,
                     'message' => 'ID inválido',
                     'errors' => [
-                        $param => ["El parámetro '{$param}' debe ser mayor que 0."]
-                    ]
+                        $param => ["El parámetro '{$param}' debe ser mayor que 0."],
+                    ],
                 ], 400);
             }
         }
@@ -76,18 +76,17 @@ class ValidateRouteParameters
     /**
      * Verifica si un valor es numérico válido
      *
-     * @param mixed $value
-     * @return bool
+     * @param  mixed  $value
      */
     protected function isValidNumeric($value): bool
     {
         // Rechazar strings que no sean dígitos
-        if (is_string($value) && !ctype_digit($value)) {
+        if (is_string($value) && ! ctype_digit($value)) {
             return false;
         }
 
         // Verificar que sea numérico
-        if (!is_numeric($value)) {
+        if (! is_numeric($value)) {
             return false;
         }
 

@@ -36,29 +36,6 @@ class UserCoupon extends Model
         return $this->belongsTo(Promocion::class);
     }
 
-    public function scopeAvailable($query)
-    {
-        return $query->where('status', 'available')
-            ->where(function ($q) {
-                $q->whereNull('expires_at')
-                    ->orWhere('expires_at', '>', now());
-            });
-    }
-
-    public function scopeUsed($query)
-    {
-        return $query->where('status', 'used');
-    }
-
-    public function scopeExpired($query)
-    {
-        return $query->where('status', 'expired')
-            ->orWhere(function ($q) {
-                $q->where('status', 'available')
-                    ->where('expires_at', '<', now());
-            });
-    }
-
     public function markAsUsed()
     {
         $this->update([
@@ -72,10 +49,10 @@ class UserCoupon extends Model
         $this->update(['status' => 'expired']);
     }
 
-    public static function generateCouponCode($prefix = 'TURISCO'): string
+    public static function generateCouponCode($prefix = 'NANPUNO'): string
     {
         do {
-            $code = $prefix . '-' . strtoupper(Str::random(8));
+            $code = $prefix.'-'.strtoupper(Str::random(8));
         } while (self::where('coupon_code', $code)->exists());
 
         return $code;

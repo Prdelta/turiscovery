@@ -21,7 +21,6 @@ class SessionController extends Controller
     /**
      * Login con sesión (no token en localStorage)
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function login(Request $request)
@@ -32,7 +31,7 @@ class SessionController extends Controller
         ]);
 
         // Rate limiting por IP
-        $key = 'login.' . $request->ip();
+        $key = 'login.'.$request->ip();
 
         if (RateLimiter::tooManyAttempts($key, 5)) {
             $seconds = RateLimiter::availableIn($key);
@@ -47,7 +46,7 @@ class SessionController extends Controller
         $user = User::where('email', $request->email)->first();
 
         // Verificar credenciales
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (! $user || ! Hash::check($request->password, $user->password)) {
             RateLimiter::hit($key, 60); // Incrementar contador por 60 segundos
 
             throw ValidationException::withMessages([
@@ -57,6 +56,13 @@ class SessionController extends Controller
 
         // Limpiar rate limiter si el login es exitoso
         RateLimiter::clear($key);
+
+        if (! $user->is_active) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tu cuenta ha sido desactivada por un administrador.',
+            ], 403);
+        }
 
         // Login vía sesión de Laravel (NO genera token)
         // La cookie de sesión se establece automáticamente y es httpOnly
@@ -75,23 +81,24 @@ class SessionController extends Controller
                     'email' => $user->email,
                     'role' => $user->role,
                     'avatar' => $user->avatar,
+                    'email_verified_at' => $user->email_verified_at,
+                    'preferences' => $user->resolvedPreferences(),
                 ],
                 // NO se devuelve token - la cookie de sesión se establece automáticamente
                 // y es httpOnly (no accesible desde JavaScript)
-            ]
+            ],
         ], 200);
     }
 
     /**
      * Logout - Invalida la sesión
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function logout(Request $request)
     {
-        // Cerrar sesión de Laravel
-        Auth::logout();
+        // La ruta usa auth:sanctum, cuyo guard no cierra sesiones: la sesión con cookie vive en "web"
+        Auth::guard('web')->logout();
 
         // Invalidar sesión actual
         $request->session()->invalidate();
@@ -106,41 +113,8 @@ class SessionController extends Controller
     }
 
     /**
-     * Obtener información del usuario autenticado
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function me(Request $request)
-    {
-        $user = $request->user();
-
-        if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No autenticado',
-            ], 401);
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'role' => $user->role,
-                    'avatar' => $user->avatar,
-                    'created_at' => $user->created_at,
-                ],
-            ],
-        ], 200);
-    }
-
-    /**
      * Verificar estado de autenticación
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function check(Request $request)
@@ -153,6 +127,9 @@ class SessionController extends Controller
                 'name' => Auth::user()->name,
                 'email' => Auth::user()->email,
                 'role' => Auth::user()->role,
+                'avatar' => Auth::user()->avatar,
+                'email_verified_at' => Auth::user()->email_verified_at,
+                'preferences' => Auth::user()->resolvedPreferences(),
             ] : null,
         ], 200);
     }

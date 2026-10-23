@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Review;
+use App\Support\MorphTypes;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 
 class ReviewController extends Controller
@@ -14,19 +16,13 @@ class ReviewController extends Controller
      */
     public function index(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'reviewable_type' => 'required|string',
-            'reviewable_id' => 'required|integer',
+        $request->merge(['reviewable_type' => MorphTypes::normalize($request->input('reviewable_type'))]);
+        $request->validate([
+            'reviewable_type' => 'required|string|in:'.implode(',', MorphTypes::REVIEWABLE),
+            'reviewable_id' => 'required|integer|min:1',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $reviews = Review::with('user')
+        $reviews = Review::with('user:id,name,avatar')
             ->where('reviewable_type', $request->reviewable_type)
             ->where('reviewable_id', $request->reviewable_id)
             ->latest()
@@ -43,20 +39,20 @@ class ReviewController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'reviewable_type' => 'required|string|in:App\Models\Locale,App\Models\Candelaria,App\Models\Experiencia,App\Models\Evento,App\Models\Promocion',
-            'reviewable_id' => 'required|integer',
+        $request->merge(['reviewable_type' => MorphTypes::normalize($request->input('reviewable_type'))]);
+        $request->validate([
+            'reviewable_type' => 'required|string|in:'.implode(',', MorphTypes::REVIEWABLE),
+            'reviewable_id' => 'required|integer|min:1',
             'rating' => 'required|integer|min:1|max:5',
             'title' => 'nullable|string|max:255',
             'comment' => 'nullable|string|max:1000',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
+        abort_unless(
+            MorphTypes::exists($request->reviewable_type, (int) $request->reviewable_id),
+            404,
+            'Ese contenido ya no existe.',
+        );
 
         // Check if user already reviewed this item
         $existingReview = Review::where('user_id', $request->user()->id)
@@ -67,7 +63,7 @@ class ReviewController extends Controller
         if ($existingReview) {
             return response()->json([
                 'success' => false,
-                'message' => 'You have already reviewed this item. Use update instead.',
+                'message' => 'Ya dejaste una reseña aquí. Puedes editarla.',
             ], 409);
         }
 
@@ -82,8 +78,8 @@ class ReviewController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Review created successfully',
-            'data' => $review->load('user'),
+            'message' => 'Reseña publicada',
+            'data' => $review->load('user:id,name,avatar'),
         ], 201);
     }
 
@@ -94,13 +90,7 @@ class ReviewController extends Controller
     {
         $review = Review::findOrFail($id);
 
-        // Only the review owner can update
-        if ($review->user_id !== $request->user()->id) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized to update this review.',
-            ], 403);
-        }
+        Gate::authorize('update', $review);
 
         $validator = Validator::make($request->all(), [
             'rating' => 'sometimes|required|integer|min:1|max:5',
@@ -111,7 +101,7 @@ class ReviewController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -119,7 +109,7 @@ class ReviewController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Review updated successfully',
+            'message' => 'Reseña actualizada',
             'data' => $review,
         ], 200);
     }
@@ -131,18 +121,13 @@ class ReviewController extends Controller
     {
         $review = Review::findOrFail($id);
 
-        if ($review->user_id !== $request->user()->id && !$request->user()->isAdmin()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized to delete this review.',
-            ], 403);
-        }
+        Gate::authorize('delete', $review);
 
         $review->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Review deleted successfully',
+            'message' => 'Reseña eliminada',
         ], 200);
     }
 

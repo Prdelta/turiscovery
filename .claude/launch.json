@@ -1,0 +1,41 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "backend",
+      "runtimeExecutable": "C:\\php\\php.exe",
+      "runtimeArgs": ["artisan", "serve", "--host=127.0.0.1", "--port=8000", "--no-reload"],
+      "port": 8000,
+      "autoPort": false,
+      "env": {
+        "DB_CONNECTION": "sqlite",
+        "DB_DATABASE": "D:/laravel/turiscovery/database/local.sqlite",
+        "SESSION_DRIVER": "file",
+        "CACHE_STORE": "file",
+        "QUEUE_CONNECTION": "sync"
+      }
+    },
+    {
+      "name": "frontend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--prefix",
+        "frontend"
+      ],
+      "port": 5173
+    },
+    {
+      "name": "frontend-preview",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "preview",
+        "--prefix",
+        "frontend"
+      ],
+      "port": 4173
+    }
+  ]
+}

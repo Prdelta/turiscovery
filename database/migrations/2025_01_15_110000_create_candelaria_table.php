@@ -30,7 +30,7 @@ return new class extends Migration
                 'music',
                 'tradition',
                 'procession',
-                'other'
+                'other',
             ])->default('other');
 
             // Media

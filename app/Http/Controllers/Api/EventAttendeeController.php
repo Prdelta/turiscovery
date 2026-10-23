@@ -76,39 +76,13 @@ class EventAttendeeController extends Controller
         ], 201);
     }
 
-    public function update(Request $request, $id)
-    {
-        $attendance = EventAttendee::findOrFail($id);
-
-        if ($attendance->user_id !== Auth::id()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No tienes permiso para actualizar esta confirmación.',
-            ], 403);
-        }
-
-        $validated = $request->validate([
-            'status' => 'required|in:confirmed,maybe,cancelled',
-            'guests' => 'nullable|integer|min:1|max:10',
-        ]);
-
-        $attendance->update($validated);
-        $attendance->load('evento');
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Confirmación actualizada.',
-            'data' => $attendance,
-        ]);
-    }
-
     public function destroy($eventoId)
     {
         $attendance = EventAttendee::where('user_id', Auth::id())
             ->where('evento_id', $eventoId)
             ->first();
 
-        if (!$attendance) {
+        if (! $attendance) {
             return response()->json([
                 'success' => false,
                 'message' => 'No has confirmado asistencia a este evento.',

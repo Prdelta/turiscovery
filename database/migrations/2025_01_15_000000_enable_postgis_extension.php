@@ -10,8 +10,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Enable PostGIS extension for geospatial queries
-        DB::statement('CREATE EXTENSION IF NOT EXISTS postgis');
+        // Enable PostGIS extension for geospatial queries (only on PostgreSQL)
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('CREATE EXTENSION IF NOT EXISTS postgis');
+        }
     }
 
     /**
@@ -19,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement('DROP EXTENSION IF EXISTS postgis');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('DROP EXTENSION IF EXISTS postgis');
+        }
     }
 };

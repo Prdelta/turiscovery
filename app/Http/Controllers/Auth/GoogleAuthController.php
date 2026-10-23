@@ -8,8 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 
 class GoogleAuthController extends Controller
 {
@@ -18,6 +18,13 @@ class GoogleAuthController extends Controller
      */
     public function redirectToGoogle()
     {
+        // Sin credenciales, Google mostraría su propia página de error: se vuelve al login con un aviso
+        if (! config('services.google.client_id') || ! config('services.google.client_secret')) {
+            Log::warning('Google OAuth sin configurar: faltan GOOGLE_CLIENT_ID o GOOGLE_CLIENT_SECRET en .env');
+
+            return redirect()->away($this->frontendUrl('/login?error=google_config'));
+        }
+
         return Socialite::driver('google')->redirect();
     }
 
@@ -39,11 +46,11 @@ class GoogleAuthController extends Controller
 
                 // Redirect based on role
                 if ($user->role === 'admin' || $user->role === 'socio') {
-                    return redirect()->intended('/dashboard');
+                    return redirect()->away($this->frontendUrl('/dashboard'));
                 }
 
                 // Turistas van a home (el header se actualiza automáticamente)
-                return redirect('/')->with('success', '¡Bienvenido de nuevo, ' . $user->name . '!');
+                return redirect()->away($this->frontendUrl('/'));
             }
 
             // Check if user exists with this email (link Google account)
@@ -53,7 +60,9 @@ class GoogleAuthController extends Controller
                 // Link Google account to existing user
                 $existingUser->update([
                     'google_id' => $googleUser->id,
-                    'avatar' => $googleUser->avatar ?? $existingUser->avatar,
+                    'avatar' => $existingUser->avatar ?: $googleUser->avatar,
+                    // Google ya verificó ese correo
+                    'email_verified_at' => $existingUser->email_verified_at ?? now(),
                 ]);
 
                 Auth::login($existingUser);
@@ -61,11 +70,11 @@ class GoogleAuthController extends Controller
 
                 // Redirect based on role
                 if ($existingUser->role === 'admin' || $existingUser->role === 'socio') {
-                    return redirect()->intended('/dashboard');
+                    return redirect()->away($this->frontendUrl('/dashboard'));
                 }
 
                 // Turistas van a home
-                return redirect('/')->with('success', '¡Bienvenido de nuevo, ' . $existingUser->name . '!');
+                return redirect()->away($this->frontendUrl('/'));
             }
 
             // Create new user with Google account
@@ -83,14 +92,20 @@ class GoogleAuthController extends Controller
             $request->session()->regenerate();
 
             // Redirect new tourist to home
-            return redirect('/')->with('success', '¡Bienvenido a Turiscovery, ' . $newUser->name . '!');
+            return redirect()->away($this->frontendUrl('/'));
         } catch (\Exception $e) {
             // Log the error for debugging
-            Log::error('Google OAuth Error: ' . $e->getMessage());
+            Log::error('Google OAuth Error: '.$e->getMessage());
 
-            return redirect('/login')->withErrors([
-                'error' => 'No se pudo completar la autenticación con Google. Por favor, intenta de nuevo.'
-            ]);
+            return redirect()->away($this->frontendUrl('/login?error=google'));
         }
+    }
+
+    /**
+     * Build an absolute URL on the React frontend
+     */
+    private function frontendUrl(string $path): string
+    {
+        return rtrim(config('app.frontend_url'), '/').$path;
     }
 }

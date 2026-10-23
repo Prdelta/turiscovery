@@ -2,16 +2,15 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use App\Models\Locale;
 use App\Models\Candelaria;
-use App\Models\Experiencia;
 use App\Models\Evento;
+use App\Models\Experiencia;
+use App\Models\Favorite;
+use App\Models\Locale;
 use App\Models\Promocion;
 use App\Models\Review;
-use App\Models\Favorite;
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB; // <--- Importante para DB::raw
 use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
@@ -37,7 +36,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $admin = User::create([
-            'name' => 'Admin Turiscovery',
+            'name' => 'Admin Ñan Puno',
             'email' => 'admin@example.com',
             'password' => Hash::make('password123'),
             'role' => 'admin',
@@ -111,13 +110,12 @@ class DatabaseSeeder extends Seeder
             $lat = $localeData['latitude'];
             $lng = $localeData['longitude'];
 
-            // Eliminamos keys viejas para que no den error si no están en fillable
             unset($localeData['latitude'], $localeData['longitude']);
 
-            // Insertamos DIRECTAMENTE el punto geográfico (Longitud primero, Latitud después)
-            $localeData['location'] = DB::raw("ST_GeogFromText('POINT($lng $lat)')");
-
-            $createdLocales[] = Locale::create($localeData);
+            // Guarda el punto (PostGIS o texto en SQLite) y las columnas latitude/longitude
+            $locale = new Locale($localeData);
+            $locale->setLocationFromCoordinates($lat, $lng)->save();
+            $createdLocales[] = $locale;
         }
 
         // 3. Create Candelaria content
@@ -167,7 +165,9 @@ class DatabaseSeeder extends Seeder
             // Since I am replacing the block, I am good.
             // Wait, I need to check Candelaria model fillable in Candelaria.php if I want to be 100% sure.
             // But for now I'll stick to 'images' array pattern.
-            if (isset($data['image_url'])) unset($data['image_url']); // Safety if I don't remove it in replacement? No, replacement overwrites.
+            if (isset($data['image_url'])) {
+                unset($data['image_url']);
+            } // Safety if I don't remove it in replacement? No, replacement overwrites.
             $createdCandelaria[] = Candelaria::create($data);
         }
 
@@ -222,15 +222,16 @@ class DatabaseSeeder extends Seeder
 
         $createdExperiencias = [];
         foreach ($experiencias as $expData) {
-            if (isset($expData['latitude']) && isset($expData['longitude'])) {
-                $lat = $expData['latitude'];
-                $lng = $expData['longitude'];
-                unset($expData['latitude'], $expData['longitude']);
+            $lat = $expData['latitude'] ?? null;
+            $lng = $expData['longitude'] ?? null;
+            unset($expData['latitude'], $expData['longitude']);
 
-                // Convertimos a PostGIS Point
-                $expData['location'] = DB::raw("ST_GeogFromText('POINT($lng $lat)')");
+            $experiencia = new Experiencia($expData);
+            if ($lat !== null && $lng !== null) {
+                $experiencia->setLocationFromCoordinates($lat, $lng);
             }
-            $createdExperiencias[] = Experiencia::create($expData);
+            $experiencia->save();
+            $createdExperiencias[] = $experiencia;
         }
 
         // 5. Create Eventos
@@ -281,15 +282,16 @@ class DatabaseSeeder extends Seeder
 
         $createdEventos = [];
         foreach ($eventos as $eventoData) {
-            if (isset($eventoData['latitude']) && isset($eventoData['longitude'])) {
-                $lat = $eventoData['latitude'];
-                $lng = $eventoData['longitude'];
-                unset($eventoData['latitude'], $eventoData['longitude']);
+            $lat = $eventoData['latitude'] ?? null;
+            $lng = $eventoData['longitude'] ?? null;
+            unset($eventoData['latitude'], $eventoData['longitude']);
 
-                // Convertimos a PostGIS Point
-                $eventoData['location'] = DB::raw("ST_GeogFromText('POINT($lng $lat)')");
+            $evento = new Evento($eventoData);
+            if ($lat !== null && $lng !== null) {
+                $evento->setLocationFromCoordinates($lat, $lng);
             }
-            $createdEventos[] = Evento::create($eventoData);
+            $evento->save();
+            $createdEventos[] = $evento;
         }
 
         // 6. Create Promociones
@@ -352,7 +354,7 @@ class DatabaseSeeder extends Seeder
         // 7. Create Reviews
         Review::create([
             'user_id' => $tourist->id,
-            'reviewable_type' => 'App\Models\Locale',
+            'reviewable_type' => 'locale',
             'reviewable_id' => $createdLocales[0]->id,
             'rating' => 5,
             'title' => '¡Excelente comida!',
@@ -361,7 +363,7 @@ class DatabaseSeeder extends Seeder
 
         Review::create([
             'user_id' => $tourist->id,
-            'reviewable_type' => 'App\Models\Experiencia',
+            'reviewable_type' => 'experiencia',
             'reviewable_id' => $createdExperiencias[0]->id,
             'rating' => 5,
             'title' => 'Experiencia inolvidable',
@@ -370,7 +372,7 @@ class DatabaseSeeder extends Seeder
 
         Review::create([
             'user_id' => $socio->id,
-            'reviewable_type' => 'App\Models\Evento',
+            'reviewable_type' => 'evento',
             'reviewable_id' => $createdEventos[0]->id,
             'rating' => 4,
             'title' => 'Muy bueno',
@@ -380,19 +382,19 @@ class DatabaseSeeder extends Seeder
         // 8. Create Favorites
         Favorite::create([
             'user_id' => $tourist->id,
-            'favoritable_type' => 'App\Models\Locale',
+            'favoritable_type' => 'locale',
             'favoritable_id' => $createdLocales[0]->id,
         ]);
 
         Favorite::create([
             'user_id' => $tourist->id,
-            'favoritable_type' => 'App\Models\Experiencia',
+            'favoritable_type' => 'experiencia',
             'favoritable_id' => $createdExperiencias[0]->id,
         ]);
 
         Favorite::create([
             'user_id' => $tourist->id,
-            'favoritable_type' => 'App\Models\Candelaria',
+            'favoritable_type' => 'candelaria',
             'favoritable_id' => $createdCandelaria[0]->id,
         ]);
 
@@ -401,6 +403,9 @@ class DatabaseSeeder extends Seeder
 
         // 10. Seed Candelaria Danzas (Traditional Dances)
         $this->call(CandelariaDanzasSeeder::class);
+
+        // Almanaque: fiestas y fechas que se repiten cada año
+        $this->call(AlmanacSeeder::class);
 
         echo "\n";
         echo "========================================\n";

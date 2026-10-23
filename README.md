@@ -1,387 +1,234 @@
-# Turiscovery - Tourism Platform for Puno, Peru
+# Ñan Puno
 
-Turiscovery es una plataforma web que conecta a turistas con la oferta local de Puno, Perú. Se enfoca en 4 pilares fundamentales: **Candelaria**, **Experiencias**, **Eventos**, y **Promociones**.
+Guía turística de Puno y el lago Titicaca. Los socios locales publican experiencias, eventos, promociones y locales. Los viajeros descubren, reservan, obtienen cupones y escuchan a los anfitriones de las comunidades.
 
-## Stack Tecnológico
-
-- **Backend**: Laravel 12 + PostgreSQL con PostGIS
-- **Frontend**: Laravel Blade + Tailwind CSS v4 (Premium Design System) + Leaflet (OpenStreetMap) + Lucide Icons
-- **Autenticación**: Laravel Sanctum + Google OAuth (Socialite)
-- **Seguridad**: RBAC (Role-Based Access Control)
+- **Backend:** Laravel 12 (API REST) + PostgreSQL con PostGIS
+- **Frontend:** React 19 + TypeScript + Vite en `frontend/`, Tailwind CSS v4, React Router, TanStack Query, Leaflet, Lucide
+- **3D:** Three.js con React Three Fiber y Drei (el lago Titicaca de la portada)
+- **Autenticación:** cookie de sesión de Sanctum (httpOnly + XSRF) y Google OAuth (Socialite)
+- **PWA:** se instala y funciona sin conexión en el lago y las islas
 
 ---
 
-## Configuración Inicial
+## Puesta en marcha
 
-### 1. Requisitos Previos
+### Requisitos
 
-- PHP 8.2+
+- PHP 8.2+ con `pdo_pgsql` y `pdo_sqlite`
 - Composer
-- PostgreSQL 14+ **con extensión PostGIS**
 - Node.js 18+
-- npm
+- PostgreSQL 14+ con PostGIS (solo para producción; ver el modo local con SQLite)
 
-### 2. Instalación de PostGIS
+### Instalación
 
-**Windows (con PostgreSQL instalado):**
-```powershell
-# Verificar si PostGIS está disponible
-psql -U postgres -c "SELECT * FROM pg_available_extensions WHERE name = 'postgis';"
-```
-
-Si PostGIS no está instalado, descargarlo desde:
-- https://postgis.net/install/
-- O usar Stack Builder (incluido con PostgreSQL para Windows)
-
-**Linux/macOS:**
 ```bash
-# Ubuntu/Debian
-sudo apt-get install postgis postgresql-14-postgis-3
-
-# macOS con Homebrew
-brew install postgis
+composer install
+npm install --prefix frontend
+cp .env.example .env
+php artisan key:generate
+php artisan storage:link
 ```
 
-### 3. Configurar Base de Datos
+### Opción A: desarrollo local con SQLite (recomendada)
+
+No necesita PostgreSQL ni PostGIS, y no toca ninguna base remota. Sin PostGIS, la columna `location` se guarda como texto y la búsqueda por cercanía usa `latitude`/`longitude` (ver `app/Models/Concerns/HasLocation.php`).
+
+```bash
+touch database/local.sqlite
+DB_CONNECTION=sqlite DB_DATABASE="$(pwd)/database/local.sqlite" php artisan migrate --seed
+```
+
+En PowerShell:
 
 ```powershell
-# Crear base de datos
-psql -U postgres
-CREATE DATABASE turiscovery;
-\q
+New-Item database/local.sqlite -ItemType File -Force
+$env:DB_CONNECTION='sqlite'; $env:DB_DATABASE="$PWD/database/local.sqlite"; php artisan migrate --seed
 ```
 
-### 4. Configurar Credenciales de Google OAuth
+Luego levanta la API con esas mismas variables, más `SESSION_DRIVER=file` y `CACHE_STORE=file`, y en otra terminal levanta el frontend:
 
-1. Ve a [Google Cloud Console](https://console.cloud.google.com/)
-2. Crea un nuevo proyecto o selecciona uno existente
-3. Habilita **Google+ API**
-4. Ve a **Credentials** → **Create Credentials** → **OAuth 2.0 Client ID**
-5. Tipo de aplicación: **Web application**
-6. **URIs de redirección autorizados**:
-   - `http://localhost:8000/api/auth/google/callback`
-   - `http://localhost:3000/api/auth/google/callback` (si usas frontend separado)
-7. Copia el **Client ID** y **Client Secret**
+```bash
+DB_CONNECTION=sqlite DB_DATABASE="$(pwd)/database/local.sqlite" SESSION_DRIVER=file CACHE_STORE=file php artisan serve
+npm --prefix frontend run dev
+```
 
-### 5. Configurar Variables de Entorno
+En la app de escritorio de Claude Code, `.claude/launch.json` ya trae las configuraciones `backend` (con esas variables) y `frontend`.
 
-Edita el archivo `.env`:
+### Opción B: PostgreSQL con PostGIS
+
+Configura `DB_*` en `.env` y corre:
+
+```bash
+php artisan migrate --seed
+composer dev   # API + cola + frontend juntos
+```
+
+> **Cuidado:** `migrate:fresh`, `db:seed` y los tests vacían o llenan la base a la que apunte la configuración. Antes de correrlos, confirma a qué base apunta `.env` y que no exista `bootstrap/cache/config.php` (`php artisan config:clear`).
+
+### Direcciones
+
+- Frontend: http://localhost:5173
+- API: http://localhost:8000/api. Vite reenvía `/api`, `/sanctum` y `/storage` a Laravel; las rutas web de Laravel redirigen al frontend.
+
+### Usuarios de prueba (seeder)
+
+| Rol | Correo | Contraseña |
+|-----|--------|------------|
+| Viajero | turista@example.com | password123 |
+| Socio | socio@example.com | password123 |
+| Admin | admin@example.com | password123 |
+
+Son solo para desarrollo. No corras el seeder en producción.
+
+### Variables de entorno importantes
 
 ```env
-# Base de datos
-DB_CONNECTION=pgsql
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_DATABASE=turiscovery
-DB_USERNAME=tu_usuario
-DB_PASSWORD=tu_contraseña
+FRONTEND_URL=http://localhost:5173
+SANCTUM_STATEFUL_DOMAINS=localhost:5173,127.0.0.1:5173,localhost,127.0.0.1,localhost:8000,127.0.0.1:8000
 
-# Google OAuth
-GOOGLE_CLIENT_ID=tu_client_id_de_google
-GOOGLE_CLIENT_SECRET=tu_secret_de_google
-GOOGLE_REDIRECT_URI=http://localhost:8000/api/auth/google/callback
+# Google OAuth: sin estas dos, el botón vuelve al login con un aviso
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_REDIRECT_URI=http://localhost:5173/api/auth/google/callback
 
-# Sanctum
-SANCTUM_STATEFUL_DOMAINS=localhost,localhost:3000,localhost:8000
+# Correos (reservas, verificación, recuperar contraseña). Con "log" quedan en storage/logs
+MAIL_MAILER=smtp
+MAIL_HOST=...
+MAIL_FROM_ADDRESS=hola@nanpuno.pe
+MAIL_FROM_NAME=Ñan Puno
 ```
 
-### 6. Instalar Dependencias y Ejecutar Migraciones
+Para Google OAuth, crea un cliente "Web application" en Google Cloud Console con la URI de redirección `http://localhost:5173/api/auth/google/callback` (y la de producción).
 
-```powershell
-# Instalar dependencias PHP
-composer install
+### Tareas programadas
 
-# Instalar dependencias Node.js
-npm install
-
-# Compilar assets (Tailwind CSS)
-npm run build
-
-# Ejecutar migraciones (esto habilitará PostGIS automáticamente)
-php artisan migrate
-
-# Generar datos de prueba e Imágenes
-php artisan db:seed
-# Nota: Si faltan imágenes, ejecutar:
-php artisan db:seed --class=FixImagesSeeder
+```bash
+php artisan schedule:work   # en desarrollo; en producción, el cron de Laravel cada minuto
 ```
 
-### 7. Iniciar Aplicación
+| Comando | Cuándo | Qué hace |
+|---------|--------|----------|
+| `nanpuno:expire` | 03:00 | Vence cupones caducados, completa reservas confirmadas de días pasados (y pide la reseña) y cancela las pendientes que nadie confirmó |
+| `bookings:remind` | 17:00 hora de Puno | Recuerda al viajero sus salidas confirmadas del día siguiente |
 
-```powershell
-# Opción 1: Modo desarrollo (backend + frontend + queue)
-composer dev
-
-# Opción 2: Iniciar servicios por separado
-# Terminal 1: Backend
-php artisan serve
-
-# Terminal 2: Frontend (Vite)
-npm run dev
-
-# Terminal 3: Queue worker (opcional)
-php artisan queue:listen
-```
-
-La aplicación estará disponible en:
-- **Backend API**: http://localhost:8000/api
-- **Frontend**: http://localhost:8000
+Ambos aceptan `--dry-run`.
 
 ---
 
-## Estructura de la API
+## Pruebas
 
-### Autenticación
-
-#### Registro
-```bash
-POST /api/register
-Content-Type: application/json
-
-{
-  "name": "Juan Pérez",
-  "email": "juan@example.com",
-  "password": "Password123!",
-  "password_confirmation": "Password123!",
-  "role": "tourist"  // o "socio"
-}
-```
-
-#### Login
-```bash
-POST /api/login
-Content-Type: application/json
-
-{
-  "email": "juan@example.com",
-  "password": "Password123!"
-}
-
-# Respuesta:
-{
-  "success": true,
-  "data": {
-    "user": {...},
-    "access_token": "1|abc123...",
-    "token_type": "Bearer"
-  }
-}
-```
-
-#### Google OAuth
-```bash
-# 1. Redirigir al usuario a Google
-GET /api/auth/google
-
-# 2. Google redirige de vuelta con el código
-GET /api/auth/google/callback?code=...
-```
-
-### Los 4 Pilares
-
-#### Candelaria
-```bash
-GET /api/candelaria?category=dance&featured=true
-GET /api/candelaria/{id}
-POST /api/candelaria  # Requiere auth + role:socio,admin
-PUT /api/candelaria/{id}
-DELETE /api/candelaria/{id}
-```
-
-#### Experiencias
-```bash
-GET /api/experiencias?difficulty=medium&max_price=100
-GET /api/experiencias?lat=-15.8402&lng=-70.0219&radius=5000  # Cerca de Puno
-POST /api/experiencias  # Requiere auth + role:socio,admin
-```
-
-#### Eventos
-```bash
-GET /api/eventos?category=concert&status=upcoming
-GET /api/eventos?lat=-15.8402&lng=-70.0219  # Eventos cercanos
-POST /api/eventos  # Requiere auth + role:socio,admin
-```
-
-**Nota:** Los eventos expirados (end_time < now) se filtran automáticamente.
-
-#### Promociones
-```bash
-GET /api/promociones?type=2x1
-GET /api/promociones?locale_id=5  # Promociones de un local específico
-POST /api/promociones  # Requiere auth + role:socio,admin
-```
-
-**Nota:** Las promociones expiradas se filtran automáticamente.
-
-#### Locales (Venues)
-```bash
-GET /api/locales?category=restaurant&lat=-15.8402&lng=-70.0219&radius=2000
-POST /api/locales  # Crear venue con geolocalización
-{
-  "name": "Restaurante La Casona",
-  "description": "Cocina típica puneña",
-  "address": "Jr. Lima 123, Puno",
-  "latitude": -15.8402,
-  "longitude": -70.0219,
-  "category": "restaurant"
-}
-```
-
-### Uso de Tokens (Sanctum)
+Las pruebas corren en SQLite en memoria (`phpunit.xml`). No necesitan PostGIS ni tocan ninguna base real.
 
 ```bash
-# Incluir el token en todas las requests protegidas
-GET /api/me
-Authorization: Bearer 1|abc123...
-```
-
----
-
-## Roles y Permisos (RBAC)
-
-| Role     | Permisos                                    |
-|----------|---------------------------------------------|
-| **Tourist** | Ver contenido público, crear reseñas, favoritos |
-| **Socio**   | Todo lo de Tourist + Crear/editar/borrar su propio contenido (locales, eventos, promociones) |
-| **Admin**   | Acceso total, puede editar cualquier contenido |
-
-### Autorización en Controllers
-
-Los controllers verifican automáticamente que:
-- Los socios solo pueden editar/borrar su propio contenido
-- Los admins pueden editar/borrar cualquier contenido
-
----
-
-## Geolocalización con PostGIS
-
-### Validación de Coordenadas
-
-Las coordenadas se validan para estar dentro de la región de Puno:
-- **Latitud**: entre -16.5 y -14.5
-- **Longitud**: entre -71 y -69
-
-### Búsqueda por Proximidad
-
-```bash
-# Encontrar locales a 5km de las coordenadas del centro de Puno
-GET /api/locales?lat=-15.8402&lng=-70.0219&radius=5000
-
-# La respuesta incluirá un campo "distance" en metros
-```
-
----
-
-## Filtrado de Contenido Time-Sensitive
-
-### Eventos
-
-Los eventos se filtran automáticamente usando el scope `active()`:
-- `is_active = true`
-- `end_time > now()`
-
-Los eventos expirados se mantienen en la base de datos para análisis histórico.
-
-### Promociones
-
-Las promociones se filtran con:
-- `is_active = true`
-- `end_date > now()`
-- `start_date <= now()`
-
----
-
-## Seguridad
-
-### Hashing de Contraseñas
-
-Laravel usa **bcrypt** por defecto (configurable a Argon2 en `config/hashing.php`).
-
-### Rate Limiting
-
-El login tiene rate limiting de **5 intentos por minuto por IP**.
-
-### Validación de Inputs
-
-Todos los controllers usan `Validator` para prevenir:
-- SQL Injection
-- XSS
-- Datos malformados
-
-### HTTPS/SSL
-
-**En producción**, configurar HTTPS:
-1. Obtener certificado SSL (Let's Encrypt)
-2. En `AppServiceProvider`:
-```php
-if ($this->app->environment('production')) {
-    URL::forceScheme('https');
-}
-```
-
----
-
-## Partner Dashboard
-
-Los socios pueden:
-
-1. **Crear Locales** con mapa interactivo:
-   - Arrastrar marcador en el mapa
-   - Las coordenadas se capturan automáticamente
-   - Se valida que estén en Puno
-
-2. **Gestionar Eventos y Promociones**:
-   - Crear eventos con fechas de inicio/fin
-   - Crear promociones con tipos: 2x1, porcentaje, monto fijo
-
-3. **Ver Analytics** (TODO):
-   - Vistas
-   - Reseñas
-   - Favoritos
-
----
-
-## Testing
-
-```powershell
-# Ejecutar todos los tests
+php artisan config:clear
 php artisan test
+```
 
-# Ejecutar tests específicos
-php artisan test --filter AuthenticationTest
-php artisan test --filter GeolocationTest
+El workflow `.github/workflows/ci.yml` también las corre contra PostgreSQL + PostGIS, junto con el lint y el build del frontend. Para replicarlo en local: `docker compose up -d` (PostGIS en el puerto 5433) y
+
+```bash
+DB_CONNECTION=pgsql DB_HOST=127.0.0.1 DB_PORT=5433 DB_DATABASE=nanpuno_test DB_USERNAME=nanpuno DB_PASSWORD=nanpuno php artisan test
+```
+
+Frontend:
+
+```bash
+npm --prefix frontend run lint
+npm --prefix frontend run build
 ```
 
 ---
 
-## Estado Actual y Próximos Pasos
+## Arquitectura
 
-1.  **Frontend Development (Completado)**:
-    -   ✅ Diseño Premium con Tailwind CSS v4
-    -   ✅ Páginas Blade para los 4 pilares (Candelaria, Experiencias, Eventos, Promociones)
-    -   ✅ Panel de Login/Registro mejorado
+### Backend
 
-2.  **Gestión de Contenido (En Progreso)**:
-    -   ✅ Generación automática de imágenes contextuales
-    -   ✅ Seeders actualizados para demostración
-    -   ⬜ Dashboard de socios avanzado
+| Capa | Dónde | Para qué |
+|------|-------|----------|
+| Rutas | `routes/api.php` | Públicas, de usuario, de socio (`role:socio,admin`) y de admin (`role:admin`) |
+| Validación | `app/Http/Requests` | Reglas de crear y editar cada tipo de contenido |
+| Autorización | `app/Policies` | Quién edita o borra cada registro (`OwnedContentPolicy`: dueño o admin) |
+| Lógica de dominio | `app/Services` | `BookingService` (cupos sin sobreventa, transiciones de estado) y `CandelariaLive` (desfile en vivo) |
+| Avisos | `app/Notifications` | `BookingNotification`: aviso en la app (siempre) y correo (según las preferencias del usuario) |
+| Modelos | `app/Models` + `Concerns` | `BelongsToOwner`, `HasImages`, `HasLocation`, `Reviewable` |
+| Tipos polimórficos | `app/Support/MorphTypes.php` | Alias estables (`experiencia`, `evento`…) en reseñas y favoritos |
+| Errores | `bootstrap/app.php` | Toda respuesta de error es `{ success: false, message, errors? }`, en español |
 
-3.  **Deployment (Pendiente)**:
-    -   Configurar servidor de producción
-    -   CI/CD con GitHub Actions
-    -   Backups automáticos de base de datos
+### Frontend (`frontend/src`)
+
+- `app/`: router, proveedores y layouts. `app/features.ts` registra los dominios: cada uno aporta sus rutas y su menú.
+- `features/<dominio>/`: explore (portada 3D, mapa, búsqueda), catalog, experiences, events, promotions, locales, bookings, candelaria, hosts, almanac, planner, trip, account, partner, admin, auth, notifications, info.
+- `shared/`: cliente de la API y tipos, autenticación, UI base, identidad textil (`textile/Weave.tsx`), mapa, modo sin conexión y configuración (`config/content.ts`, `config/places.ts`).
 
 ---
 
-## Soporte
+## Funciones
 
-Para dudas o problemas:
-- Revisar la documentación de Laravel: https://laravel.com/docs
-- PostGIS documentation: https://postgis.net/docs/
-- Google OAuth setup: https://developers.google.com/identity/protocols/oauth2
+### Para el viajero
+
+- **El lago es la interfaz:** la portada es el Titicaca en 3D con sus lugares (Puno, Uros, Taquile, Amantaní, Sillustani, Chucuito). Cada contenido se asigna al lugar más cercano a sus coordenadas.
+- **Reservas** con cupos por fecha, confirmación del socio y avisos en la app y por correo.
+- **Cupones:** el viajero los obtiene en cada promoción y el local los valida al cobrar.
+- **Mi cuenta:** favoritos, reservas, asistencias, cupones, reseñas, foto de perfil y preferencias (intereses, ritmo de viaje y qué correos recibir). Con esas preferencias se arma la sección "Para ti".
+- **Planificador con aclimatación** (`/planificador`): reparte las actividades según la altura (3 812 m) y el lugar de origen. El plan vive en la URL y se guarda en el dispositivo.
+- **Candelaria en vivo** (`/candelaria/en-vivo`): qué conjunto está pasando, los siguientes y su hora estimada, con aviso para las danzas marcadas.
+- **Anfitriones con voz** (`/anfitriones`): retrato, historia, idiomas y saludo grabado en su lengua.
+- **Almanaque vivo** (`/hoy`): fiestas del calendario andino, fase lunar, época del año y viento en el lago (Open-Meteo).
+- **Sin conexión:** "Guardar para el viaje" descarga cupones, reservas y el plan. Al cerrar sesión se borran del dispositivo.
+- **Cuenta:** registro con verificación de correo (no bloquea el uso), recuperación de contraseña (`/recuperar`) e inicio de sesión con Google.
+
+### Para el socio (`/dashboard`)
+
+- Publicar y editar experiencias, eventos, promociones, locales y contenido de la Candelaria, con imágenes y ubicación en el mapa.
+- Recibir reservas, confirmarlas o rechazarlas, y marcarlas como completadas desde el día de la salida.
+- **Canjear cupones** (`/dashboard/cupones`): buscar el código que muestra el viajero y marcarlo como usado.
+- Gestionar anfitriones y grabar su saludo desde el navegador.
+
+### Para el administrador (`/admin`)
+
+Usuarios y socios, danzas, galería histórica, búsqueda de recursos (Wikipedia/Commons), almanaque y control del desfile en vivo de la Candelaria.
+
+---
+
+## Roles
+
+| Rol | Puede |
+|-----|-------|
+| Viajero (`tourist`) | Ver todo lo público, reservar, obtener cupones, guardar favoritos y escribir reseñas |
+| Socio (`socio`) | Lo anterior, más gestionar su propio contenido, sus reservas, sus cupones y sus anfitriones |
+| Admin (`admin`) | Todo, incluido el contenido de cualquier socio |
+
+El registro siempre crea viajeros. Las cuentas de socio las crea un administrador.
+
+---
+
+## API (resumen)
+
+Todas las rutas van bajo `/api`. Las protegidas usan la cookie de sesión de Sanctum: primero `GET /sanctum/csrf-cookie`, luego enviar el encabezado `X-XSRF-TOKEN`.
+
+| Área | Rutas |
+|------|-------|
+| Sesión | `POST /session/login`, `POST /session/logout`, `GET /session/check`, `POST /register` |
+| Contraseña | `POST /forgot-password`, `POST /reset-password` |
+| Verificación | `GET /email/verify/{id}/{hash}` (enlace firmado), `POST /email/verification-notification` |
+| Contenido | `GET /experiencias`, `/eventos`, `/promociones`, `/locales`, `/candelaria` (con `?lat=&lng=&radius=` para buscar cerca) |
+| Perfil | `GET/PUT /profile`, `POST /profile/avatar` |
+| Reservas | `GET/POST /bookings`, `POST /bookings/{id}/cancel`, `GET /experiencias/{id}/availability` |
+| Cupones | `GET/POST /user-coupons`; socio: `GET /partner/coupons`, `GET /partner/coupons/lookup?code=`, `POST /partner/coupons/redeem` |
+| Avisos | `GET /notifications`, `POST /notifications/{id}/read`, `POST /notifications/read-all` |
+| Socio | `GET /my/{tipo}`, `GET/PUT /partner/bookings`, `POST /uploads`, `/anfitriones` |
+
+---
+
+## Producción
+
+1. `npm --prefix frontend run build` genera `frontend/dist/`. Publícalo en un hosting estático y haz que todas las rutas sirvan `index.html`.
+2. Si el frontend y la API están en dominios distintos: `VITE_API_URL` al compilar, `FRONTEND_URL` y `SANCTUM_STATEFUL_DOMAINS` con el dominio del frontend, y `SESSION_DOMAIN=.tu-dominio.com`.
+3. Configura SMTP, las credenciales de Google y el cron de `schedule:run`.
+4. Por rendimiento, si la base está lejos del servidor, usa `SESSION_DRIVER`/`CACHE_STORE` en `redis` o `file`: con `database`, cada petición suma varias consultas extra.
 
 ---
 
 ## Licencia
 
-MIT License
+MIT
