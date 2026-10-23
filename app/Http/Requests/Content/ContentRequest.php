@@ -79,6 +79,34 @@ abstract class ContentRequest extends FormRequest
         ];
     }
 
+    /** Dirección por partes; con ellas se arman formatted_address y short_address (HasLocation) */
+    protected function addressRules(): array
+    {
+        return [
+            'street' => 'nullable|string|max:255',
+            'street_number' => 'nullable|string|max:20',
+            'district' => 'nullable|string|max:100',
+            'city' => 'sometimes|string|max:100',
+            'region' => 'sometimes|string|max:100',
+            'country' => 'sometimes|string|max:100',
+            'postal_code' => 'nullable|string|max:20',
+            'address_notes' => 'nullable|string|max:500',
+        ];
+    }
+
+    /**
+     * Ciudad, región y país tienen valor por defecto (Puno, Puno, Perú) y no admiten vacío:
+     * si llegan vacíos se ignoran y queda el valor que ya tenían.
+     */
+    protected function prepareForValidation(): void
+    {
+        $blank = array_filter(['city', 'region', 'country'], fn ($field) => $this->exists($field) && blank($this->input($field)));
+
+        if ($blank) {
+            $this->replace($this->except($blank));
+        }
+    }
+
     public function hasCoordinates(): bool
     {
         return $this->filled('latitude') && $this->filled('longitude');

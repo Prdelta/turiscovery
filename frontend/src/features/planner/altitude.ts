@@ -7,8 +7,6 @@ import type { Evento, Experiencia } from '@/shared/api/types'
   Son pautas generales de viaje, no indicaciones médicas.
 */
 
-export const PUNO_ALTITUDE = 3812
-
 export type Origin = 'costa' | 'altura'
 export type DayLevel = 'descanso' | 'suave' | 'libre'
 type Difficulty = Experiencia['difficulty']

@@ -135,7 +135,7 @@ export function DetailShell({
   showMap?: boolean
 }) {
   const title = titleOf(item as never)
-  const withCoords = item as { latitude?: number | null; longitude?: number | null; formatted_address?: string | null; address?: string | null }
+  const withCoords = item as { latitude?: number | null; longitude?: number | null; formatted_address?: string | null; address?: string | null; address_notes?: string | null }
   const coords = withCoords.latitude && withCoords.longitude ? { latitude: withCoords.latitude, longitude: withCoords.longitude } : null
   const place = placeFor(withCoords.latitude, withCoords.longitude)
   const rating = (item as { average_rating?: number }).average_rating
@@ -167,6 +167,7 @@ export function DetailShell({
             <section aria-labelledby="ubicacion" className="mt-12">
               <h2 id="ubicacion" className="t-h2 mb-2">Dónde</h2>
               {(withCoords.formatted_address || withCoords.address) && <p className="mb-4 text-ink-soft">{withCoords.formatted_address || withCoords.address}</p>}
+              {withCoords.address_notes && <p className="mb-4 -mt-2 whitespace-pre-line text-ink-soft">Cómo llegar: {withCoords.address_notes}</p>}
               <div className="card overflow-hidden">
                 <Suspense fallback={<div className="skeleton h-80" />}>
                   <MapView points={[{ id: item.id, lat: coords.latitude, lng: coords.longitude, title }]} height={300} />

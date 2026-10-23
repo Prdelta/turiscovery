@@ -22,6 +22,7 @@ class LocaleRequest extends ContentRequest
             'website' => 'nullable|url|max:255',
             ...$this->commonRules(),
             ...$this->locationRules(required: true, bounds: self::PUNO_BOUNDS),
+            ...$this->addressRules(),
             'address' => $this->required().'|string|max:500',
         ];
     }

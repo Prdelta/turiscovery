@@ -61,11 +61,6 @@ class Promocion extends Model
             ->where('start_date', '<=', now());
     }
 
-    public function scopeExpired($query)
-    {
-        return $query->where('end_date', '<', now());
-    }
-
     public function scopeUpcoming($query)
     {
         return $query->where('start_date', '>', now())

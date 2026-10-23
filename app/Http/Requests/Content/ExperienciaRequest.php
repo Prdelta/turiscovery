@@ -31,6 +31,7 @@ class ExperienciaRequest extends ContentRequest
             'tags.*' => 'string|max:40',
             ...$this->commonRules(),
             ...$this->locationRules(),
+            ...$this->addressRules(),
         ];
     }
 }

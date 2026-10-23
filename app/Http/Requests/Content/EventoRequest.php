@@ -22,6 +22,7 @@ class EventoRequest extends ContentRequest
             'category' => $this->required().'|in:concert,festival,nightlife,cultural,sports,exhibition,other',
             ...$this->commonRules(),
             ...$this->locationRules(),
+            ...$this->addressRules(),
         ];
     }
 }

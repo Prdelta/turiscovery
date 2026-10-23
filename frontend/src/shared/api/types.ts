@@ -55,6 +55,14 @@ interface BaseContent {
 
 interface WithAddress {
   address?: string | null
+  street?: string | null
+  street_number?: string | null
+  district?: string | null
+  city?: string | null
+  region?: string | null
+  country?: string | null
+  postal_code?: string | null
+  address_notes?: string | null
   formatted_address?: string | null
   short_address?: string | null
   latitude?: number | null
@@ -68,8 +76,6 @@ export interface Locale extends BaseContent, WithAddress {
   phone?: string | null
   email?: string | null
   website?: string | null
-  district?: string | null
-  city?: string | null
 }
 
 export interface Experiencia extends BaseContent, WithAddress {

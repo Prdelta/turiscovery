@@ -25,11 +25,6 @@ class CandelariaPerformance extends Model
         'finished_at' => 'datetime',
     ];
 
-    public function programItem(): BelongsTo
-    {
-        return $this->belongsTo(CandelariaProgramItem::class, 'program_item_id');
-    }
-
     public function danza(): BelongsTo
     {
         return $this->belongsTo(CandelariaDanza::class, 'candelaria_danza_id');

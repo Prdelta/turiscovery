@@ -25,6 +25,16 @@ export interface FormConfig {
   titleField: 'title' | 'name'
 }
 
+/** Dirección por partes (opcional): el sitio la muestra armada, por ejemplo "Jr. Lima N° 345, Centro, Puno, Perú" */
+const ADDRESS_FIELDS: FieldDef[] = [
+  { name: 'street', label: 'Calle o avenida', kind: 'text', hint: 'Ejemplo: Jr. Lima' },
+  { name: 'street_number', label: 'Número', kind: 'text' },
+  { name: 'district', label: 'Distrito o barrio', kind: 'text' },
+  { name: 'city', label: 'Ciudad', kind: 'text', hint: 'Vacío = Puno.' },
+  { name: 'postal_code', label: 'Código postal', kind: 'text' },
+  { name: 'address_notes', label: 'Referencias para llegar', kind: 'textarea', wide: true, hint: 'Ejemplo: portón azul, a media cuadra de la Plaza de Armas.' },
+]
+
 export const FORM_CONFIG: Record<ContentType, FormConfig> = {
   locales: {
     titleField: 'name',
@@ -37,6 +47,7 @@ export const FORM_CONFIG: Record<ContentType, FormConfig> = {
       { name: 'email', label: 'Correo de contacto', kind: 'email' },
       { name: 'website', label: 'Sitio web', kind: 'url', hint: 'Incluye https://' },
       { name: 'address', label: 'Dirección', kind: 'text', required: true, wide: true, hint: 'Calle, número y referencia. Ejemplo: Jr. Lima 345, a media cuadra de la Plaza de Armas.' },
+      ...ADDRESS_FIELDS,
       { name: 'description', label: 'Descripción', kind: 'textarea', required: true, wide: true },
     ],
   },
@@ -58,6 +69,7 @@ export const FORM_CONFIG: Record<ContentType, FormConfig> = {
       { name: 'effort_note', label: 'Esfuerzo', kind: 'text', hint: 'Ejemplo: 540 escalones desde el muelle' },
       { name: 'tags', label: 'Etiquetas', kind: 'tags', hint: 'Separadas por comas. Ejemplo: lago, familia, cultura' },
       { name: 'address', label: 'Punto de encuentro', kind: 'text', wide: true },
+      ...ADDRESS_FIELDS,
       { name: 'description', label: 'Descripción', kind: 'textarea', required: true, wide: true },
       { name: 'content', label: 'Itinerario y detalles', kind: 'textarea', wide: true, hint: 'Qué incluye, horarios, qué llevar.' },
     ],
@@ -74,6 +86,7 @@ export const FORM_CONFIG: Record<ContentType, FormConfig> = {
       { name: 'end_time', label: 'Fin', kind: 'datetime', required: true },
       { name: 'ticket_price', label: 'Precio de entrada (S/)', kind: 'number', min: 0, step: '0.01', hint: 'Vacío o 0 = entrada libre.' },
       { name: 'address', label: 'Lugar', kind: 'text', wide: true },
+      ...ADDRESS_FIELDS,
       { name: 'description', label: 'Descripción', kind: 'textarea', required: true, wide: true },
       { name: 'content', label: 'Programa', kind: 'textarea', wide: true },
     ],

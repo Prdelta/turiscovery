@@ -36,29 +36,6 @@ class UserCoupon extends Model
         return $this->belongsTo(Promocion::class);
     }
 
-    public function scopeAvailable($query)
-    {
-        return $query->where('status', 'available')
-            ->where(function ($q) {
-                $q->whereNull('expires_at')
-                    ->orWhere('expires_at', '>', now());
-            });
-    }
-
-    public function scopeUsed($query)
-    {
-        return $query->where('status', 'used');
-    }
-
-    public function scopeExpired($query)
-    {
-        return $query->where('status', 'expired')
-            ->orWhere(function ($q) {
-                $q->where('status', 'available')
-                    ->where('expires_at', '<', now());
-            });
-    }
-
     public function markAsUsed()
     {
         $this->update([

@@ -108,16 +108,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(UserCoupon::class);
     }
 
-    public function isTourist(): bool
-    {
-        return $this->role === 'tourist';
-    }
-
-    public function isSocio(): bool
-    {
-        return $this->role === 'socio';
-    }
-
     public function isAdmin(): bool
     {
         return $this->role === 'admin';

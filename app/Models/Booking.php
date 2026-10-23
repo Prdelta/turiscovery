@@ -47,14 +47,6 @@ class Booking extends Model
     }
 
     /**
-     * Scope para obtener solo reservas pendientes
-     */
-    public function scopePending($query)
-    {
-        return $query->where('status', 'pending');
-    }
-
-    /**
      * Scope para obtener solo reservas confirmadas
      */
     public function scopeConfirmed($query)

@@ -253,3 +253,47 @@ test('la cercanía en experiencias mantiene los datos del anfitrión', function 
 
     expect($first)->toHaveKey('anfitrion')->and($first['title'])->toBe('Kayak en el lago');
 });
+
+/* ---------- Dirección detallada ---------- */
+
+test('el socio guarda la dirección detallada y el sitio la muestra armada', function (string $type) {
+    $socio = contenidoUser();
+    Sanctum::actingAs($socio);
+    $address = [
+        'street' => 'Jr. Lima',
+        'street_number' => '345',
+        'district' => 'Centro',
+        'city' => 'Puno',
+        'postal_code' => '21001',
+        'address_notes' => 'A media cuadra de la Plaza de Armas',
+    ];
+
+    $id = $this->postJson("/api/{$type}", [...contenidoPayload($type, $socio), ...$address])
+        ->assertCreated()
+        ->assertJsonPath('data.street', 'Jr. Lima')
+        ->json('data.id');
+
+    $this->getJson("/api/{$type}/{$id}")
+        ->assertOk()
+        ->assertJsonPath('data.address_notes', 'A media cuadra de la Plaza de Armas')
+        ->assertJsonPath('data.formatted_address', 'Jr. Lima N° 345, Centro, Puno, Perú')
+        ->assertJsonPath('data.short_address', 'Jr. Lima N° 345, Centro');
+})->with(['locales', 'eventos', 'experiencias']);
+
+test('dejar la ciudad vacía al editar conserva la que tenía', function () {
+    $socio = contenidoUser();
+    Sanctum::actingAs($socio);
+    $id = $this->postJson('/api/locales', [...contenidoPayload('locales', $socio), 'city' => 'Juliaca'])->assertCreated()->json('data.id');
+
+    $this->putJson("/api/locales/{$id}", ['city' => null, 'district' => null, 'region' => ''])->assertOk();
+
+    expect(Locale::find($id))->city->toBe('Juliaca')->region->toBe('Puno')->district->toBeNull();
+});
+
+test('la dirección detallada respeta los largos máximos', function () {
+    Sanctum::actingAs(contenidoUser());
+
+    $this->postJson('/api/locales', [...contenidoPayload('locales', contenidoUser()), 'street_number' => str_repeat('9', 30)])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['street_number']);
+});

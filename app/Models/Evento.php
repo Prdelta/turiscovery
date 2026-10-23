@@ -65,11 +65,6 @@ class Evento extends Model
             ->where('end_time', '>', now());
     }
 
-    public function scopeExpired($query)
-    {
-        return $query->where('end_time', '<', now());
-    }
-
     public function scopeUpcoming($query)
     {
         return $query->where('start_time', '>', now())

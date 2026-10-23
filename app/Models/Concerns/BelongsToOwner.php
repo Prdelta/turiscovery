@@ -21,9 +21,4 @@ trait BelongsToOwner
     {
         return $user->isAdmin() ? $query : $query->where($this->getTable().'.user_id', $user->id);
     }
-
-    public function isOwnedBy(?User $user): bool
-    {
-        return $user !== null && (int) $this->user_id === (int) $user->id;
-    }
 }
